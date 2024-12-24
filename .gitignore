@@ -1,0 +1,22 @@
+# Ignore build artifacts
+/build/
+*.o
+*.out
+*.exe
+*.dll
+*.so
+*.a
+*.lib
+*.obj
+
+# Ignore CMake files
+/CMakeCache.txt
+/CMakeFiles/
+/cmake_install.cmake
+/Makefile
+
+# Ignore Python virtual environments
+/py/venv/
+/py/__pycache__/
+/py/*.pyc
+/py/.pytest_cache/

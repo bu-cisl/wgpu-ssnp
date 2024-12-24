@@ -4,12 +4,10 @@ import math
 import torch
 from torch import Tensor
 
-
 def scatter_factor(n: Tensor, res_z: float = 0.1, dz: float = 1, n0: float = 1.0) -> Tensor:
 	return (2*torch.pi*res_z / n0)**2 * dz * n * (2*n0 + n)
 
 def diffract(uf: Tensor, ub: Tensor, res: tuple[float] = (0.1, 0.1, 0.1), dz: float = 1) -> tuple[Tensor]:
-
 	assert uf.shape == ub.shape, 'uf and ub must have the same shape'
 
 	cgamma = c_gamma(res, uf.shape, device=uf.device)
@@ -45,7 +43,6 @@ def binary_pupil(shape: tuple[int], na: float, res: tuple[float] = (0.1, 0.1, 0.
 	return mask
 
 def tilt(shape: tuple[int], angles: Tensor, NA: float= 0.65, res: tuple[float] = (0.1, 0.1, 0.1), trunc: bool = True, device: str = 'cpu') -> Tensor:
-
 	c_ba = NA*torch.stack(
 		(
 			torch.sin(angles),
@@ -77,7 +74,6 @@ def tilt(shape: tuple[int], angles: Tensor, NA: float= 0.65, res: tuple[float] =
 	return out
 
 def merge_prop(uf: Tensor, ub: Tensor, res: tuple[float] = (0.1, 0.1, 0.1)) -> Tensor:
-
 	assert uf.device == ub.device, 'uf and ub must be on the same device'
 	
 	kz = c_gamma(res, uf.shape, device=uf.device) * (2 * torch.pi * res[2])
@@ -87,7 +83,6 @@ def merge_prop(uf: Tensor, ub: Tensor, res: tuple[float] = (0.1, 0.1, 0.1)) -> T
 	return uf_new, ub_new
 
 def split_prop(uf: Tensor, ub: Tensor, res: tuple[float] = (0.1, 0.1, 0.1)) -> Tensor:
-
 	assert uf.device == ub.device, 'uf and ub must be on the same device'
 
 	kz = c_gamma(res, uf.shape, device=uf.device) * (2 * torch.pi * res[2])
@@ -98,7 +93,6 @@ def split_prop(uf: Tensor, ub: Tensor, res: tuple[float] = (0.1, 0.1, 0.1)) -> T
 	return uf_new, ub_new
 
 class SNNPBeam:
-
 	def __init__(
 			self,
 			res: tuple[float] = (0.1, 0.1, 0.1),
