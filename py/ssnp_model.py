@@ -1,6 +1,5 @@
 # """Simple SSNP forward model."""
 import math
-
 import torch
 from torch import Tensor
 
@@ -33,9 +32,15 @@ def c_gamma(res: tuple[float], shape: tuple[int], device: str = 'cpu') -> Tensor
 	def _near_0(size):
 		return torch.fmod(torch.arange(size, device=device) / size + 0.5, 1) - 0.5
 
-	eps = 1E-8
+	eps = torch.tensor(1E-8, device=device)
+	# eps = 1E-8
 	c_beta, c_alpha = [_near_0(size).to(torch.complex64) / resolution for size, resolution in zip(shape, res[-2:])]
-	return torch.sqrt(1 - (torch.square(c_alpha) + torch.square(c_beta[:, None])), min=eps).unsqueeze(0)
+	# Compute the real magnitudes for the maximum and square operations
+	alpha_square = torch.abs(c_alpha) ** 2
+	beta_square = torch.abs(c_beta) ** 2
+	# Ensure no negative values are passed to sqrt by using maximum with eps tensor
+	return torch.sqrt(torch.maximum(1 - (alpha_square + beta_square[:, None]), eps)).unsqueeze(0)
+	# return torch.sqrt(1 - (torch.square(c_alpha) + torch.square(c_beta[:, None])), min=eps).unsqueeze(0)
 
 def binary_pupil(shape: tuple[int], na: float, res: tuple[float] = (0.1, 0.1, 0.1), device: str = 'cpu') -> Tensor:
 	cgamma = c_gamma(res, shape, device=device)
