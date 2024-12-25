@@ -10,21 +10,28 @@ def diffract(uf: Tensor, ub: Tensor, res: tuple[float] = (0.1, 0.1, 0.1), dz: fl
 	assert uf.shape == ub.shape, 'uf and ub must have the same shape'
 
 	cgamma = c_gamma(res, uf.shape, device=uf.device)
+	print(f"cgamma dtype: {cgamma.dtype}, shape: {cgamma.shape}")
 	kz = 2 * torch.pi * res[2] * cgamma
+	print(f"kz dtype: {kz.dtype}, shape: {kz.shape}")
 	eva = torch.exp(torch.clamp((cgamma - 0.2) * 5, max=0))
+	print(f"eva dtype: {eva.dtype}, shape: {eva.shape}")
 
 	p_mat = torch.stack([torch.cos(kz * dz), torch.sin(kz * dz) / kz,
 			-torch.sin(kz * dz) * kz, torch.cos(kz * dz)])
+	print(f"p_mat dtype: {p_mat.dtype}, shape: {p_mat.shape}")
 	
 	p_mat *= eva
+	print(f"p_mat after scaling dtype: {p_mat.dtype}, shape: {p_mat.shape}")
 
 	uf_new1 = p_mat[0] * uf
 	uf_new2 = p_mat[1] * ub
 	uf_new = uf_new1 + uf_new2
+	print(f"uf_new dtype: {uf_new.dtype}, shape: {uf_new.shape}")
 
 	ub_new1 = p_mat[2] * uf
 	ub_new2 = p_mat[3] * ub
 	ub_new = ub_new1 + ub_new2
+	print(f"ub_new dtype: {ub_new.dtype}, shape: {ub_new.shape}")
 
 	return uf_new, ub_new
 

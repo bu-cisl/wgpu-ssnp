@@ -21,7 +21,7 @@ int main() {
     auto gamma_result = c_gamma(res, shape);
 
     std::cout << "C++ c_gamma Results: \n";
-    for (const auto& batch : gamma_result) {  // Iterate over the batch dimension (size 1)
+    for (const auto& batch : gamma_result) {
         size_t size_alpha = shape[0];
         size_t size_beta = shape[1];
 
@@ -31,8 +31,42 @@ int main() {
                 const auto& elem = batch[i * size_beta + j];  // Flattened access
                 std::cout << "(" << elem.real() << "," << elem.imag() << ") ";
             }
-            std::cout << "\n";  // Newline after each row
+            std::cout << "\n";
         }
-        std::cout << "\n";  // Extra newline for batch separation
+        std::cout << "\n";
     }
+
+    // test diffract
+    std::vector<std::complex<double>> uf = {
+        {1.0, 0.0}, {2.0, 0.0}, {3.0, 0.0},
+        {4.0, 0.0}, {5.0, 0.0}, {6.0, 0.0},
+        {7.0, 0.0}, {8.0, 0.0}, {9.0, 0.0}
+    };
+
+    std::vector<std::complex<double>> ub = {
+        {9.0, 0.0}, {8.0, 0.0}, {7.0, 0.0},
+        {6.0, 0.0}, {5.0, 0.0}, {4.0, 0.0},
+        {3.0, 0.0}, {2.0, 0.0}, {1.0, 0.0}
+    };
+
+    std::vector<std::vector<std::complex<double>>> uf_batch = {uf};
+    std::vector<std::vector<std::complex<double>>> ub_batch = {ub};
+
+    auto [uf_new, ub_new] = diffract(uf_batch, ub_batch, res, dz);
+
+    // Print uf_new
+    std::cout << "C++ diffract result (uf_new):\n";
+    for (size_t i = 0; i < uf_new[0].size(); ++i) {
+        std::cout << "(" << uf_new[0][i].real() << "," << uf_new[0][i].imag() << ") ";
+        if ((i + 1) % 3 == 0) std::cout << "\n";
+    }
+
+    // Print ub_new
+    std::cout << "C++ diffract result (ub_new):\n";
+    for (size_t i = 0; i < ub_new[0].size(); ++i) {
+        std::cout << "(" << ub_new[0][i].real() << "," << ub_new[0][i].imag() << ") ";
+        if ((i + 1) % 3 == 0) std::cout << "\n";
+    }
+
+    return 0;
 }
