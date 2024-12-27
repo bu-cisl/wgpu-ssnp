@@ -49,7 +49,8 @@ std::vector<std::vector<std::complex<float>>> c_gamma(const std::vector<float>& 
     return {result};
 }
 
-std::pair<std::vector<std::vector<std::complex<double>>>, std::vector<std::vector<std::complex<double>>>>
+std::pair<std::vector<std::vector<std::vector<std::complex<double>>>>, 
+          std::vector<std::vector<std::vector<std::complex<double>>>>>
 diffract(const std::vector<std::vector<std::complex<double>>>& uf,
          const std::vector<std::vector<std::complex<double>>>& ub,
          const std::vector<float>& res, 
@@ -59,7 +60,7 @@ diffract(const std::vector<std::vector<std::complex<double>>>& uf,
     int batch_size = uf.size();
     int size = uf[0].size();  // Flattened total size
 
-    // Calculate cgamma
+    // Calculate shape dimensions (height x width)
     auto shape = std::vector<int>{static_cast<int>(std::sqrt(size)), static_cast<int>(std::sqrt(size))};
     while (shape[0] * shape[1] != size) {
         shape[1] += 1;
@@ -68,7 +69,10 @@ diffract(const std::vector<std::vector<std::complex<double>>>& uf,
             shape[1] = size / shape[0];
         }
     }
+    int height = shape[0];
+    int width = shape[1];
 
+    // Compute cgamma and kz
     auto cgamma = c_gamma(res, shape);
     std::vector<std::vector<std::complex<double>>> kz(batch_size, std::vector<std::complex<double>>(size));
     std::vector<std::vector<std::complex<double>>> eva(batch_size, std::vector<std::complex<double>>(size));
@@ -93,22 +97,28 @@ diffract(const std::vector<std::vector<std::complex<double>>>& uf,
             p_mat[1][b][i] = std::sin(kz_val * std::complex<double>(dz)) / (kz_val + 1e-8);
             p_mat[2][b][i] = -std::sin(kz_val * std::complex<double>(dz)) * (kz_val);
             p_mat[3][b][i] = std::cos(kz_val * std::complex<double>(dz));
-            
-            // Apply eva scaling
+
             for (int j = 0; j < 4; ++j) {
                 p_mat[j][b][i] *= eva[b][i];
             }
         }
     }
 
-    // Calculate uf_new and ub_new
-    std::vector<std::vector<std::complex<double>>> uf_new(batch_size, std::vector<std::complex<double>>(size));
-    std::vector<std::vector<std::complex<double>>> ub_new(batch_size, std::vector<std::complex<double>>(size));
+    // Initialize reshaped uf_new and ub_new
+    std::vector<std::vector<std::vector<std::complex<double>>>> uf_new(batch_size,
+        std::vector<std::vector<std::complex<double>>>(height, std::vector<std::complex<double>>(width)));
 
+    std::vector<std::vector<std::vector<std::complex<double>>>> ub_new(batch_size,
+        std::vector<std::vector<std::complex<double>>>(height, std::vector<std::complex<double>>(width)));
+
+    // Compute uf_new and ub_new and reshape
     for (int b = 0; b < batch_size; ++b) {
         for (size_t i = 0; i < size; ++i) {
-            uf_new[b][i] = p_mat[0][b][i] * uf[b][i] + p_mat[1][b][i] * ub[b][i];
-            ub_new[b][i] = p_mat[2][b][i] * uf[b][i] + p_mat[3][b][i] * ub[b][i];
+            int row = i / width;
+            int col = i % width;
+
+            uf_new[b][row][col] = p_mat[0][b][i] * uf[b][i] + p_mat[1][b][i] * ub[b][i];
+            ub_new[b][row][col] = p_mat[2][b][i] * uf[b][i] + p_mat[3][b][i] * ub[b][i];
         }
     }
 
