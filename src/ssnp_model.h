@@ -12,5 +12,7 @@ diffract(const std::vector<std::vector<std::complex<double>>>& uf,
          const std::vector<std::vector<std::complex<double>>>& ub,
          const std::vector<float>& res = {0.1f, 0.1f, 0.1f},
          float dz = 1);
+std::vector<std::vector<bool>> binary_pupil(
+    const std::vector<int>& shape, float na, const std::vector<float>& res = {0.1f, 0.1f, 0.1f});
 
 #endif

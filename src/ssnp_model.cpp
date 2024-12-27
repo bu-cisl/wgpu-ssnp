@@ -124,3 +124,23 @@ diffract(const std::vector<std::vector<std::complex<double>>>& uf,
 
     return {uf_new, ub_new};
 }
+
+std::vector<std::vector<bool>> binary_pupil(const std::vector<int>& shape, float na, const std::vector<float>& res) {
+    auto cgamma = c_gamma(res, shape);
+    size_t height = shape[0];
+    size_t width = shape[1];
+
+    std::vector<std::vector<bool>> mask(height, std::vector<bool>(width));
+    double threshold = std::sqrt(1 - na * na);
+    const auto& cgamma_batch = cgamma[0];
+
+    // Compare each value of cgamma with the threshold and assign to mask
+    for (size_t i = 0; i < height; ++i) {
+        for (size_t j = 0; j < width; ++j) {
+            // Use std::abs to compute the magnitude of the complex number
+            mask[i][j] = std::abs(cgamma_batch[i * width + j]) > threshold;
+        }
+    }
+
+    return mask;
+}

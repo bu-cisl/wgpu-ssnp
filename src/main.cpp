@@ -13,7 +13,7 @@ int main() {
     for (auto& val : result) {
         std::cout << val << " ";
     }
-    std::cout << std::endl;
+    std::cout << "\nOutput shape: (" << result.size() << ")\n";
 
     // Test c_gamma
     std::vector<float> res = {1.0f, 1.0f, 1.0f};
@@ -21,18 +21,18 @@ int main() {
     auto gamma_result = c_gamma(res, shape);
 
     std::cout << "C++ c_gamma Results: \n";
-    for (const auto& batch : gamma_result) {
-        size_t size_alpha = shape[0];
-        size_t size_beta = shape[1];
-        // Print in grid format
-        for (size_t i = 0; i < size_alpha; ++i) {
-            for (size_t j = 0; j < size_beta; ++j) {
-                const auto& elem = batch[i * size_beta + j];  // Flattened access
+    size_t batch_size = gamma_result.size();
+    size_t size_per_batch = shape[0] * shape[1];
+    for (size_t b = 0; b < batch_size; ++b) {
+        for (size_t i = 0; i < shape[0]; ++i) {
+            for (size_t j = 0; j < shape[1]; ++j) {
+                const auto& elem = gamma_result[b][i * shape[1] + j];
                 std::cout << "(" << elem.real() << "," << elem.imag() << ") ";
             }
             std::cout << "\n";
         }
     }
+    std::cout << "Output shape: (" << batch_size << ", " << shape[0] << ", " << shape[1] << ")\n";
 
     // Test diffract
     std::vector<std::complex<double>> uf = {
@@ -59,6 +59,7 @@ int main() {
             std::cout << "\n";
         }
     }
+    std::cout << "Output shape (uf_new): (" << uf_new.size() << ", " << shape[0] << ", " << shape[1] << ")\n";
     std::cout << "C++ diffract Result (ub_new):\n";
     for (const auto& batch : ub_new) {
         for (const auto& row : batch) {
@@ -68,4 +69,22 @@ int main() {
             std::cout << "\n";
         }
     }
+    std::cout << "Output shape (ub_new): (" << ub_new.size() << ", " << shape[0] << ", " << shape[1] << ")\n";
+
+    // Test binary_pupil
+    std::vector<int> shape2 = {5, 4};
+    float na = 0.7f;
+    std::vector<float> res2 = {0.1f, 0.1f, 0.1f};
+    auto mask = binary_pupil(shape2, na, res2);
+
+    std::cout << "C++ binary_pupil result:\n";
+    for (const auto& row : mask) {
+        for (const auto& val : row) {
+            std::cout << (val ? 1 : 0) << " ";
+        }
+        std::cout << "\n";
+    }
+    std::cout << "Output shape: (" << mask.size() << ", " << mask[0].size() << ")\n";
+    
+    return 0;
 }
