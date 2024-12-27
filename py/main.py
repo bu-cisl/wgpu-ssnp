@@ -34,6 +34,6 @@ def test_diffract():
     print(ub_new)
 
 if __name__ == "__main__":
-    # test_scatter_factor()
-    # test_c_gamma()
+    test_scatter_factor()
+    test_c_gamma()
     test_diffract()

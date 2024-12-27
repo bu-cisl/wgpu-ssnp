@@ -33,10 +33,9 @@ int main() {
             }
             std::cout << "\n";
         }
-        std::cout << "\n";
     }
 
-    // test diffract
+    // Test diffract
     std::vector<std::complex<double>> uf = {
         {1.0, 0.0}, {2.0, 0.0}, {3.0, 0.0},
         {4.0, 0.0}, {5.0, 0.0}, {6.0, 0.0},
@@ -52,21 +51,17 @@ int main() {
     std::vector<std::vector<std::complex<double>>> uf_batch = {uf};
     std::vector<std::vector<std::complex<double>>> ub_batch = {ub};
 
-    auto [uf_new, ub_new] = diffract(uf_batch, ub_batch, res, dz);
+    auto [uf_new, ub_new] = diffract(uf_batch, ub_batch, {1.0, 1.0, 1.0}, 1.0);
 
-    // Print uf_new
-    std::cout << "C++ diffract result (uf_new):\n";
+    std::cout << "C++ diffract Result (uf_new):\n";
     for (size_t i = 0; i < uf_new[0].size(); ++i) {
         std::cout << "(" << uf_new[0][i].real() << "," << uf_new[0][i].imag() << ") ";
         if ((i + 1) % 3 == 0) std::cout << "\n";
     }
 
-    // Print ub_new
-    std::cout << "C++ diffract result (ub_new):\n";
+    std::cout << "C++ diffract Result (ub_new):\n";
     for (size_t i = 0; i < ub_new[0].size(); ++i) {
         std::cout << "(" << ub_new[0][i].real() << "," << ub_new[0][i].imag() << ") ";
         if ((i + 1) % 3 == 0) std::cout << "\n";
     }
-
-    return 0;
 }
