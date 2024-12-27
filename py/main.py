@@ -33,7 +33,17 @@ def test_diffract():
     print("Python diffract result (ub_new):")
     print(ub_new)
 
+def test_binary_pupil():
+    shape = (5, 4)
+    na = 0.7
+    res = (0.1, 0.1, 0.1)
+
+    mask = ssnp_model.binary_pupil(shape, na, res)
+    print("Python binary_pupil result:")
+    print(mask)
+
 if __name__ == "__main__":
     test_scatter_factor()
     test_c_gamma()
     test_diffract()
+    test_binary_pupil()
