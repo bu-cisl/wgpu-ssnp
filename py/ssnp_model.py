@@ -62,27 +62,34 @@ def tilt(shape: tuple[int], angles: Tensor, NA: float= 0.65, res: tuple[float] =
 		),
 		dim=1
 	)
+	print(f"c_ba (sine and cosine components): \n{c_ba}")
 
 	norm = torch.tensor(shape) * torch.tensor(res[1:])
 	norm = norm.view(1, 2)
+	print(f"norm (shape * resolution): \n{norm}")
 
 	if trunc:
 		factor = torch.trunc(c_ba * norm).T
 	else:
 		factor = (c_ba * norm).T
+	print(f"factor (after truncation check): \n{factor}")
 
 	xr = torch.arange(shape[1], device=device).view(1,1,-1).to(dtype=torch.complex128)
 	xr = (2j * torch.pi / shape[1]) * factor[1].reshape(-1,1,1) * xr
 	xr.exp_()
+	print(f"xr (exponential in x direction): \n{xr}")
 
 	yr = torch.arange(shape[0], device=device).view(1,-1,1).to(dtype=torch.complex128)
 	yr = (2j * torch.pi / shape[0]) * factor[0].reshape(-1,1,1) * yr
 	yr.exp_()
+	print(f"yr (exponential in y direction): \n{yr}")
 
 	out = xr * yr
+	print(f"out (result of multiplication of xr and yr): \n{out}")
 
 	# normalize by center point value
 	out /= out[:, *(i // 2 for i in shape)].clone()
+	print(f"out (after normalization by center value): \n{out}")
 	return out
 
 def merge_prop(uf: Tensor, ub: Tensor, res: tuple[float] = (0.1, 0.1, 0.1)) -> Tensor:

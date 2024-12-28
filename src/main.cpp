@@ -86,5 +86,12 @@ int main() {
     }
     std::cout << "Output shape: (" << mask.size() << ", " << mask[0].size() << ")\n";
     
-    return 0;
+
+    // Test tilt
+    std::vector<int> shape3 = {2, 2};
+    std::vector<double> angles = {50.0, 100.0};
+    double NA = 0.65;
+    std::vector<double> res3 = {0.1f, 0.1f, 0.1f};
+    bool trunc = false;
+    auto tilt_result = tilt(shape3, angles, NA, res3, trunc);
 }

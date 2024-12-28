@@ -3,6 +3,7 @@
 #include <vector>
 #include <complex>
 #include <cassert>
+#include <iostream>
 
 std::vector<float> scatter_factor(const std::vector<float>& n, float res_z, float dz, float n0) {
     float factor = std::pow(2 * M_PI * res_z / n0, 2) * dz;
@@ -49,12 +50,12 @@ std::vector<std::vector<std::complex<float>>> c_gamma(const std::vector<float>& 
     return {result};
 }
 
-std::pair<std::vector<std::vector<std::vector<std::complex<double>>>>, 
-          std::vector<std::vector<std::vector<std::complex<double>>>>>
-diffract(const std::vector<std::vector<std::complex<double>>>& uf,
-         const std::vector<std::vector<std::complex<double>>>& ub,
-         const std::vector<float>& res, 
-         float dz) {
+std::pair<std::vector<std::vector<std::vector<std::complex<double>>>>, std::vector<std::vector<std::vector<std::complex<double>>>>>
+diffract(
+    const std::vector<std::vector<std::complex<double>>>& uf,
+    const std::vector<std::vector<std::complex<double>>>& ub,
+    const std::vector<float>& res, 
+    float dz) {
     assert(uf.size() == ub.size() && uf[0].size() == ub[0].size());
 
     int batch_size = uf.size();
@@ -125,7 +126,10 @@ diffract(const std::vector<std::vector<std::complex<double>>>& uf,
     return {uf_new, ub_new};
 }
 
-std::vector<std::vector<bool>> binary_pupil(const std::vector<int>& shape, float na, const std::vector<float>& res) {
+std::vector<std::vector<bool>> binary_pupil(
+    const std::vector<int>& shape, 
+    float na, 
+    const std::vector<float>& res) {
     auto cgamma = c_gamma(res, shape);
     size_t height = shape[0];
     size_t width = shape[1];
@@ -143,4 +147,49 @@ std::vector<std::vector<bool>> binary_pupil(const std::vector<int>& shape, float
     }
 
     return mask;
+}
+
+std::vector<std::vector<std::vector<std::complex<double>>>> tilt(
+    const std::vector<int>& shape,
+    const std::vector<double>& angles,
+    double NA,
+    const std::vector<double>& res,
+    bool trunc) {
+    std::vector<std::vector<double>> c_ba(shape[0], std::vector<double>(2));
+
+    // Compute c_ba (sine and cosine components)
+    for (size_t i = 0; i < angles.size(); ++i) {
+        c_ba[i][0] = NA * std::sin(angles[i]);
+        c_ba[i][1] = NA * std::cos(angles[i]);
+    }
+    std::cout << "c_ba (sine and cosine components):\n";
+    for (size_t i = 0; i < angles.size(); ++i) {
+        std::cout << "(" << c_ba[i][0] << ", " << c_ba[i][1] << ")\n";
+    }
+
+    // Compute norm (shape * resolution)
+    std::vector<double> norm = {shape[1] * res[1], shape[0] * res[0]};
+    std::cout << "norm (shape * resolution):\n";
+    std::cout << "(" << norm[0] << ", " << norm[1] << ")\n";
+
+    // Compute factor (after truncation check)
+    std::vector<std::vector<double>> factor(angles.size(), std::vector<double>(2));
+
+    for (size_t i = 0; i < angles.size(); ++i) {
+        for (size_t j = 0; j < 2; ++j) {
+            double value = c_ba[i][j] * norm[j];
+            if (trunc) {
+                // Apply truncation if trunc is true
+                factor[i][j] = std::trunc(value);  // Truncate the value
+            } else {
+                // Otherwise, store the non-truncated value
+                factor[i][j] = value;
+            }
+        }
+    }
+
+    std::cout << "factor (after truncation check):\n";
+    for (size_t i = 0; i < angles.size(); ++i) {
+        std::cout << "(" << factor[i][0] << ", " << factor[i][1] << ")\n";
+    }
 }
