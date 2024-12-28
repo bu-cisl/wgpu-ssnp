@@ -94,4 +94,18 @@ int main() {
     std::vector<double> res3 = {0.1f, 0.1f, 0.1f};
     bool trunc = false;
     auto tilt_result = tilt(shape3, angles, NA, res3, trunc);
+
+    std::cout << "C++ tilt Result:\n";
+    for (size_t i = 0; i < tilt_result.size(); ++i) {
+        for (size_t y = 0; y < shape3[0]; ++y) { 
+            for (size_t x = 0; x < shape3[1]; ++x) {
+                std::cout << "(" << tilt_result[i][y][x].real() << ", "
+                          << tilt_result[i][y][x].imag() << ") ";
+            }
+            std::cout << "\n";
+        }
+    }
+    std::cout << "Output shape: (" << tilt_result.size() << ", " << shape3[0] << ", " << shape3[1] << ")\n";
+
+    return 0;
 }

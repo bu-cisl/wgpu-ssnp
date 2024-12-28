@@ -15,6 +15,7 @@ diffract(
     const std::vector<float>& res = {0.1f, 0.1f, 0.1f},
     float dz = 1);
 
+// Returns flattened Tensor
 std::vector<std::vector<bool>> binary_pupil(
     const std::vector<int>& shape, 
     float na, 

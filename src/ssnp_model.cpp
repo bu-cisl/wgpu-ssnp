@@ -78,10 +78,9 @@ diffract(
     std::vector<std::vector<std::complex<double>>> kz(batch_size, std::vector<std::complex<double>>(size));
     std::vector<std::vector<std::complex<double>>> eva(batch_size, std::vector<std::complex<double>>(size));
 
-    double pi = 3.141592653589793;
     for (int b = 0; b < batch_size; ++b) {
         for (size_t i = 0; i < size; ++i) {
-            kz[b][i] = std::complex<float>(2.0f * pi * res[2]) * cgamma[0][i];
+            kz[b][i] = std::complex<float>(2.0f * M_PI * res[2]) * cgamma[0][i];
             eva[b][i] = std::exp(std::min(std::abs((cgamma[0][i] - std::complex<float>(0.2)) * 5.0f), 0.0f));
         }
     }
@@ -126,6 +125,7 @@ diffract(
     return {uf_new, ub_new};
 }
 
+// Returns flattened Tensor
 std::vector<std::vector<bool>> binary_pupil(
     const std::vector<int>& shape, 
     float na, 
@@ -149,6 +149,7 @@ std::vector<std::vector<bool>> binary_pupil(
     return mask;
 }
 
+// Output needs to be normalized by center point value
 std::vector<std::vector<std::vector<std::complex<double>>>> tilt(
     const std::vector<int>& shape,
     const std::vector<double>& angles,
@@ -162,15 +163,19 @@ std::vector<std::vector<std::vector<std::complex<double>>>> tilt(
         c_ba[i][0] = NA * std::sin(angles[i]);
         c_ba[i][1] = NA * std::cos(angles[i]);
     }
+    /*
     std::cout << "c_ba (sine and cosine components):\n";
     for (size_t i = 0; i < angles.size(); ++i) {
         std::cout << "(" << c_ba[i][0] << ", " << c_ba[i][1] << ")\n";
     }
+    */
 
     // Compute norm (shape * resolution)
     std::vector<double> norm = {shape[1] * res[1], shape[0] * res[0]};
+    /*
     std::cout << "norm (shape * resolution):\n";
     std::cout << "(" << norm[0] << ", " << norm[1] << ")\n";
+    */
 
     // Compute factor (after truncation check)
     std::vector<std::vector<double>> factor(angles.size(), std::vector<double>(2));
@@ -188,8 +193,81 @@ std::vector<std::vector<std::vector<std::complex<double>>>> tilt(
         }
     }
 
+    /*
     std::cout << "factor (after truncation check):\n";
     for (size_t i = 0; i < angles.size(); ++i) {
         std::cout << "(" << factor[i][0] << ", " << factor[i][1] << ")\n";
     }
+    */
+
+    // Compute xr
+    std::vector<std::vector<std::vector<std::complex<double>>>> xr(angles.size(), std::vector<std::vector<std::complex<double>>>(1, std::vector<std::complex<double>>(shape[1])));
+    const std::complex<double> I(0.0, 1.0);  // Imaginary unit i
+
+    for (size_t i = 0; i < angles.size(); ++i) {
+        for (int x = 0; x < shape[1]; ++x) {
+            std::complex<double> exponent = (2.0 * I * M_PI / static_cast<double>(shape[1])) * factor[i][1] * static_cast<double>(x);
+            xr[i][0][x] = std::exp(exponent);
+        }
+    }
+
+    /*
+    std::cout << "xr (exponential in x direction):\n";
+    for (size_t i = 0; i < angles.size(); ++i) {
+        for (int x = 0; x < shape[1]; ++x) {
+            std::cout << xr[i][0][x] << " ";
+        }
+        std::cout << "\n";
+    }
+    */
+
+    // Compute yr
+    std::vector<std::vector<std::vector<std::complex<double>>>> yr(angles.size(), std::vector<std::vector<std::complex<double>>>(shape[0], std::vector<std::complex<double>>(1)));
+    for (size_t i = 0; i < angles.size(); ++i) {
+        for (int y = 0; y < shape[0]; ++y) {
+            std::complex<double> exponent = (2.0 * I * M_PI / static_cast<double>(shape[0])) * factor[i][0] * static_cast<double>(y);
+            yr[i][y][0] = std::exp(exponent);
+        }
+    }
+
+    /*
+    std::cout << "yr (exponential in y direction):\n";
+    for (size_t i = 0; i < angles.size(); ++i) {
+        for (int y = 0; y < shape[0]; ++y) {
+            std::cout << yr[i][y][0] << " ";
+        }
+        std::cout << "\n";
+    }
+    */
+
+    // Compute out
+    std::vector<std::vector<std::vector<std::complex<double>>>> out(angles.size(), 
+    std::vector<std::vector<std::complex<double>>>(shape[0], std::vector<std::complex<double>>(shape[1])));
+
+    for (size_t i = 0; i < angles.size(); ++i) {
+        for (int y = 0; y < shape[0]; ++y) {
+            for (int x = 0; x < shape[1]; ++x) {
+                out[i][y][x] = xr[i][0][x] * yr[i][y][0];
+            }
+        }
+    }
+
+    /*
+    std::cout << "out:\n";
+    for (size_t i = 0; i < angles.size(); ++i) {
+        std::cout << "Angle " << angles[i] << "°: \n";
+        for (int y = 0; y < shape[0]; ++y) {
+            for (int x = 0; x < shape[1]; ++x) {
+                std::cout << "(" << out[i][y][x].real() << ", " << out[i][y][x].imag() << ") ";
+            }
+            std::cout << "\n";
+        }
+        std::cout << "\n";
+    }
+    */
+
+    // TODO: NORMALIZE THE CENTER POINT VALUE!!! Careful of rounding and truncation
+    // out /= out[:, *(i // 2 for i in shape)].clone()
+
+    return out;
 }
