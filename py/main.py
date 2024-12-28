@@ -54,10 +54,8 @@ def test_tilt():
     print(tilt_result)
 
 if __name__ == "__main__":
-    """
     test_scatter_factor()
     test_c_gamma()
     test_diffract()
     test_binary_pupil()
-    """
     test_tilt()
