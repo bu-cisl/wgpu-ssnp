@@ -266,7 +266,7 @@ std::vector<std::vector<std::vector<std::complex<double>>>> tilt(
     }
     */
 
-    // TODO: NORMALIZE THE CENTER POINT VALUE!!! Careful of rounding and truncation
+    // TODO: NORMALIZE THE CENTER POINT VALUE!!! Careful of precision
     // out /= out[:, *(i // 2 for i in shape)].clone()
 
     return out;
