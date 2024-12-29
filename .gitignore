@@ -20,3 +20,6 @@
 /py/__pycache__/
 /py/*.pyc
 /py/.pytest_cache/
+
+# Ignore sandbox and testing files
+/test

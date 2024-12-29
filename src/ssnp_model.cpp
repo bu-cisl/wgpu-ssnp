@@ -79,7 +79,7 @@ diffract(
     std::vector<std::vector<std::complex<double>>> eva(batch_size, std::vector<std::complex<double>>(size));
 
     for (int b = 0; b < batch_size; ++b) {
-        for (size_t i = 0; i < size; ++i) {
+        for (int i = 0; i < size; ++i) {
             kz[b][i] = std::complex<float>(2.0f * M_PI * res[2]) * cgamma[0][i];
             eva[b][i] = std::exp(std::min(std::abs((cgamma[0][i] - std::complex<float>(0.2)) * 5.0f), 0.0f));
         }
@@ -91,7 +91,7 @@ diffract(
             std::vector<std::complex<double>>(size)));
 
     for (int b = 0; b < batch_size; ++b) {
-        for (size_t i = 0; i < size; ++i) {
+        for (int i = 0; i < size; ++i) {
             std::complex<double> kz_val = kz[b][i];
             p_mat[0][b][i] = std::cos(kz_val * std::complex<double>(dz));
             p_mat[1][b][i] = std::sin(kz_val * std::complex<double>(dz)) / (kz_val + 1e-8);
@@ -113,7 +113,7 @@ diffract(
 
     // Compute uf_new and ub_new and reshape
     for (int b = 0; b < batch_size; ++b) {
-        for (size_t i = 0; i < size; ++i) {
+        for (int i = 0; i < size; ++i) {
             int row = i / width;
             int col = i % width;
 
