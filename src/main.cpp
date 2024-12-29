@@ -22,10 +22,9 @@ int main() {
 
     std::cout << "C++ c_gamma Results: \n";
     size_t batch_size = gamma_result.size();
-    size_t size_per_batch = shape[0] * shape[1];
     for (size_t b = 0; b < batch_size; ++b) {
-        for (size_t i = 0; i < shape[0]; ++i) {
-            for (size_t j = 0; j < shape[1]; ++j) {
+        for (int i = 0; i < shape[0]; ++i) {
+            for (int j = 0; j < shape[1]; ++j) {
                 const auto& elem = gamma_result[b][i * shape[1] + j];
                 std::cout << "(" << elem.real() << "," << elem.imag() << ") ";
             }
@@ -97,8 +96,8 @@ int main() {
 
     std::cout << "C++ tilt Result:\n";
     for (size_t i = 0; i < tilt_result.size(); ++i) {
-        for (size_t y = 0; y < shape3[0]; ++y) { 
-            for (size_t x = 0; x < shape3[1]; ++x) {
+        for (int y = 0; y < shape3[0]; ++y) { 
+            for (int x = 0; x < shape3[1]; ++x) {
                 std::cout << "(" << tilt_result[i][y][x].real() << ", "
                           << tilt_result[i][y][x].imag() << ") ";
             }
