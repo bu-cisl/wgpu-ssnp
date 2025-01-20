@@ -6,11 +6,8 @@ project(
 )
 
 add_executable(ssnp_cpp src/main.cpp src/ssnp_model.cpp)
-add_executable(test_wgpu src/testWGPU.cpp)
 
 set_target_properties(ssnp_cpp PROPERTIES
-    INSTALL_RPATH_USE_LINK_PATH TRUE
-    BUILD_RPATH "${CMAKE_CURRENT_SOURCE_DIR}/webgpu/bin/macos-arm64"
     CXX_STANDARD 17
     CXX_STANDARD_REQUIRED ON
     CXX_EXTENSIONS OFF
@@ -28,7 +25,6 @@ add_subdirectory(webgpu)
 
 # Link WebGPU library to ssnp_cpp
 target_link_libraries(ssnp_cpp PRIVATE webgpu)
-target_link_libraries(test_wgpu PRIVATE webgpu)
 
 # Copy necessary runtime binaries
 target_copy_webgpu_binaries(ssnp_cpp)
