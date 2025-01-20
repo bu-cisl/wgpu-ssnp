@@ -2,7 +2,7 @@
 #define WEBGPU_CPP_IMPLEMENTATION
 #include <webgpu/webgpu.hpp>
 
-bool initialize_instance(wgpu::Instance& instance, wgpu::Adapter& adapter, wgpu::Device& device) {
+bool init_wgpu(wgpu::Instance& instance, wgpu::Adapter& adapter, wgpu::Device& device, wgpu::Queue& queue) {
     // Create an instance
     wgpu::InstanceDescriptor instanceDescriptor = {};
     instance = wgpu::createInstance(instanceDescriptor);
@@ -32,6 +32,14 @@ bool initialize_instance(wgpu::Instance& instance, wgpu::Adapter& adapter, wgpu:
     }
     std::cout << "WebGPU device requested successfully!" << std::endl;
 
+    // Retrieve command queue
+    queue = device.getQueue();
+    if (!queue) {
+        std::cerr << "Failed to retrieve command queue." << std::endl;
+        return false;
+    }
+    std::cout << "Command queue retrieved successfully!" << std::endl;
+
     return true;
 }
 
@@ -39,14 +47,17 @@ int main() {
     wgpu::Instance instance = nullptr;
     wgpu::Adapter adapter = nullptr;
     wgpu::Device device = nullptr;
+    wgpu::Queue queue = nullptr;
 
-    if (!initialize_instance(instance, adapter, device)) {
+    if (!init_wgpu(instance, adapter, device, queue)) {
         return 1; // Initialization failed
     }
 
     wgpuInstanceRelease(instance);
     wgpuAdapterRelease(adapter);
     wgpuDeviceRelease(device);
+    wgpuQueueRelease(queue);
     std::cout << "WebGPU resources released successfully!" << std::endl;
+
     return 0; // Success
 }
