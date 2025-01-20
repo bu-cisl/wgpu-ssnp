@@ -43,6 +43,38 @@ bool init_wgpu(wgpu::Instance& instance, wgpu::Adapter& adapter, wgpu::Device& d
     return true;
 }
 
+bool record_and_submit_commands(wgpu::Device& device, wgpu::Queue& queue) {
+    // Create a command encoder
+    wgpu::CommandEncoder commandEncoder = device.createCommandEncoder({});
+    if (!commandEncoder) {
+        std::cerr << "Failed to create command encoder." << std::endl;
+        return false;
+    }
+    std::cout << "Command encoder created successfully!" << std::endl;
+
+    // Record commands (For now, just clear a buffer or perform a no-op)
+    // Example: Here we are not actually doing anything specific yet, 
+    // but we can clear buffers in the next steps.
+
+    // Finish encoding and get the command buffer
+    wgpu::CommandBuffer commandBuffer = commandEncoder.finish({});
+    if (!commandBuffer) {
+        std::cerr << "Failed to finish command buffer." << std::endl;
+        return false;
+    }
+    std::cout << "Command buffer created successfully!" << std::endl;
+
+    // Submit the command buffer to the queue for execution
+    queue.submit(1, &commandBuffer);
+    std::cout << "Commands submitted successfully!" << std::endl;
+
+    wgpuCommandBufferRelease(commandBuffer);
+    wgpuCommandEncoderRelease(commandEncoder);
+    std::cout << "Command buffer and encoder released successfully!" << std::endl;
+
+    return true;
+}
+
 int main() {
     wgpu::Instance instance = nullptr;
     wgpu::Adapter adapter = nullptr;
@@ -51,6 +83,10 @@ int main() {
 
     if (!init_wgpu(instance, adapter, device, queue)) {
         return 1; // Initialization failed
+    }
+
+    if (!record_and_submit_commands(device, queue)) {
+        return 1; // Command recording or submission failed
     }
 
     wgpuInstanceRelease(instance);
