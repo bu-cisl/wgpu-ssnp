@@ -128,7 +128,62 @@ wgpu::ShaderModule createShaderModule(wgpu::Device& device, const std::string& s
     return device.createShaderModule(shaderModuleDesc);
 }
 
+wgpu::BindGroup createBindGroup(wgpu::Device& device, wgpu::BindGroupLayout layout, 
+                                wgpu::Buffer inputBuffer, wgpu::Buffer outputBuffer, wgpu::Buffer paramBuffer) {
+    wgpu::BindGroupEntry entries[3] = {};
+
+    // Bind input buffer
+    entries[0].binding = 0;
+    entries[0].buffer = inputBuffer;
+    entries[0].offset = 0;
+    entries[0].size = inputBuffer.getSize();
+
+    // Bind output buffer
+    entries[1].binding = 1;
+    entries[1].buffer = outputBuffer;
+    entries[1].offset = 0;
+    entries[1].size = outputBuffer.getSize();
+
+    // Bind param buffer
+    entries[2].binding = 2;
+    entries[2].buffer = paramBuffer;
+    entries[2].offset = 0;
+    entries[2].size = paramBuffer.getSize();
+
+    // Create the bind group
+    wgpu::BindGroupDescriptor bindGroupDesc = {};
+    bindGroupDesc.layout = layout;
+    bindGroupDesc.entryCount = 3;
+    bindGroupDesc.entries = entries;
+
+    return device.createBindGroup(bindGroupDesc);
+}
+
+wgpu::ComputePipeline createComputePipeline(wgpu::Device& device, wgpu::ShaderModule shaderModule, 
+                                            wgpu::BindGroupLayout bindGroupLayout) {
+    // Define pipeline layout
+    wgpu::PipelineLayoutDescriptor pipelineLayoutDesc = {};
+    pipelineLayoutDesc.bindGroupLayoutCount = 1;
+    pipelineLayoutDesc.bindGroupLayouts = reinterpret_cast<WGPUBindGroupLayout*>(&bindGroupLayout);
+
+    wgpu::PipelineLayout pipelineLayout = device.createPipelineLayout(pipelineLayoutDesc);
+
+    // Define compute stage
+    wgpu::ProgrammableStageDescriptor computeStage = {};
+    computeStage.module = shaderModule;
+    computeStage.entryPoint = "main";
+
+    // Define compute pipeline
+    wgpu::ComputePipelineDescriptor pipelineDesc = {};
+    pipelineDesc.layout = pipelineLayout;
+    pipelineDesc.compute = computeStage;
+
+    return device.createComputePipeline(pipelineDesc);
+}
+
+
 int main() {
+    wgpu::BindGroupLayout createBindGroupLayout(wgpu::Device& device);
     wgpu::Instance instance = nullptr;
     wgpu::Adapter adapter = nullptr;
     wgpu::Device device = nullptr;
@@ -159,23 +214,18 @@ int main() {
         static_cast<WGPUBufferUsage>(wgpu::BufferUsage::Uniform | wgpu::BufferUsage::CopyDst), 
         params.data());
 
-    // Load WGSL shader code
+    // Create bind group layout
+    wgpu::BindGroupLayout bindGroupLayout = createBindGroupLayout(device);
+
+    // Create bind group
+    wgpu::BindGroup bindGroup = createBindGroup(device, bindGroupLayout, inputBuffer, outputBuffer, paramBuffer);
+
+    // Load WGSL shader
     std::string shaderCode = readShaderFile("src/scatter_factor.wgsl");
-    if (shaderCode.empty()) {
-        std::cerr << "Failed to read shader file." << std::endl;
-        return 1;
-    }
-    std::cout << "Shader file loaded successfully!" << std::endl;
-
-    // Create shader module
     wgpu::ShaderModule shaderModule = createShaderModule(device, shaderCode);
-    if (!shaderModule) {
-        std::cerr << "Failed to create shader module." << std::endl;
-        return 1;
-    }
-    std::cout << "Shader module created successfully!" << std::endl;
 
-    // Continue with pipeline creation...
+    // Create compute pipeline
+    wgpu::ComputePipeline computePipeline = createComputePipeline(device, shaderModule, bindGroupLayout);
 
     if (!record_and_submit_commands(device, queue)) {
         return 1; // Command recording or submission failed
