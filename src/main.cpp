@@ -46,38 +46,6 @@ bool init_wgpu(wgpu::Instance& instance, wgpu::Adapter& adapter, wgpu::Device& d
     return true;
 }
 
-bool record_and_submit_commands(wgpu::Device& device, wgpu::Queue& queue) {
-    // Create a command encoder
-    wgpu::CommandEncoder commandEncoder = device.createCommandEncoder({});
-    if (!commandEncoder) {
-        std::cerr << "Failed to create command encoder." << std::endl;
-        return false;
-    }
-    std::cout << "Command encoder created successfully!" << std::endl;
-
-    // Record commands (For now, just clear a buffer or perform a no-op)
-    // Example: Here we are not actually doing anything specific yet, 
-    // but we can clear buffers in the next steps.
-
-    // Finish encoding and get the command buffer
-    wgpu::CommandBuffer commandBuffer = commandEncoder.finish({});
-    if (!commandBuffer) {
-        std::cerr << "Failed to finish command buffer." << std::endl;
-        return false;
-    }
-    std::cout << "Command buffer created successfully!" << std::endl;
-
-    // Submit the command buffer to the queue for execution
-    queue.submit(1, &commandBuffer);
-    std::cout << "Commands submitted successfully!" << std::endl;
-
-    wgpuCommandBufferRelease(commandBuffer);
-    wgpuCommandEncoderRelease(commandEncoder);
-    std::cout << "Command buffer and encoder released successfully!" << std::endl;
-
-    return true;
-}
-
 wgpu::Buffer createBuffer(wgpu::Device& device, size_t size, wgpu::BufferUsage usage, const void* data = nullptr) {
     wgpu::BufferDescriptor bufferDesc = {};
     bufferDesc.size = size;
@@ -181,6 +149,69 @@ wgpu::ComputePipeline createComputePipeline(wgpu::Device& device, wgpu::ShaderMo
     return device.createComputePipeline(pipelineDesc);
 }
 
+bool record_and_submit_commands(wgpu::Device& device, wgpu::Queue& queue, 
+                                wgpu::ComputePipeline& computePipeline, wgpu::BindGroup& bindGroup) {
+    // Create command encoder
+    wgpu::CommandEncoder commandEncoder = device.createCommandEncoder({});
+
+    // Begin compute pass
+    wgpu::ComputePassEncoder computePass = commandEncoder.beginComputePass({});
+
+    // Bind pipeline and bind group
+    computePass.setPipeline(computePipeline);
+    computePass.setBindGroup(0, bindGroup, 0, nullptr);
+
+    // Dispatch workgroups (assuming 256 total elements, adjust accordingly)
+    computePass.dispatchWorkgroups(4, 1, 1);  // Example: 4 workgroups of 64 threads each
+
+    // End compute pass
+    computePass.end();
+
+    // Finish encoding and get the command buffer
+    wgpu::CommandBuffer commandBuffer = commandEncoder.finish({});
+
+    // Submit the command buffer
+    queue.submit(1, &commandBuffer);
+
+    std::cout << "Compute commands submitted successfully!" << std::endl;
+
+    // Release resources
+    wgpuCommandBufferRelease(commandBuffer);
+    wgpuCommandEncoderRelease(commandEncoder);
+
+    return true;
+}
+
+wgpu::BindGroupLayout createBindGroupLayout(wgpu::Device& device) {
+    // Define the bind group layout entries
+    std::vector<wgpu::BindGroupLayoutEntry> bindGroupLayoutEntries(3);
+
+    // Input buffer (storage, read-only)
+    bindGroupLayoutEntries[0].binding = 0;
+    bindGroupLayoutEntries[0].visibility = wgpu::ShaderStage::Compute;
+    bindGroupLayoutEntries[0].buffer.type = wgpu::BufferBindingType::ReadOnlyStorage;
+    bindGroupLayoutEntries[0].buffer.minBindingSize = 0;
+
+    // Output buffer (storage, read-write)
+    bindGroupLayoutEntries[1].binding = 1;
+    bindGroupLayoutEntries[1].visibility = wgpu::ShaderStage::Compute;
+    bindGroupLayoutEntries[1].buffer.type = wgpu::BufferBindingType::Storage;
+    bindGroupLayoutEntries[1].buffer.minBindingSize = 0;
+
+    // Uniform buffer (params)
+    bindGroupLayoutEntries[2].binding = 2;
+    bindGroupLayoutEntries[2].visibility = wgpu::ShaderStage::Compute;
+    bindGroupLayoutEntries[2].buffer.type = wgpu::BufferBindingType::Uniform;
+    bindGroupLayoutEntries[2].buffer.minBindingSize = 0;
+
+    // Create the bind group layout descriptor
+    wgpu::BindGroupLayoutDescriptor bindGroupLayoutDesc;
+    bindGroupLayoutDesc.entryCount = bindGroupLayoutEntries.size();
+    bindGroupLayoutDesc.entries = bindGroupLayoutEntries.data();
+
+    // Create and return the bind group layout
+    return device.createBindGroupLayout(bindGroupLayoutDesc);
+}
 
 int main() {
     wgpu::BindGroupLayout createBindGroupLayout(wgpu::Device& device);
@@ -227,7 +258,7 @@ int main() {
     // Create compute pipeline
     wgpu::ComputePipeline computePipeline = createComputePipeline(device, shaderModule, bindGroupLayout);
 
-    if (!record_and_submit_commands(device, queue)) {
+    if (!record_and_submit_commands(device, queue, computePipeline, bindGroup)) {
         return 1; // Command recording or submission failed
     }
 

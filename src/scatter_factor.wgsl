@@ -1,6 +1,5 @@
 @group(0) @binding(0) var<storage, read> input_n: array<f32>;
 @group(0) @binding(1) var<storage, read_write> output_result: array<f32>;
-
 @group(0) @binding(2) var<uniform> params: vec3<f32>; // res_z, dz, n0
 
 const pi: f32 = 3.141592653589793;
