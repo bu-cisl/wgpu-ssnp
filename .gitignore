@@ -23,3 +23,6 @@
 
 # Ignore sandbox and testing files
 /test
+
+# Ignore VS code settings
+.vscode

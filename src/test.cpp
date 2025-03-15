@@ -1,7 +1,7 @@
 #include <iostream>
 #include "ssnp_model.h"
 
-int test() {
+int main() {
     // Test scatter_factor
     std::vector<float> n = {1.0f, 2.0f, 3.0f};
     float res_z = 0.1f;
