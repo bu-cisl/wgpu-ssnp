@@ -10,6 +10,6 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
     if (i >= arrayLength(&input_n)) {
         return;
     }
-    let factor = pow(2.0 * pi * params.x / params.z, 2.0) * params.y;
-    output_result[i] = factor * input_n[i] * (2.0 * params.z + input_n[i]);
+    let factor = pow(2.0 * pi * params.x / params.z, 2.0) * params.y * (2.0 * params.z + input_n[i]);
+    output_result[i] = factor * input_n[i];
 }
