@@ -11,13 +11,10 @@ struct Params {
     float dz;
     float n0;
 };
-std::vector<float> inputData = {1,2,3};
-size_t buffer_len = inputData.size();
-std::vector<float> outputData(buffer_len, 0.0);
-Params params = {0.1f, 1.0f, 1.0f};
+
+size_t buffer_len;
 
 // INITIALIZING WEBGPU
-
 bool init_wgpu(wgpu::Instance& instance, wgpu::Adapter& adapter, wgpu::Device& device, wgpu::Queue& queue) {
     // Create an instance
     wgpu::InstanceDescriptor instanceDescriptor = {};
@@ -60,7 +57,6 @@ bool init_wgpu(wgpu::Instance& instance, wgpu::Adapter& adapter, wgpu::Device& d
 }
 
 // LOADING AND COMPILING SHADER CODE
-
 std::string readShaderFile(const std::string& filename) {
     std::ifstream file(filename);
     if (!file.is_open()) {
@@ -134,7 +130,6 @@ wgpu::Buffer createBuffer(wgpu::Device& device, const void* data, size_t size, w
 }
 
 // CREATING BIND GROUP AND LAYOUT
-
 wgpu::BindGroupLayout createBindGroupLayout(wgpu::Device& device) {
     wgpu::BindGroupLayoutEntry inputBufferLayout = {};
     inputBufferLayout.binding = 0;
@@ -190,7 +185,6 @@ wgpu::BindGroup createBindGroup(wgpu::Device& device, wgpu::BindGroupLayout bind
 }
 
 // CREATING COMPUTE PIPELINE
-
 wgpu::ComputePipeline createComputePipeline(wgpu::Device& device, wgpu::ShaderModule shaderModule, wgpu::BindGroupLayout bindGroupLayout) {
     // Define pipeline layout
     wgpu::PipelineLayoutDescriptor pipelineLayoutDesc = {};
@@ -213,6 +207,11 @@ wgpu::ComputePipeline createComputePipeline(wgpu::Device& device, wgpu::ShaderMo
 }
 
 int main() {
+    std::vector<float> inputData = {1,2,3};
+    buffer_len = inputData.size();
+    std::vector<float> outputData(buffer_len, 0.0);
+    Params params = {0.1f, 1.0f, 1.0f};
+
     // INITIALIZING WEBGPU
     wgpu::Instance instance = nullptr;
     wgpu::Adapter adapter = nullptr;
