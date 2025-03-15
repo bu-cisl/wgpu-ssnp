@@ -6,6 +6,7 @@ project(
 )
 
 add_executable(ssnp_cpp src/main.cpp src/ssnp_model.cpp)
+add_executable(test_ssnp src/test.cpp src/ssnp_model.cpp)
 
 set_target_properties(ssnp_cpp PROPERTIES
     CXX_STANDARD 17
