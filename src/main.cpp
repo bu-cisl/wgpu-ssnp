@@ -2,9 +2,19 @@
 #include <cstring>
 #include <fstream>
 #include <sstream>
-#include <thread>
 #define WEBGPU_CPP_IMPLEMENTATION
 #include <webgpu/webgpu.hpp>
+
+// INPUT PARAMS
+struct Params {
+    float res_z;
+    float dz;
+    float n0;
+};
+std::vector<float> inputData = {1,2,3};
+size_t buffer_len = inputData.size();
+std::vector<float> outputData(buffer_len, 0.0);
+Params params = {0.1f, 1.0f, 1.0f};
 
 // INITIALIZING WEBGPU
 
@@ -89,13 +99,6 @@ wgpu::ShaderModule createShaderModule(wgpu::Device& device, const std::string& s
 }
 
 // CREATING BUFFERS FOR SCATTER_FACTOR
-
-struct Params {
-    float res_z;
-    float dz;
-    float n0;
-};
-
 std::string bufferUsageToString(wgpu::BufferUsage usage) {
     std::string usageStr;
     if (usage & wgpu::BufferUsage::CopySrc) usageStr += "CopySrc | ";
@@ -162,13 +165,13 @@ wgpu::BindGroup createBindGroup(wgpu::Device& device, wgpu::BindGroupLayout bind
     inputEntry.binding = 0;
     inputEntry.buffer = inputBuffer;
     inputEntry.offset = 0;
-    inputEntry.size = sizeof(float) * 4; // Adjust based on actual input size
+    inputEntry.size = sizeof(float) * buffer_len;
 
     wgpu::BindGroupEntry outputEntry = {};
     outputEntry.binding = 1;
     outputEntry.buffer = outputBuffer;
     outputEntry.offset = 0;
-    outputEntry.size = sizeof(float) * 4; // Adjust based on actual output size
+    outputEntry.size = sizeof(float) * buffer_len;
 
     wgpu::BindGroupEntry uniformEntry = {};
     uniformEntry.binding = 2;
@@ -221,15 +224,11 @@ int main() {
     }
 
     // LOADING AND COMPILING SHADER CODE
-    std::string shaderCode = readShaderFile("src/scatter_factor.wgsl");
+    std::string shaderCode = readShaderFile("src/scatter_factor.wgsl"); // function specified
     wgpu::ShaderModule shaderModule = createShaderModule(device, shaderCode);
 
     // CREATING BUFFERS FOR SCATTER_FACTOR
-    std::vector<float> inputData = {1,2,3,0};
-    std::vector<float> outputData(inputData.size(), 0.0);
-    Params params = {0.1f, 1.0f, 1.0f};
-
-    wgpu::Buffer inputBuffer = createBuffer(device, inputData.data(), inputData.size() * sizeof(float), wgpu::BufferUsage::Storage);
+    wgpu::Buffer inputBuffer = createBuffer(device, inputData.data(), buffer_len * sizeof(float), wgpu::BufferUsage::Storage);
     wgpu::Buffer outputBuffer = createBuffer(device, nullptr, outputData.size() * sizeof(float),  static_cast<WGPUBufferUsage>(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
     wgpu::Buffer uniformBuffer = createBuffer(device, &params, sizeof(Params), wgpu::BufferUsage::Uniform);
 
@@ -259,7 +258,7 @@ int main() {
     wgpu::ComputePassEncoder computePass = commandEncoder.beginComputePass(computePassDesc);
     computePass.setPipeline(computePipeline);
     computePass.setBindGroup(0, bindGroup, 0, nullptr);
-    computePass.dispatchWorkgroups(inputData.size() / 64 + 1, 1, 1);
+    computePass.dispatchWorkgroups(buffer_len / 64 + 1, 1, 1);
     computePass.end();
     std::cout << "Compute Pass encoded successfully!" << std::endl;
 
@@ -286,7 +285,6 @@ int main() {
     std::cout << "Copy command submitted!" << std::endl;
 
     // MAPPING
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
     std::cout << "Queue flushed, waiting before mapping..." << std::endl;
 
     bool mappingComplete = false;
