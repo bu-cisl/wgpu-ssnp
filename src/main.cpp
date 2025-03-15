@@ -285,7 +285,7 @@ int main() {
     queue.submit(1, &commandBuffer2);
     std::cout << "Copy command submitted!" << std::endl;
 
-    // MAPPING BULLSHIT
+    // MAPPING
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
     std::cout << "Queue flushed, waiting before mapping..." << std::endl;
 
@@ -315,6 +315,7 @@ int main() {
 
     // Wait for the mapping to complete
     while (!mappingComplete) {
+        wgpuDevicePoll(device, false, nullptr);
         std::this_thread::yield();  // Prevent 100% CPU usage
     }
 
