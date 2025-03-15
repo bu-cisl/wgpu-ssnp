@@ -1,0 +1,24 @@
+name: Scatter Factor Tests
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Testing scatter factor"
+      - name: Check out repository code
+        uses: actions/checkout@v4
+      - run: echo "Repository cloned."
+
+      - name: Set up CMake
+        run: sudo apt-get install cmake -y
+      - run: echo "Cmake installed."
+
+      - name: Build and Test
+        run: |
+          cmake -B build -S .
+          cmake --build build
+          ./build/ssnp_cpp
+
+      - run: echo "Job status is ${{ job.status }}."
