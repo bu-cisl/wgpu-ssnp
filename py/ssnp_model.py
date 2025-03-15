@@ -88,7 +88,7 @@ def tilt(shape: tuple[int], angles: Tensor, NA: float= 0.65, res: tuple[float] =
 	# print(f"out: \n{out}")
 
 	# normalize by center point value
-	out /= out[:, *(i // 2 for i in shape)].clone()
+	out /= out[:, tuple(i // 2 for i in shape)].clone()
 	return out
 
 def merge_prop(uf: Tensor, ub: Tensor, res: tuple[float] = (0.1, 0.1, 0.1)) -> Tensor:

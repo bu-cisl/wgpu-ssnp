@@ -16,6 +16,7 @@
 
 # Ignore Python virtual environments
 /py/venv/
+/py/.venv/
 /py/__pycache__/
 /py/*.pyc
 /py/.pytest_cache/
