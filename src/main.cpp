@@ -225,9 +225,9 @@ int main() {
     wgpu::ShaderModule shaderModule = createShaderModule(device, shaderCode);
 
     // CREATING BUFFERS FOR SCATTER_FACTOR
-    std::vector<float> inputData = {1.0, 2.0, 3.0, 4.0};
+    std::vector<float> inputData = {1,2,3,0};
     std::vector<float> outputData(inputData.size(), 0.0);
-    Params params = {0.5f, 1.0f, 2.0f};
+    Params params = {0.1f, 1.0f, 1.0f};
 
     wgpu::Buffer inputBuffer = createBuffer(device, inputData.data(), inputData.size() * sizeof(float), wgpu::BufferUsage::Storage);
     wgpu::Buffer outputBuffer = createBuffer(device, nullptr, outputData.size() * sizeof(float),  static_cast<WGPUBufferUsage>(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
