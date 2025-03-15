@@ -290,7 +290,7 @@ int main() {
     std::cout << "Queue flushed, waiting before mapping..." << std::endl;
 
     bool mappingComplete = false;
-    readbackBuffer.mapAsync(wgpu::MapMode::Read, 0, outputData.size() * sizeof(float), [&readbackBuffer, &outputData, &mappingComplete](wgpu::BufferMapAsyncStatus status) { 
+    auto handle = readbackBuffer.mapAsync(wgpu::MapMode::Read, 0, outputData.size() * sizeof(float), [&](wgpu::BufferMapAsyncStatus status) {
         if (status == wgpu::BufferMapAsyncStatus::Success) {
             std::cout << "Buffer mapped successfully!" << std::endl;
             void* mappedData = readbackBuffer.getMappedRange(0, outputData.size() * sizeof(float));
@@ -315,8 +315,7 @@ int main() {
 
     // Wait for the mapping to complete
     while (!mappingComplete) {
-        wgpuDevicePoll(device, false, nullptr);
-        std::this_thread::yield();  // Prevent 100% CPU usage
+       wgpuDevicePoll(device, false, nullptr); 
     }
 
     // RELEASE RESOURCES
