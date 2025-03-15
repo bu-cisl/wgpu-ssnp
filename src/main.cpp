@@ -3,6 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include <thread>
+#include <memory>
 #define WEBGPU_CPP_IMPLEMENTATION
 #include <webgpu/webgpu.hpp>
 
@@ -60,7 +61,6 @@ std::string readShaderFile(const std::string& filename) {
     std::stringstream buffer;
     buffer << file.rdbuf();
 
-    /**/
     std::string shaderCode = buffer.str();
     std::cout << "Shader file read successfully! First 100 chars:\n";
     std::cout << shaderCode.substr(0, 100) << "...\n"; 
@@ -230,7 +230,7 @@ int main() {
     Params params = {0.5f, 1.0f, 2.0f};
 
     wgpu::Buffer inputBuffer = createBuffer(device, inputData.data(), inputData.size() * sizeof(float), wgpu::BufferUsage::Storage);
-    wgpu::Buffer outputBuffer = createBuffer(device, nullptr, outputData.size() * sizeof(float),  static_cast<WGPUBufferUsage>(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
+    wgpu::Buffer outputBuffer = createBuffer(device, nullptr, outputData.size() * sizeof(float), static_cast<WGPUBufferUsage>(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
     wgpu::Buffer uniformBuffer = createBuffer(device, &params, sizeof(Params), wgpu::BufferUsage::Uniform);
 
     // CREATING BIND GROUP AND LAYOUT
@@ -259,7 +259,12 @@ int main() {
     wgpu::ComputePassEncoder computePass = commandEncoder.beginComputePass(computePassDesc);
     computePass.setPipeline(computePipeline);
     computePass.setBindGroup(0, bindGroup, 0, nullptr);
-    computePass.dispatchWorkgroups(inputData.size() / 64 + 1, 1, 1);
+
+    // Calculate workgroup count based on input size
+    uint32_t invocationCount = inputData.size();
+    uint32_t workgroupSize = 64; // Matches @workgroup_size(64) in the shader
+    uint32_t workgroupCount = (invocationCount + workgroupSize - 1) / workgroupSize; // Ceiling division
+    computePass.dispatchWorkgroups(workgroupCount, 1, 1);
     computePass.end();
     std::cout << "Compute Pass encoded successfully!" << std::endl;
 
@@ -269,6 +274,17 @@ int main() {
 
     queue.submit(1, &commandBuffer);
     std::cout << "Compute work submitted successfully!" << std::endl;
+
+    bool queueWorkDone = false;
+    queue.onSubmittedWorkDone([&queueWorkDone](wgpu::QueueWorkDoneStatus status) {
+        std::cout << "Queue.onSubmittedWorkDone callback triggered!" << std::endl;
+        if (status == wgpu::QueueWorkDoneStatus::Success) {
+            std::cout << "Queue work completed successfully!" << std::endl;
+        } else {
+            std::cerr << "Queue work failed! Status: " << static_cast<int>(status) << std::endl;
+        }
+        queueWorkDone = true;  // Modify the captured variable
+    });
 
     // READING BACK RESULTS
     wgpu::BufferDescriptor readbackBufferDesc = {};
@@ -285,40 +301,106 @@ int main() {
     queue.submit(1, &commandBuffer2);
     std::cout << "Copy command submitted!" << std::endl;
 
-    // MAPPING BULLSHIT
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
-    std::cout << "Queue flushed, waiting before mapping..." << std::endl;
+    // Wait for the queue work to complete
+    bool queueWorkDone2 = false;
+    queue.onSubmittedWorkDone([&queueWorkDone2](wgpu::QueueWorkDoneStatus status) {
+        std::cout << "Queue.onSubmittedWorkDone callback triggered!" << std::endl;
+        if (status == wgpu::QueueWorkDoneStatus::Success) {
+            std::cout << "Queue work completed successfully!" << std::endl;
+        } else {
+            std::cerr << "Queue work failed! Status: " << static_cast<int>(status) << std::endl;
+        }
+        queueWorkDone2 = true;  // Modify the captured variable
+    });
 
-    bool mappingComplete = false;
-    readbackBuffer.mapAsync(wgpu::MapMode::Read, 0, outputData.size() * sizeof(float), [&readbackBuffer, &outputData, &mappingComplete](wgpu::BufferMapAsyncStatus status) { 
+    if (!readbackBuffer) {
+        std::cerr << "Readback buffer is invalid!" << std::endl;
+        return 1;
+    }
+
+    // Add a timeout for debugging
+    auto startTime = std::chrono::steady_clock::now();
+    while (!queueWorkDone2) {
+        auto currentTime = std::chrono::steady_clock::now();
+        auto elapsedTime = std::chrono::duration_cast<std::chrono::seconds>(currentTime - startTime).count();
+        if (elapsedTime > 5) {  // Timeout after 5 seconds
+            std::cerr << "Timeout waiting for queue work to complete!" << std::endl;
+            break;
+        }
+        std::this_thread::yield();  // Prevent 100% CPU usage
+    }
+
+    if (!readbackBuffer) {
+        std::cerr << "Readback buffer is invalid!" << std::endl;
+        return 1;
+    }
+
+    // MAPPING BULLSHIT
+    struct QueueWorkState {
+        bool done = false;
+    };
+
+    // Shared state for buffer mapping completion
+    struct MappingState {
+        bool complete = false;
+    };
+
+    auto queueWorkState = std::make_shared<QueueWorkState>();
+    queue.onSubmittedWorkDone([queueWorkState](wgpu::QueueWorkDoneStatus status) {
+        std::cout << "Queue.onSubmittedWorkDone callback triggered!" << std::endl;
+        if (status == wgpu::QueueWorkDoneStatus::Success) {
+            std::cout << "Queue work completed successfully!" << std::endl;
+        } else {
+            std::cerr << "Queue work failed! Status: " << static_cast<int>(status) << std::endl;
+        }
+        queueWorkState->done = true;  // Modify the shared state
+    });
+
+    // Wait for the queue work to complete
+    auto startTimeQueue = std::chrono::steady_clock::now(); // Renamed to startTimeQueue
+    while (!queueWorkState->done) {
+        auto currentTime = std::chrono::steady_clock::now();
+        auto elapsedTime = std::chrono::duration_cast<std::chrono::seconds>(currentTime - startTimeQueue).count();
+        if (elapsedTime > 5) {  // Timeout after 5 seconds
+            std::cerr << "Timeout waiting for queue work to complete!" << std::endl;
+            break;
+        }
+        std::this_thread::yield();  // Prevent 100% CPU usage
+    }
+
+    // Shared state for buffer mapping completion
+    auto mappingState = std::make_shared<MappingState>();
+    readbackBuffer.mapAsync(wgpu::MapMode::Read, 0, outputData.size() * sizeof(float), [mappingState, &readbackBuffer, &outputData](wgpu::BufferMapAsyncStatus status) {
+        std::cout << "mapAsync callback triggered! Status: " << static_cast<int>(status) << std::endl;
         if (status == wgpu::BufferMapAsyncStatus::Success) {
-            std::cout << "Buffer mapped successfully!" << std::endl;
             void* mappedData = readbackBuffer.getMappedRange(0, outputData.size() * sizeof(float));
             if (mappedData) {
                 memcpy(outputData.data(), mappedData, outputData.size() * sizeof(float));
                 std::cout << "Output data copied successfully!" << std::endl;
                 readbackBuffer.unmap();
-
-                std::cout << "Compute shader output: ";
-                for (float value : outputData) {
-                    std::cout << value << " ";
-                }
-                std::cout << std::endl;
             } else {
                 std::cerr << "Failed to get mapped range!" << std::endl;
             }
         } else {
             std::cerr << "Failed to map buffer! Status: " << static_cast<int>(status) << std::endl;
         }
-        mappingComplete = true;
+        mappingState->complete = true;  // Modify the shared state
     });
 
     // Wait for the mapping to complete
-    while (!mappingComplete) {
+    auto startTimeMapping = std::chrono::steady_clock::now(); // Renamed to startTimeMapping
+    while (!mappingState->complete) {
+        auto currentTime = std::chrono::steady_clock::now();
+        auto elapsedTime = std::chrono::duration_cast<std::chrono::seconds>(currentTime - startTimeMapping).count();
+        if (elapsedTime > 5) {  // Timeout after 5 seconds
+            std::cerr << "Timeout waiting for buffer mapping to complete!" << std::endl;
+            break;
+        }
         std::this_thread::yield();  // Prevent 100% CPU usage
     }
 
     // RELEASE RESOURCES
+    std::cout << "Releasing resources..." << std::endl;
     computePipeline.release();
     bindGroup.release();
     bindGroupLayout.release();
