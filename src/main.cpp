@@ -23,7 +23,6 @@ bool init_wgpu(wgpu::Instance& instance, wgpu::Adapter& adapter, wgpu::Device& d
         std::cerr << "Failed to create WebGPU instance." << std::endl;
         return false;
     }
-    std::cout << "WebGPU instance created successfully!" << std::endl;
 
     // Request adapter
     wgpu::RequestAdapterOptions adapterOptions = {};
@@ -33,7 +32,6 @@ bool init_wgpu(wgpu::Instance& instance, wgpu::Adapter& adapter, wgpu::Device& d
         std::cerr << "Failed to request a WebGPU adapter." << std::endl;
         return false;
     }
-    std::cout << "WebGPU adapter requested successfully!" << std::endl;
 
     // Request device
     wgpu::DeviceDescriptor deviceDescriptor = {};
@@ -43,7 +41,6 @@ bool init_wgpu(wgpu::Instance& instance, wgpu::Adapter& adapter, wgpu::Device& d
         std::cerr << "Failed to request a WebGPU device." << std::endl;
         return false;
     }
-    std::cout << "WebGPU device requested successfully!" << std::endl;
 
     // Retrieve command queue
     queue = device.getQueue();
@@ -51,7 +48,6 @@ bool init_wgpu(wgpu::Instance& instance, wgpu::Adapter& adapter, wgpu::Device& d
         std::cerr << "Failed to retrieve command queue." << std::endl;
         return false;
     }
-    std::cout << "Command queue retrieved successfully!" << std::endl;
 
     return true;
 }
@@ -65,12 +61,6 @@ std::string readShaderFile(const std::string& filename) {
     }
     std::stringstream buffer;
     buffer << file.rdbuf();
-
-    /**/
-    std::string shaderCode = buffer.str();
-    std::cout << "Shader file read successfully! First 100 chars:\n";
-    std::cout << shaderCode.substr(0, 100) << "...\n"; 
-
     return buffer.str();
 }
 
@@ -87,10 +77,7 @@ wgpu::ShaderModule createShaderModule(wgpu::Device& device, const std::string& s
 
     if (!shaderModule) {
         std::cerr << "Failed to create shader module." << std::endl;
-    } else {
-        std::cout << "Shader module created successfully!" << std::endl;
     }
-
     return shaderModule;
 }
 
@@ -124,7 +111,6 @@ wgpu::Buffer createBuffer(wgpu::Device& device, const void* data, size_t size, w
     if (data) {
         device.getQueue().writeBuffer(buffer, 0, data, size);
     }
-    std::cout << "Buffer created successfully! Size: " << size << " bytes, Usage: " << bufferUsageToString(usage) << std::endl;
 
     return buffer;
 }
@@ -238,7 +224,6 @@ int main() {
         std::cerr << "Failed to create bind group!" << std::endl;
         return 1;
     }
-    std::cout << "Bind Group created successfully!" << std::endl;
 
     // CREATING COMPUTE PIPELINE
     wgpu::ComputePipeline computePipeline = createComputePipeline(device, shaderModule, bindGroupLayout);
@@ -246,12 +231,10 @@ int main() {
         std::cerr << "Failed to create compute pipeline!" << std::endl;
         return 1;
     }
-    std::cout << "Compute Pipeline created successfully!" << std::endl;
 
     // ENCODING AND DISPATCHING COMPUTE COMMANDS
     wgpu::CommandEncoderDescriptor encoderDesc = {};
     wgpu::CommandEncoder commandEncoder = device.createCommandEncoder(encoderDesc);
-    std::cout << "Command Encoder created successfully!" << std::endl;
 
     wgpu::ComputePassDescriptor computePassDesc = {};
     wgpu::ComputePassEncoder computePass = commandEncoder.beginComputePass(computePassDesc);
@@ -259,44 +242,34 @@ int main() {
     computePass.setBindGroup(0, bindGroup, 0, nullptr);
     computePass.dispatchWorkgroups(buffer_len / 64 + 1, 1, 1);
     computePass.end();
-    std::cout << "Compute Pass encoded successfully!" << std::endl;
 
     wgpu::CommandBufferDescriptor cmdBufferDesc = {};
     wgpu::CommandBuffer commandBuffer = commandEncoder.finish(cmdBufferDesc);
-    std::cout << "Command Buffer created successfully!" << std::endl;
 
     queue.submit(1, &commandBuffer);
-    std::cout << "Compute work submitted successfully!" << std::endl;
 
     // READING BACK RESULTS
     wgpu::BufferDescriptor readbackBufferDesc = {};
     readbackBufferDesc.size = outputData.size() * sizeof(float);
     readbackBufferDesc.usage = wgpu::BufferUsage::CopyDst | wgpu::BufferUsage::MapRead;
     wgpu::Buffer readbackBuffer = device.createBuffer(readbackBufferDesc);
-    std::cout << "Readback Buffer created successfully!" << std::endl;
 
     wgpu::CommandEncoder copyEncoder = device.createCommandEncoder(encoderDesc);
     copyEncoder.copyBufferToBuffer(outputBuffer, 0, readbackBuffer, 0, outputData.size() * sizeof(float));
-    std::cout << "Copy command encoded!" << std::endl;
 
     wgpu::CommandBuffer commandBuffer2 = copyEncoder.finish();
     queue.submit(1, &commandBuffer2);
-    std::cout << "Copy command submitted!" << std::endl;
 
     // MAPPING
-    std::cout << "Queue flushed, waiting before mapping..." << std::endl;
-
     bool mappingComplete = false;
     auto handle = readbackBuffer.mapAsync(wgpu::MapMode::Read, 0, outputData.size() * sizeof(float), [&](wgpu::BufferMapAsyncStatus status) {
         if (status == wgpu::BufferMapAsyncStatus::Success) {
-            std::cout << "Buffer mapped successfully!" << std::endl;
             void* mappedData = readbackBuffer.getMappedRange(0, outputData.size() * sizeof(float));
             if (mappedData) {
                 memcpy(outputData.data(), mappedData, outputData.size() * sizeof(float));
-                std::cout << "Output data copied successfully!" << std::endl;
                 readbackBuffer.unmap();
 
-                std::cout << "Compute shader output: ";
+                std::cout << "Scatter Factor output: ";
                 for (float value : outputData) {
                     std::cout << value << " ";
                 }
@@ -330,7 +303,6 @@ int main() {
     wgpuDeviceRelease(device);
     wgpuAdapterRelease(adapter);
     wgpuInstanceRelease(instance);
-    std::cout << "WebGPU resources released successfully!" << std::endl;
 
     return 0;
 }
