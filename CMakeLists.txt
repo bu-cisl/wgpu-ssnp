@@ -5,7 +5,7 @@ project(
     LANGUAGES CXX C
 )
 
-add_executable(ssnp_cpp src/main.cpp)
+add_executable(ssnp_cpp src/main.cpp src/scatter_factor.cpp)
 
 set_target_properties(ssnp_cpp PROPERTIES
     CXX_STANDARD 17
