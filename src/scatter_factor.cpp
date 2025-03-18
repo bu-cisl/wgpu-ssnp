@@ -16,35 +16,6 @@ struct Params {
 
 size_t buffer_len;
 
-// LOADING AND COMPILING SHADER CODE
-std::string readShaderFile(const std::string& filename) {
-    std::ifstream file(filename);
-    if (!file.is_open()) {
-        std::cerr << "Failed to open shader file: " << filename << std::endl;
-        return "";
-    }
-    std::stringstream buffer;
-    buffer << file.rdbuf();
-    return buffer.str();
-}
-
-wgpu::ShaderModule createShaderModule(wgpu::Device& device, const std::string& shaderCode) {
-    wgpu::ShaderModuleWGSLDescriptor wgslDesc = {};
-    wgslDesc.chain.next = nullptr;
-    wgslDesc.chain.sType = wgpu::SType::ShaderModuleWGSLDescriptor;
-    wgslDesc.code = shaderCode.c_str();
-
-    wgpu::ShaderModuleDescriptor shaderModuleDesc = {};
-    shaderModuleDesc.nextInChain = &wgslDesc.chain;
-
-    wgpu::ShaderModule shaderModule = device.createShaderModule(shaderModuleDesc);
-
-    if (!shaderModule) {
-        std::cerr << "Failed to create shader module." << std::endl;
-    }
-    return shaderModule;
-}
-
 // CREATING BUFFERS FOR SCATTER_FACTOR
 std::string bufferUsageToString(wgpu::BufferUsage usage) {
     std::string usageStr;
