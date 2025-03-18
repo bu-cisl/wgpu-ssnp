@@ -18,7 +18,7 @@ wgpu::ShaderModule createShaderModule(wgpu::Device& device, const std::string& s
 // Creates a WebGPU buffer
 wgpu::Buffer createBuffer(wgpu::Device& device, const void* data, size_t size, wgpu::BufferUsage usage);
 
-// Compute Pipeline utilities
+// Compute pipeline utilities
 wgpu::ComputePipeline createComputePipeline(wgpu::Device& device, wgpu::ShaderModule shaderModule, wgpu::BindGroupLayout bindGroupLayout);
 
 #endif

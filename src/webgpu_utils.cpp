@@ -75,7 +75,7 @@ wgpu::Buffer createBuffer(wgpu::Device& device, const void* data, size_t size, w
 
     wgpu::Buffer buffer = device.createBuffer(bufferDesc);
     if (!buffer) {
-        std::cerr << "Failed to create buffer!" << std::endl;
+        std::cerr << "Failed to create buffer." << std::endl;
     }
 
     if (data) {
@@ -92,6 +92,10 @@ wgpu::ComputePipeline createComputePipeline(wgpu::Device& device, wgpu::ShaderMo
     pipelineLayoutDesc.bindGroupLayouts = reinterpret_cast<WGPUBindGroupLayout*>(&bindGroupLayout);
 
     wgpu::PipelineLayout pipelineLayout = device.createPipelineLayout(pipelineLayoutDesc);
+    if (!pipelineLayout) {
+        std::cerr << "Failed to create pipeline layout." << std::endl;
+        return nullptr;
+    }
 
     // Define compute stage
     wgpu::ProgrammableStageDescriptor computeStage = {};
@@ -103,5 +107,10 @@ wgpu::ComputePipeline createComputePipeline(wgpu::Device& device, wgpu::ShaderMo
     pipelineDesc.layout = pipelineLayout;
     pipelineDesc.compute = computeStage;
 
-    return device.createComputePipeline(pipelineDesc);
+    wgpu::ComputePipeline pipeline = device.createComputePipeline(pipelineDesc);
+    if (!pipeline) {
+        std::cerr << "Failed to create compute pipeline." << std::endl;
+    }
+
+    return pipeline;
 }
