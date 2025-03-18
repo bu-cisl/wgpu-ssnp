@@ -71,28 +71,6 @@ wgpu::BindGroup createBindGroup(wgpu::Device& device, wgpu::BindGroupLayout bind
     return device.createBindGroup(bindGroupDesc);
 }
 
-// CREATING COMPUTE PIPELINE
-wgpu::ComputePipeline createComputePipeline(wgpu::Device& device, wgpu::ShaderModule shaderModule, wgpu::BindGroupLayout bindGroupLayout) {
-    // Define pipeline layout
-    wgpu::PipelineLayoutDescriptor pipelineLayoutDesc = {};
-    pipelineLayoutDesc.bindGroupLayoutCount = 1;
-    pipelineLayoutDesc.bindGroupLayouts = reinterpret_cast<WGPUBindGroupLayout*>(&bindGroupLayout);
-
-    wgpu::PipelineLayout pipelineLayout = device.createPipelineLayout(pipelineLayoutDesc);
-
-    // Define compute stage
-    wgpu::ProgrammableStageDescriptor computeStage = {};
-    computeStage.module = shaderModule;
-    computeStage.entryPoint = "main";
-
-    // Define compute pipeline
-    wgpu::ComputePipelineDescriptor pipelineDesc = {};
-    pipelineDesc.layout = pipelineLayout;
-    pipelineDesc.compute = computeStage;
-
-    return device.createComputePipeline(pipelineDesc);
-}
-
 std::vector<float> scatter_factor(std::vector<float> inputData, std::optional<float> res_z, std::optional<float> dz, std::optional<float> n0) {
     buffer_len = inputData.size();
     std::vector<float> outputData(buffer_len, 0.0);

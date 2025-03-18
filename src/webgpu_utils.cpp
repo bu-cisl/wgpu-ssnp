@@ -84,3 +84,24 @@ wgpu::Buffer createBuffer(wgpu::Device& device, const void* data, size_t size, w
 
     return buffer;
 }
+
+wgpu::ComputePipeline createComputePipeline(wgpu::Device& device, wgpu::ShaderModule shaderModule, wgpu::BindGroupLayout bindGroupLayout) {
+    // Define pipeline layout
+    wgpu::PipelineLayoutDescriptor pipelineLayoutDesc = {};
+    pipelineLayoutDesc.bindGroupLayoutCount = 1;
+    pipelineLayoutDesc.bindGroupLayouts = reinterpret_cast<WGPUBindGroupLayout*>(&bindGroupLayout);
+
+    wgpu::PipelineLayout pipelineLayout = device.createPipelineLayout(pipelineLayoutDesc);
+
+    // Define compute stage
+    wgpu::ProgrammableStageDescriptor computeStage = {};
+    computeStage.module = shaderModule;
+    computeStage.entryPoint = "main";
+
+    // Define compute pipeline
+    wgpu::ComputePipelineDescriptor pipelineDesc = {};
+    pipelineDesc.layout = pipelineLayout;
+    pipelineDesc.compute = computeStage;
+
+    return device.createComputePipeline(pipelineDesc);
+}
