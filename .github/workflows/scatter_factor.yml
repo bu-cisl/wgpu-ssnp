@@ -3,11 +3,34 @@ on: [push]
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    if: github.actor == 'nektos/act'  # Only run if ACT is set
+    container:
+      image: ubuntu:latest
+    env:
+      TZ: "America/New_York"  # Change to your desired timezone
+      DEBIAN_FRONTEND: noninteractive  # Prevents tzdata from prompting
     steps:
-      - uses: actions/checkout@v4
-      - run: apt update && apt-get install g++ cmake -y
-      - run: |
+      - name: 🛠 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🌍 Configure Timezone
+        run: |
+          apt update && apt-get install -y tzdata
+          ln -fs /usr/share/zoneinfo/$TZ /etc/localtime
+          dpkg-reconfigure -f noninteractive tzdata
+
+      - name: 🔧 Install Build Tools
+        run: |
+          apt-get install -y g++ cmake
+
+      - name: 🎮 Install GPU & WebGPU Dependencies
+        run: |
+          apt-get install -y mesa-utils vulkan-tools
+
+      - name: 🏗 Build Project
+        run: |
           cmake -B build -S .
           cmake --build build
-          ./build/ssnp_cpp
+
+      - name: 🚀 Run Executable
+        run: ./build/ssnp_cpp
