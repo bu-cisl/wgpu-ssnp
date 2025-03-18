@@ -66,3 +66,21 @@ wgpu::ShaderModule createShaderModule(wgpu::Device& device, const std::string& s
     }
     return shaderModule;
 }
+
+wgpu::Buffer createBuffer(wgpu::Device& device, const void* data, size_t size, wgpu::BufferUsage usage) {
+    wgpu::BufferDescriptor bufferDesc = {};
+    bufferDesc.size = size;
+    bufferDesc.usage = usage | wgpu::BufferUsage::CopyDst;
+    bufferDesc.mappedAtCreation = false;
+
+    wgpu::Buffer buffer = device.createBuffer(bufferDesc);
+    if (!buffer) {
+        std::cerr << "Failed to create buffer!" << std::endl;
+    }
+
+    if (data) {
+        device.getQueue().writeBuffer(buffer, 0, data, size);
+    }
+
+    return buffer;
+}

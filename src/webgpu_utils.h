@@ -15,4 +15,7 @@ std::string readShaderFile(const std::string& filename);
 // Creates a WebGPU shader module from WGSL source code
 wgpu::ShaderModule createShaderModule(wgpu::Device& device, const std::string& shaderCode);
 
+// Creates a WebGPU buffer
+wgpu::Buffer createBuffer(wgpu::Device& device, const void* data, size_t size, wgpu::BufferUsage usage);
+
 #endif

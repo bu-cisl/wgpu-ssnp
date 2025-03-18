@@ -16,40 +16,6 @@ struct Params {
 
 size_t buffer_len;
 
-// CREATING BUFFERS FOR SCATTER_FACTOR
-std::string bufferUsageToString(wgpu::BufferUsage usage) {
-    std::string usageStr;
-    if (usage & wgpu::BufferUsage::CopySrc) usageStr += "CopySrc | ";
-    if (usage & wgpu::BufferUsage::CopyDst) usageStr += "CopyDst | ";
-    if (usage & wgpu::BufferUsage::Index) usageStr += "Index | ";
-    if (usage & wgpu::BufferUsage::Vertex) usageStr += "Vertex | ";
-    if (usage & wgpu::BufferUsage::Uniform) usageStr += "Uniform | ";
-    if (usage & wgpu::BufferUsage::Storage) usageStr += "Storage | ";
-    if (usage & wgpu::BufferUsage::Indirect) usageStr += "Indirect | ";
-    if (!usageStr.empty()) {
-        usageStr = usageStr.substr(0, usageStr.size() - 3);
-    }
-    return usageStr;
-}
-
-wgpu::Buffer createBuffer(wgpu::Device& device, const void* data, size_t size, wgpu::BufferUsage usage) {
-    wgpu::BufferDescriptor bufferDesc = {};
-    bufferDesc.size = size;
-    bufferDesc.usage = usage | wgpu::BufferUsage::CopyDst;
-    bufferDesc.mappedAtCreation = false;
-
-    wgpu::Buffer buffer = device.createBuffer(bufferDesc);
-    if (!buffer) {
-        std::cerr << "Failed to create buffer!" << std::endl;
-    }
-
-    if (data) {
-        device.getQueue().writeBuffer(buffer, 0, data, size);
-    }
-
-    return buffer;
-}
-
 // CREATING BIND GROUP AND LAYOUT
 wgpu::BindGroupLayout createBindGroupLayout(wgpu::Device& device) {
     wgpu::BindGroupLayoutEntry inputBufferLayout = {};
