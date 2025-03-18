@@ -1,11 +1,11 @@
 #include "webgpu_utils.h"
 
 // INITIALIZING WEBGPU
-bool init_wgpu(wgpu::Instance& instance, wgpu::Adapter& adapter, wgpu::Device& device, wgpu::Queue& queue) {
+bool initWebGPU(WebGPUContext& context) {
     // Create an instance
     wgpu::InstanceDescriptor instanceDescriptor = {};
-    instance = wgpu::createInstance(instanceDescriptor);
-    if (!instance) {
+    context.instance = wgpu::createInstance(instanceDescriptor);
+    if (!context.instance) {
         std::cerr << "Failed to create WebGPU instance." << std::endl;
         return false;
     }
@@ -13,8 +13,8 @@ bool init_wgpu(wgpu::Instance& instance, wgpu::Adapter& adapter, wgpu::Device& d
     // Request adapter
     wgpu::RequestAdapterOptions adapterOptions = {};
     adapterOptions.powerPreference = wgpu::PowerPreference::HighPerformance;
-    adapter = instance.requestAdapter(adapterOptions);
-    if (!adapter) {
+    context.adapter = context.instance.requestAdapter(adapterOptions);
+    if (!context.adapter) {
         std::cerr << "Failed to request a WebGPU adapter." << std::endl;
         return false;
     }
@@ -22,15 +22,15 @@ bool init_wgpu(wgpu::Instance& instance, wgpu::Adapter& adapter, wgpu::Device& d
     // Request device
     wgpu::DeviceDescriptor deviceDescriptor = {};
     deviceDescriptor.label = "Default Device";
-    device = adapter.requestDevice(deviceDescriptor);
-    if (!device) {
+    context.device = context.adapter.requestDevice(deviceDescriptor);
+    if (!context.device) {
         std::cerr << "Failed to request a WebGPU device." << std::endl;
         return false;
     }
 
     // Retrieve command queue
-    queue = device.getQueue();
-    if (!queue) {
+    context.queue = context.device.getQueue();
+    if (!context.queue) {
         std::cerr << "Failed to retrieve command queue." << std::endl;
         return false;
     }

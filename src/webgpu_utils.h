@@ -6,8 +6,15 @@
 #include <sstream>
 #include <vector>
 
+struct WebGPUContext {
+    wgpu::Instance instance = nullptr;
+    wgpu::Adapter adapter = nullptr;
+    wgpu::Device device = nullptr;
+    wgpu::Queue queue = nullptr;
+};
+
 // Initializes WebGPU
-bool init_wgpu(wgpu::Instance&, wgpu::Adapter&, wgpu::Device&, wgpu::Queue&);
+bool initWebGPU(WebGPUContext& context);
 
 // Reads shader source code from a file
 std::string readShaderFile(const std::string& filename);

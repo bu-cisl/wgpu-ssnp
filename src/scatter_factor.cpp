@@ -74,17 +74,18 @@ wgpu::BindGroup createBindGroup(wgpu::Device& device, wgpu::BindGroupLayout bind
 std::vector<float> scatter_factor(std::vector<float> inputData, std::optional<float> res_z, std::optional<float> dz, std::optional<float> n0) {
     buffer_len = inputData.size();
     std::vector<float> outputData(buffer_len, 0.0);
-    Params params = {res_z.value(),dz.value(),n0.value()};
+    Params params = {res_z.value(), dz.value(), n0.value()};
 
     // INITIALIZING WEBGPU
-    wgpu::Instance instance = nullptr;
-    wgpu::Adapter adapter = nullptr;
-    wgpu::Device device = nullptr;
-    wgpu::Queue queue = nullptr;
-
-    if (!init_wgpu(instance, adapter, device, queue)) {
+    WebGPUContext context;
+    if (!initWebGPU(context)) {
         return {};
     }
+
+    wgpu::Instance instance = context.instance;
+    wgpu::Adapter adapter = context.adapter;
+    wgpu::Device device = context.device;
+    wgpu::Queue queue = context.queue;
 
     // LOADING AND COMPILING SHADER CODE
     std::string shaderCode = readShaderFile("src/scatter_factor.wgsl"); // function specified
