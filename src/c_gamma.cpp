@@ -59,20 +59,14 @@ wgpu::BindGroup createBindGroup2(wgpu::Device& device, wgpu::BindGroupLayout bin
 }
 
 std::vector<float> c_gamma(WebGPUContext& context, const std::vector<float>& res, const std::vector<int>& shape) {
-    // Calculate the total number of elements in the output buffer
+    // (EDIT)
     size_t num_elements = 1;
     for (int dim : shape) {
         num_elements *= dim;
     }
     buffer_len2 = num_elements;
-
-    // Initialize output data
     std::vector<float> outputData(buffer_len2, 0.0f);
-
-    // Pack the Params struct into a flat buffer
     Params params = {res, shape};
-
-    // Calculate the size of the uniform buffer
     size_t uniformBufferSize = sizeof(float) * params.res.size() + sizeof(int) * params.shape.size();
 
     // INITIALIZING WEBGPU
@@ -83,7 +77,7 @@ std::vector<float> c_gamma(WebGPUContext& context, const std::vector<float>& res
     std::string shaderCode = readShaderFile("src/c_gamma.wgsl");
     wgpu::ShaderModule shaderModule = createShaderModule(device, shaderCode);
 
-    // CREATING BUFFERS FOR C_GAMMA
+    // CREATING BUFFERS FOR C_GAMMA (EDIT)
     wgpu::Buffer uniformBuffer = createBuffer(device, nullptr, uniformBufferSize, wgpu::BufferUsage::Uniform);
     wgpu::Buffer outputBuffer = createBuffer(device, nullptr, outputData.size() * sizeof(float), static_cast<WGPUBufferUsage>(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
 
