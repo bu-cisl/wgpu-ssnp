@@ -1,6 +1,6 @@
 struct Params {
-    res: vec3<f32>,
-    shape: vec3<i32>,
+    res: array<f32>,
+    shape: array<i32>,
 };
 
 @group(0) @binding(0) var<uniform> params: Params;
@@ -14,25 +14,33 @@ fn near_0(index: i32, size: i32) -> f32 {
 
 @compute @workgroup_size(4, 4, 4)
 fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
-    let x = i32(global_id.x);
-    let y = i32(global_id.y);
-    let z = i32(global_id.z);
+    let num_dims = arrayLength(&params.shape);
 
-    if (x >= params.shape.x || y >= params.shape.y || z >= params.shape.z) {
-        return;
+    for (var dim: i32 = 0; dim < num_dims; dim++) {
+        if (i32(global_id[dim]) >= params.shape[dim]) {
+            return;
+        }
     }
 
-    let c_alpha = near_0(y, params.shape.y) / params.res.x;
-    let c_beta  = near_0(x, params.shape.x) / params.res.y;
-    let c_gamma = near_0(z, params.shape.z) / params.res.z;
+    var c_values: array<f32>;
+    for (var dim: i32 = 0; dim < num_dims; dim++) {
+        c_values[dim] = near_0(i32(global_id[dim]), params.shape[dim]) / params.res[dim];
+    }
 
-    let alpha_square = pow(abs(c_alpha), 2.0);
-    let beta_square  = pow(abs(c_beta), 2.0);
-    let gamma_square = pow(abs(c_gamma), 2.0);
+    var sum_squares: f32 = 0.0;
+    for (var dim: i32 = 0; dim < num_dims; dim++) {
+        sum_squares += pow(abs(c_values[dim]), 2.0);
+    }
 
-    let value = 1.0 - (alpha_square + beta_square + gamma_square);
+    let value = 1.0 - sum_squares;
     let result = sqrt(max(value, eps));
 
-    let index = (z * params.shape.y * params.shape.x) + (y * params.shape.x) + x;
+    var index: i32 = 0;
+    var stride: i32 = 1;
+    for (var dim: i32 = 0; dim < num_dims; dim++) {
+        index += i32(global_id[dim]) * stride;
+        stride *= params.shape[dim];
+    }
+
     output[index] = result;
 }
