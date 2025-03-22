@@ -9,8 +9,8 @@
 
 // INPUT PARAMS
 struct Params {
-    float res;
-    int shape;
+    float res[3];
+    int shape[3];
 };
 
 size_t buffer_len;
@@ -47,7 +47,7 @@ wgpu::BindGroup createBindGroup(wgpu::Device& device, wgpu::BindGroupLayout bind
     outputEntry.binding = 1;
     outputEntry.buffer = outputBuffer;
     outputEntry.offset = 0;
-    outputEntry.size = buffer_len * sizeof(float);
+    outputEntry.size = sizeof(float) * buffer_len;
 
     wgpu::BindGroupEntry entries[] = {uniformEntry, outputEntry};
 
@@ -59,3 +59,6 @@ wgpu::BindGroup createBindGroup(wgpu::Device& device, wgpu::BindGroupLayout bind
     return device.createBindGroup(bindGroupDesc);
 }
 
+std::vector<float> c_gamma(WebGPUContext& context, int width, int height, int depth, float res_x, float res_y, float res_z) {
+
+}
