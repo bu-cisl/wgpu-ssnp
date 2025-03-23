@@ -67,6 +67,7 @@ wgpu::ShaderModule createShaderModule(wgpu::Device& device, const std::string& s
     return shaderModule;
 }
 
+// CREATING BUFFERS
 wgpu::Buffer createBuffer(wgpu::Device& device, const void* data, size_t size, wgpu::BufferUsage usage) {
     wgpu::BufferDescriptor bufferDesc = {};
     bufferDesc.size = size;
@@ -85,6 +86,7 @@ wgpu::Buffer createBuffer(wgpu::Device& device, const void* data, size_t size, w
     return buffer;
 }
 
+// COMPUTE PIPELINE UTILITIES
 wgpu::ComputePipeline createComputePipeline(wgpu::Device& device, wgpu::ShaderModule shaderModule, wgpu::BindGroupLayout bindGroupLayout) {
     // Define pipeline layout
     wgpu::PipelineLayoutDescriptor pipelineLayoutDesc = {};

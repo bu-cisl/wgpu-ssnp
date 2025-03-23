@@ -2,7 +2,6 @@
 #include <cstring>
 #include <fstream>
 #include <sstream>
-#define WEBGPU_CPP_IMPLEMENTATION
 #include <webgpu/webgpu.hpp>
 #include "scatter_factor.h"
 #include "../webgpu_utils.h"
@@ -14,10 +13,10 @@ struct Params {
     float n0;
 };
 
-size_t buffer_len;
+static size_t buffer_len;
 
 // CREATING BIND GROUP AND LAYOUT
-wgpu::BindGroupLayout createBindGroupLayout(wgpu::Device& device) {
+static wgpu::BindGroupLayout createBindGroupLayout(wgpu::Device& device) {
     wgpu::BindGroupLayoutEntry inputBufferLayout = {};
     inputBufferLayout.binding = 0;
     inputBufferLayout.visibility = wgpu::ShaderStage::Compute;
@@ -42,7 +41,7 @@ wgpu::BindGroupLayout createBindGroupLayout(wgpu::Device& device) {
     return device.createBindGroupLayout(layoutDesc);
 }
 
-wgpu::BindGroup createBindGroup(wgpu::Device& device, wgpu::BindGroupLayout bindGroupLayout, wgpu::Buffer inputBuffer, wgpu::Buffer outputBuffer, wgpu::Buffer uniformBuffer) {
+static wgpu::BindGroup createBindGroup(wgpu::Device& device, wgpu::BindGroupLayout bindGroupLayout, wgpu::Buffer inputBuffer, wgpu::Buffer outputBuffer, wgpu::Buffer uniformBuffer) {
     wgpu::BindGroupEntry inputEntry = {};
     inputEntry.binding = 0;
     inputEntry.buffer = inputBuffer;

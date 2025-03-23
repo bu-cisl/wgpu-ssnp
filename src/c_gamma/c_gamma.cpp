@@ -12,10 +12,10 @@ struct Params {
     std::vector<int> shape;
 };
 
-size_t buffer_len2;
+static size_t buffer_len;
 
 // CREATING BIND GROUP AND LAYOUT
-wgpu::BindGroupLayout createBindGroupLayout2(wgpu::Device& device) {
+static wgpu::BindGroupLayout createBindGroupLayout(wgpu::Device& device) {
     wgpu::BindGroupLayoutEntry shapeBufferLayout = {};
     shapeBufferLayout.binding = 0;
     shapeBufferLayout.visibility = wgpu::ShaderStage::Compute;
@@ -40,7 +40,7 @@ wgpu::BindGroupLayout createBindGroupLayout2(wgpu::Device& device) {
     return device.createBindGroupLayout(layoutDesc);
 }
 
-wgpu::BindGroup createBindGroup2(wgpu::Device& device, wgpu::BindGroupLayout bindGroupLayout, wgpu::Buffer shapeBuffer, wgpu::Buffer resBuffer, wgpu::Buffer outputBuffer, const Params& params) {
+static wgpu::BindGroup createBindGroup(wgpu::Device& device, wgpu::BindGroupLayout bindGroupLayout, wgpu::Buffer shapeBuffer, wgpu::Buffer resBuffer, wgpu::Buffer outputBuffer, const Params& params) {
     wgpu::BindGroupEntry shapeEntry = {};
     shapeEntry.binding = 0;
     shapeEntry.buffer = shapeBuffer;
@@ -57,7 +57,7 @@ wgpu::BindGroup createBindGroup2(wgpu::Device& device, wgpu::BindGroupLayout bin
     outputEntry.binding = 2;
     outputEntry.buffer = outputBuffer;
     outputEntry.offset = 0;
-    outputEntry.size = sizeof(float) * buffer_len2;
+    outputEntry.size = sizeof(float) * buffer_len;
 
     wgpu::BindGroupEntry entries[] = {shapeEntry, resEntry, outputEntry};
 
@@ -75,8 +75,8 @@ std::vector<float> c_gamma(WebGPUContext& context, const std::vector<float>& res
     for (int dim : shape) {
         num_elements *= dim;
     }
-    buffer_len2 = num_elements;
-    std::vector<float> outputData(buffer_len2, 0.0f);
+    buffer_len = num_elements;
+    std::vector<float> outputData(buffer_len, 0.0f);
     Params params = {res, shape};
 
     // INITIALIZING WEBGPU
@@ -95,12 +95,12 @@ std::vector<float> c_gamma(WebGPUContext& context, const std::vector<float>& res
     wgpu::BufferUsage::Storage);
     wgpu::Buffer resBuffer = createBuffer(device, params.res.data(), sizeof(float) * params.res.size(), 
     wgpu::BufferUsage::Storage);
-    wgpu::Buffer outputBuffer = createBuffer(device, outputData.data(), sizeof(float) * buffer_len2, 
+    wgpu::Buffer outputBuffer = createBuffer(device, outputData.data(), sizeof(float) * buffer_len, 
     static_cast<WGPUBufferUsage>(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
 
     // CREATING BIND GROUP AND LAYOUT
-    wgpu::BindGroupLayout bindGroupLayout = createBindGroupLayout2(device);
-    wgpu::BindGroup bindGroup = createBindGroup2(device, bindGroupLayout, shapeBuffer, resBuffer, outputBuffer, params);
+    wgpu::BindGroupLayout bindGroupLayout = createBindGroupLayout(device);
+    wgpu::BindGroup bindGroup = createBindGroup(device, bindGroupLayout, shapeBuffer, resBuffer, outputBuffer, params);
     if (!bindGroup) {
         std::cerr << "Failed to create bind group!" << std::endl;
         return {};

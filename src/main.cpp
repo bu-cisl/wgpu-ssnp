@@ -1,3 +1,4 @@
+#define WEBGPU_CPP_IMPLEMENTATION
 #include "scatter_factor/scatter_factor.h"
 #include "c_gamma/c_gamma.h"
 #include "webgpu_utils.h"
