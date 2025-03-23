@@ -90,10 +90,20 @@ std::vector<float> c_gamma(WebGPUContext& context, const std::vector<float>& res
     std::string shaderCode = readShaderFile("src/c_gamma.wgsl");
     wgpu::ShaderModule shaderModule = createShaderModule(device, shaderCode);
 
-    // CREATING BUFFERS FOR C_GAMMA (EDIT)
+    // CREATING BUFFERS FOR C_GAMMA
+    wgpu::Buffer shapeBuffer = createBuffer(device, params.shape.data(), sizeof(int) * params.shape.size(), 
+    wgpu::BufferUsage::Storage);
+    wgpu::Buffer resBuffer = createBuffer(device, params.res.data(), sizeof(float) * params.res.size(), 
+    wgpu::BufferUsage::Storage);
+    wgpu::Buffer outputBuffer = createBuffer(device, outputData.data(), sizeof(float) * buffer_len2, 
+    static_cast<WGPUBufferUsage>(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
+
     std::vector<float> output = {};
 
     // Release resources
+    shapeBuffer.release();
+    resBuffer.release();
+    outputBuffer.release();
     shaderModule.release();
 
     return output;
