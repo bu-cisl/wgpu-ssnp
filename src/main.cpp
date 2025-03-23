@@ -19,7 +19,7 @@ int main() {
     vector<float> output = scatter_factor(context, input);
 
     // Print scatter_factor output
-    cout << "Scatter factor output: " << endl;
+    cout << "scatter_factor output: " << endl;
     for (float o : output) {
         cout << o << " ";
     }
@@ -31,11 +31,16 @@ int main() {
     vector<float> gamma_output = c_gamma(context, res, shape);
 
     // Print c_gamma output
-    cout << "c_gamma output: " << endl;
-    for (float o : gamma_output) {
-        cout << o << " ";
+    cout << "c_gamma output:" << endl;
+
+    for (int i = 0; i < shape[0]; i++) {
+        cout << "[";
+        for (int j = 0; j < shape[1]; j++) {
+            cout << gamma_output[i * shape[1] + j];
+            if (j < shape[1] - 1) cout << ", ";
+        }
+        cout << "]" << endl;
     }
-    cout << endl;
 
     // Release WebGPU resources
     wgpuQueueRelease(context.queue);
