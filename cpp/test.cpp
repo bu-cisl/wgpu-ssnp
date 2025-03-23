@@ -16,7 +16,7 @@ int main() {
     std::cout << "\nOutput shape: (" << result.size() << ")\n";
 
     // Test c_gamma
-    std::vector<float> res = {1.0f, 1.0f, 1.0f};
+    std::vector<float> res = {1.0f, 1.0f};
     std::vector<int> shape = {3, 3};
     auto gamma_result = c_gamma(res, shape);
 

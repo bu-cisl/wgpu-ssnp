@@ -98,13 +98,88 @@ std::vector<float> c_gamma(WebGPUContext& context, const std::vector<float>& res
     wgpu::Buffer outputBuffer = createBuffer(device, outputData.data(), sizeof(float) * buffer_len2, 
     static_cast<WGPUBufferUsage>(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
 
+    // CREATING BIND GROUP AND LAYOUT
+    wgpu::BindGroupLayout bindGroupLayout = createBindGroupLayout2(device);
+    wgpu::BindGroup bindGroup = createBindGroup2(device, bindGroupLayout, shapeBuffer, resBuffer, outputBuffer, params);
+    if (!bindGroup) {
+        std::cerr << "Failed to create bind group!" << std::endl;
+        return {};
+    }
+
+    // CREATING COMPUTE PIPELINE
+    wgpu::ComputePipeline computePipeline = createComputePipeline(device, shaderModule, bindGroupLayout);
+    if (!computePipeline) {
+        std::cerr << "Failed to create compute pipeline!" << std::endl;
+        return {};
+    }
+
+    // ENCODING AND DISPATCHING COMPUTE COMMANDS
+    wgpu::CommandEncoderDescriptor encoderDesc = {};
+    wgpu::CommandEncoder commandEncoder = device.createCommandEncoder(encoderDesc);
+
+    wgpu::ComputePassDescriptor computePassDesc = {};
+    wgpu::ComputePassEncoder computePass = commandEncoder.beginComputePass(computePassDesc);
+    computePass.setPipeline(computePipeline);
+    computePass.setBindGroup(0, bindGroup, 0, nullptr);
+    computePass.dispatchWorkgroups(4, 4, 4);
+    computePass.end();
+
+    wgpu::CommandBufferDescriptor cmdBufferDesc = {};
+    wgpu::CommandBuffer commandBuffer = commandEncoder.finish(cmdBufferDesc);
+
+    queue.submit(1, &commandBuffer);
+
+    // READING BACK RESULTS
+    wgpu::BufferDescriptor readbackBufferDesc = {};
+    readbackBufferDesc.size = outputData.size() * sizeof(float);
+    readbackBufferDesc.usage = wgpu::BufferUsage::CopyDst | wgpu::BufferUsage::MapRead;
+    wgpu::Buffer readbackBuffer = device.createBuffer(readbackBufferDesc);
+
+    wgpu::CommandEncoder copyEncoder = device.createCommandEncoder(encoderDesc);
+    copyEncoder.copyBufferToBuffer(outputBuffer, 0, readbackBuffer, 0, outputData.size() * sizeof(float));
+
+    wgpu::CommandBuffer commandBuffer2 = copyEncoder.finish();
+    queue.submit(1, &commandBuffer2);
+
+    // MAPPING
     std::vector<float> output = {};
 
-    // Release resources
+    bool mappingComplete = false;
+    auto handle = readbackBuffer.mapAsync(wgpu::MapMode::Read, 0, outputData.size() * sizeof(float), [&](wgpu::BufferMapAsyncStatus status) {
+        if (status == wgpu::BufferMapAsyncStatus::Success) {
+            void* mappedData = readbackBuffer.getMappedRange(0, outputData.size() * sizeof(float));
+            if (mappedData) {
+                memcpy(outputData.data(), mappedData, outputData.size() * sizeof(float));
+                readbackBuffer.unmap();
+            
+                for (float value : outputData) {
+                    output.push_back(value);
+                }
+            } else {
+                std::cerr << "Failed to get mapped range!" << std::endl;
+            }
+        } else {
+            std::cerr << "Failed to map buffer! Status: " << static_cast<int>(status) << std::endl;
+        }
+        mappingComplete = true;
+    });
+
+    // Wait for the mapping to complete
+    while (!mappingComplete) {
+        wgpuDevicePoll(device, false, nullptr);
+    }
+
+    // RELEASE RESOURCES
+    computePipeline.release();
+    bindGroup.release();
+    bindGroupLayout.release();
     shapeBuffer.release();
     resBuffer.release();
     outputBuffer.release();
     shaderModule.release();
+    readbackBuffer.release();
+    commandBuffer.release();
+    commandBuffer2.release();
 
     return output;
 }

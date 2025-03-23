@@ -86,7 +86,7 @@ std::vector<float> scatter_factor(WebGPUContext& context, std::vector<float> inp
 
     // CREATING BUFFERS FOR SCATTER_FACTOR
     wgpu::Buffer inputBuffer = createBuffer(device, inputData.data(), buffer_len * sizeof(float), wgpu::BufferUsage::Storage);
-    wgpu::Buffer outputBuffer = createBuffer(device, nullptr, outputData.size() * sizeof(float),  static_cast<WGPUBufferUsage>(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
+    wgpu::Buffer outputBuffer = createBuffer(device, nullptr, outputData.size() * sizeof(float), static_cast<WGPUBufferUsage>(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
     wgpu::Buffer uniformBuffer = createBuffer(device, &params, sizeof(Params), wgpu::BufferUsage::Uniform);
 
     // CREATING BIND GROUP AND LAYOUT

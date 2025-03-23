@@ -26,7 +26,7 @@ int main() {
     cout << endl;
 
     // Test c_gamma
-    std::vector<float> res = {1.0f, 1.0f, 1.0f};
+    std::vector<float> res = {1.0f, 1.0f};
     std::vector<int> shape = {3, 3};
     vector<float> gamma_output = c_gamma(context, res, shape);
 

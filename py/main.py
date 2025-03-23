@@ -10,7 +10,7 @@ def test_scatter_factor():
     print(python_result)
 
 def test_c_gamma():
-    res = (1, 1, 1)
+    res = (1, 1)
     shape = (3, 3)
     gamma_result = ssnp_model.c_gamma(res, shape)
 
