@@ -4,7 +4,7 @@
 #include <sstream>
 #include <webgpu/webgpu.hpp>
 #include "c_gamma.h"
-#include "webgpu_utils.h"
+#include "../webgpu_utils.h"
 
 // INPUT PARAMS
 struct Params {
@@ -87,7 +87,7 @@ std::vector<float> c_gamma(WebGPUContext& context, const std::vector<float>& res
     }
 
     // LOADING AND COMPILING SHADER CODE
-    std::string shaderCode = readShaderFile("src/c_gamma.wgsl");
+    std::string shaderCode = readShaderFile("src/c_gamma/c_gamma.wgsl");
     wgpu::ShaderModule shaderModule = createShaderModule(device, shaderCode);
 
     // CREATING BUFFERS FOR C_GAMMA

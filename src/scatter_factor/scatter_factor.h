@@ -1,6 +1,6 @@
 #ifndef SCATTER_FACTOR_H
 #define SCATTER_FACTOR_H
-#include "webgpu_utils.h"
+#include "../webgpu_utils.h"
 #include <vector>
 #include <optional>
 

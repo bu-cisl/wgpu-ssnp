@@ -1,5 +1,5 @@
-#include "scatter_factor.h"
-#include "c_gamma.h"
+#include "scatter_factor/scatter_factor.h"
+#include "c_gamma/c_gamma.h"
 #include "webgpu_utils.h"
 #include <vector>
 #include <iostream>

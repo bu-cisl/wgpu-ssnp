@@ -1,7 +1,7 @@
 @group(0) @binding(0) var<storage, read> shape: array<i32>;
 @group(0) @binding(1) var<storage, read> res: array<f32>;
 @group(0) @binding(2) var<storage, read_write> output: array<f32>;
-
+ 
 const eps: f32 = 1E-8;
 
 fn near_0(index: i32, size: i32) -> f32 {

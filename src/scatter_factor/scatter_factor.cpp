@@ -5,7 +5,7 @@
 #define WEBGPU_CPP_IMPLEMENTATION
 #include <webgpu/webgpu.hpp>
 #include "scatter_factor.h"
-#include "webgpu_utils.h"
+#include "../webgpu_utils.h"
 
 // INPUT PARAMS
 struct Params {
@@ -81,7 +81,7 @@ std::vector<float> scatter_factor(WebGPUContext& context, std::vector<float> inp
     wgpu::Queue queue = context.queue;
 
     // LOADING AND COMPILING SHADER CODE
-    std::string shaderCode = readShaderFile("src/scatter_factor.wgsl");
+    std::string shaderCode = readShaderFile("src/scatter_factor/scatter_factor.wgsl");
     wgpu::ShaderModule shaderModule = createShaderModule(device, shaderCode);
 
     // CREATING BUFFERS FOR SCATTER_FACTOR
