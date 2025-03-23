@@ -3,15 +3,15 @@ import torch
 import ssnp_model
 
 def test_scatter_factor():
-    n = np.array([1.0, 2.0, 3.0])
+    n = np.array([5, 21, 65])
     python_result = ssnp_model.scatter_factor(n)
 
     print("Python scatter_factor result:")
     print(python_result)
 
 def test_c_gamma():
-    res = (1, 1)
-    shape = (3, 3)
+    res = (5.2, 2.2)
+    shape = (3, 2)
     gamma_result = ssnp_model.c_gamma(res, shape)
 
     print("Python c_gamma result:")

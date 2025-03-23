@@ -4,6 +4,7 @@
 #include "webgpu_utils.h"
 #include <vector>
 #include <iostream>
+#include <iomanip>
 
 using namespace std;
 
@@ -16,31 +17,32 @@ int main() {
     }
 
     // Call scatter_factor
-    vector<float> input = {1, 2, 3};
+    vector<float> input = {5, 21, 65};
     vector<float> output = scatter_factor(context, input);
 
     // Print scatter_factor output
     cout << "scatter_factor output: " << endl;
+    cout << "[ ";
     for (float o : output) {
-        cout << o << " ";
+        cout << fixed << setprecision(8) << o << " ";
     }
-    cout << endl;
+    cout << "]" << endl;
 
     // Test c_gamma
-    std::vector<float> res = {1.0f, 1.0f};
-    std::vector<int> shape = {3, 3};
+    std::vector<float> res = {5.2f, 6.2f};
+    std::vector<int> shape = {3, 2};
     vector<float> gamma_output = c_gamma(context, res, shape);
 
     // Print c_gamma output
     cout << "c_gamma output:" << endl;
 
     for (int i = 0; i < shape[0]; i++) {
-        cout << "[";
+        cout << "[ ";
         for (int j = 0; j < shape[1]; j++) {
-            cout << gamma_output[i * shape[1] + j];
+            cout << fixed << setprecision(4) << gamma_output[i * shape[1] + j];
             if (j < shape[1] - 1) cout << ", ";
         }
-        cout << "]" << endl;
+        cout << " ]" << endl;
     }
 
     // Release WebGPU resources
