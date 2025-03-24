@@ -13,7 +13,7 @@ int main() {
     WebGPUContext context;
     initWebGPU(context);
 
-    // Call scatter_factor
+    // Test scatter_factor
     vector<float> input = {5, 21, 65};
     vector<float> output = scatter_factor(context, input);
 
@@ -23,13 +23,12 @@ int main() {
     cout << endl;
 
     // Test c_gamma
-    std::vector<float> res = {5.2f, 2.2f};
-    std::vector<int> shape = {3, 2};
+    vector<float> res = {5.2f, 2.2f};
+    vector<int> shape = {3, 2};
     vector<float> cgamma = c_gamma(context, res, shape);
 
     // Print c_gamma output
     cout << "c_gamma output:" << endl;
-
     for (float c : cgamma) cout << fixed << setprecision(4) << c << " ";
     cout << endl;
 

@@ -28,4 +28,7 @@ wgpu::Buffer createBuffer(wgpu::Device& device, const void* data, size_t size, w
 // Compute pipeline utilities
 wgpu::ComputePipeline createComputePipeline(wgpu::Device& device, wgpu::ShaderModule shaderModule, wgpu::BindGroupLayout bindGroupLayout);
 
+// Readback from GPU to CPU
+std::vector<float> readBack(wgpu::Device& device, wgpu::Queue& queue, size_t buffer_len, wgpu::Buffer& outputBuffer);
+
 #endif

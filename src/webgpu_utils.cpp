@@ -1,4 +1,5 @@
 #include "webgpu_utils.h"
+#include <cstring>
 
 // INITIALIZING WEBGPU
 void initWebGPU(WebGPUContext& context) {
@@ -109,4 +110,49 @@ wgpu::ComputePipeline createComputePipeline(wgpu::Device& device, wgpu::ShaderMo
     }
 
     return pipeline;
+}
+
+// READBACK
+std::vector<float> readBack(wgpu::Device& device, wgpu::Queue& queue, size_t buffer_len, wgpu::Buffer& outputBuffer) {
+    std::vector<float> output(buffer_len);
+
+    // READING BACK RESULTS
+    wgpu::BufferDescriptor readbackBufferDesc = {};
+    readbackBufferDesc.size = buffer_len * sizeof(float);
+    readbackBufferDesc.usage = wgpu::BufferUsage::CopyDst | wgpu::BufferUsage::MapRead;
+    wgpu::Buffer readbackBuffer = device.createBuffer(readbackBufferDesc);
+
+    wgpu::CommandEncoderDescriptor encoderDesc = {};
+    wgpu::CommandEncoder copyEncoder = device.createCommandEncoder(encoderDesc);
+    copyEncoder.copyBufferToBuffer(outputBuffer, 0, readbackBuffer, 0, buffer_len * sizeof(float));
+
+    wgpu::CommandBuffer commandBuffer = copyEncoder.finish();
+    queue.submit(1, &commandBuffer);
+
+    //MAPPING BACK TO CPU
+    bool mappingComplete = false;
+    auto handle = readbackBuffer.mapAsync(wgpu::MapMode::Read, 0, buffer_len * sizeof(float), [&](wgpu::BufferMapAsyncStatus status) {
+        if (status == wgpu::BufferMapAsyncStatus::Success) {
+            void* mappedData = readbackBuffer.getMappedRange(0, buffer_len * sizeof(float));
+            if (mappedData) {
+                memcpy(output.data(), mappedData, buffer_len * sizeof(float));
+                readbackBuffer.unmap();
+            } else {
+                std::cerr << "Failed to get mapped range!" << std::endl;
+            }
+        } else {
+            std::cerr << "Failed to map buffer! Status: " << static_cast<int>(status) << std::endl;
+        }
+        mappingComplete = true;
+    });
+
+    // Wait for the mapping to complete
+    while (!mappingComplete) {
+        wgpuDevicePoll(device, false, nullptr); 
+    }
+
+    readbackBuffer.release();
+    commandBuffer.release();
+
+    return output;
 }

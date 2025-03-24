@@ -113,44 +113,7 @@ std::vector<float> c_gamma(WebGPUContext& context, const std::vector<float>& res
     queue.submit(1, &commandBuffer);
 
     // READING BACK RESULTS
-    wgpu::BufferDescriptor readbackBufferDesc = {};
-    readbackBufferDesc.size = outputData.size() * sizeof(float);
-    readbackBufferDesc.usage = wgpu::BufferUsage::CopyDst | wgpu::BufferUsage::MapRead;
-    wgpu::Buffer readbackBuffer = device.createBuffer(readbackBufferDesc);
-
-    wgpu::CommandEncoder copyEncoder = device.createCommandEncoder(encoderDesc);
-    copyEncoder.copyBufferToBuffer(outputBuffer, 0, readbackBuffer, 0, outputData.size() * sizeof(float));
-
-    wgpu::CommandBuffer commandBuffer2 = copyEncoder.finish();
-    queue.submit(1, &commandBuffer2);
-
-    // MAPPING
-    std::vector<float> output = {};
-
-    bool mappingComplete = false;
-    auto handle = readbackBuffer.mapAsync(wgpu::MapMode::Read, 0, outputData.size() * sizeof(float), [&](wgpu::BufferMapAsyncStatus status) {
-        if (status == wgpu::BufferMapAsyncStatus::Success) {
-            void* mappedData = readbackBuffer.getMappedRange(0, outputData.size() * sizeof(float));
-            if (mappedData) {
-                memcpy(outputData.data(), mappedData, outputData.size() * sizeof(float));
-                readbackBuffer.unmap();
-            
-                for (float value : outputData) {
-                    output.push_back(value);
-                }
-            } else {
-                std::cerr << "Failed to get mapped range!" << std::endl;
-            }
-        } else {
-            std::cerr << "Failed to map buffer! Status: " << static_cast<int>(status) << std::endl;
-        }
-        mappingComplete = true;
-    });
-
-    // Wait for the mapping to complete
-    while (!mappingComplete) {
-        wgpuDevicePoll(device, false, nullptr);
-    }
+    std::vector<float> output = readBack(device, queue, buffer_len, outputBuffer);
 
     // RELEASE RESOURCES
     computePipeline.release();
@@ -158,11 +121,8 @@ std::vector<float> c_gamma(WebGPUContext& context, const std::vector<float>& res
     bindGroupLayout.release();
     shapeBuffer.release();
     resBuffer.release();
-    outputBuffer.release();
     shaderModule.release();
-    readbackBuffer.release();
     commandBuffer.release();
-    commandBuffer2.release();
 
     return output;
 }
