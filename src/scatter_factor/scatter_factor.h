@@ -4,6 +4,6 @@
 #include <vector>
 #include <optional>
 
-std::vector<float> scatter_factor(WebGPUContext& context, std::vector<float> inputData, std::optional<float> res_z = 0.1, std::optional<float> dz = 1, std::optional<float> n0 = 1);
+void scatter_factor(WebGPUContext& context, wgpu::Buffer& outputBuffer, std::vector<float> inputData, std::optional<float> res_z = 0.1, std::optional<float> dz = 1, std::optional<float> n0 = 1);
 
 #endif 

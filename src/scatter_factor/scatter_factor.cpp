@@ -70,7 +70,7 @@ static wgpu::BindGroup createBindGroup(wgpu::Device& device, wgpu::BindGroupLayo
     return device.createBindGroup(bindGroupDesc);
 }
 
-std::vector<float> scatter_factor(WebGPUContext& context, std::vector<float> inputData, std::optional<float> res_z, std::optional<float> dz, std::optional<float> n0) {
+void scatter_factor(WebGPUContext& context, wgpu::Buffer& outputBuffer, std::vector<float> inputData, std::optional<float> res_z, std::optional<float> dz, std::optional<float> n0) {
     buffer_len = inputData.size();
     Params params = {res_z.value(), dz.value(), n0.value()};
 
@@ -84,7 +84,6 @@ std::vector<float> scatter_factor(WebGPUContext& context, std::vector<float> inp
 
     // CREATING BUFFERS FOR SCATTER_FACTOR
     wgpu::Buffer inputBuffer = createBuffer(device, inputData.data(), buffer_len * sizeof(float), wgpu::BufferUsage::Storage);
-    wgpu::Buffer outputBuffer = createBuffer(device, nullptr, buffer_len * sizeof(float), static_cast<WGPUBufferUsage>(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
     wgpu::Buffer uniformBuffer = createBuffer(device, &params, sizeof(Params), wgpu::BufferUsage::Uniform);
 
     // CREATING BIND GROUP AND LAYOUT
@@ -110,9 +109,6 @@ std::vector<float> scatter_factor(WebGPUContext& context, std::vector<float> inp
 
     queue.submit(1, &commandBuffer);
 
-    // READING BACK RESULTS
-    std::vector<float> output = readBack(device, queue, buffer_len, outputBuffer);
-
     // RELEASE RESOURCES
     computePipeline.release();
     bindGroup.release();
@@ -120,6 +116,4 @@ std::vector<float> scatter_factor(WebGPUContext& context, std::vector<float> inp
     inputBuffer.release();
     uniformBuffer.release();
     shaderModule.release();
-
-    return output;
 }

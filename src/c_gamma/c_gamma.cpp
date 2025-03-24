@@ -70,10 +70,9 @@ static wgpu::BindGroup createBindGroup(wgpu::Device& device, wgpu::BindGroupLayo
     return device.createBindGroup(bindGroupDesc);
 }
 
-std::vector<float> c_gamma(WebGPUContext& context, const std::vector<float>& res, const std::vector<int>& shape) {
+void c_gamma(WebGPUContext& context, wgpu::Buffer& outputBuffer, const std::vector<float>& res, const std::vector<int>& shape) {
     // Calculate the total number of elements in the output buffer
     buffer_len = std::accumulate(shape.begin(), shape.end(), 1, std::multiplies<int>());
-    std::vector<float> outputData(buffer_len, 0.0f);
     Params params = {res, shape};
 
     // INITIALIZING WEBGPU
@@ -87,7 +86,6 @@ std::vector<float> c_gamma(WebGPUContext& context, const std::vector<float>& res
     // CREATING BUFFERS FOR C_GAMMA
     wgpu::Buffer shapeBuffer = createBuffer(device, params.shape.data(), sizeof(int) * params.shape.size(), wgpu::BufferUsage::Storage);
     wgpu::Buffer resBuffer = createBuffer(device, params.res.data(), sizeof(float) * params.res.size(), wgpu::BufferUsage::Storage);
-    wgpu::Buffer outputBuffer = createBuffer(device, nullptr, sizeof(float) * buffer_len, static_cast<WGPUBufferUsage>(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
 
     // CREATING BIND GROUP AND LAYOUT
     wgpu::BindGroupLayout bindGroupLayout = createBindGroupLayout(device);
@@ -112,9 +110,6 @@ std::vector<float> c_gamma(WebGPUContext& context, const std::vector<float>& res
 
     queue.submit(1, &commandBuffer);
 
-    // READING BACK RESULTS
-    std::vector<float> output = readBack(device, queue, buffer_len, outputBuffer);
-
     // RELEASE RESOURCES
     computePipeline.release();
     bindGroup.release();
@@ -123,6 +118,4 @@ std::vector<float> c_gamma(WebGPUContext& context, const std::vector<float>& res
     resBuffer.release();
     shaderModule.release();
     commandBuffer.release();
-
-    return output;
 }
