@@ -31,7 +31,7 @@ fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
     let value = 1.0 - sum_squares;
     let result = sqrt(max(value, eps));
 
-    var index: i32 = i32(global_id[1]) * shape[0] + i32(global_id[0]);
+    var index: i32 = i32(global_id[0]) * shape[1] + i32(global_id[1]);
 
     output[index] = result;
 }
