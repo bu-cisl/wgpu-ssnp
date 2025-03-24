@@ -91,17 +91,9 @@ std::vector<float> scatter_factor(WebGPUContext& context, std::vector<float> inp
     // CREATING BIND GROUP AND LAYOUT
     wgpu::BindGroupLayout bindGroupLayout = createBindGroupLayout(device);
     wgpu::BindGroup bindGroup = createBindGroup(device, bindGroupLayout, inputBuffer, outputBuffer, uniformBuffer);
-    if (!bindGroup) {
-        std::cerr << "Failed to create bind group!" << std::endl;
-        return {};
-    }
 
     // CREATING COMPUTE PIPELINE
     wgpu::ComputePipeline computePipeline = createComputePipeline(device, shaderModule, bindGroupLayout);
-    if (!computePipeline) {
-        std::cerr << "Failed to create compute pipeline!" << std::endl;
-        return {};
-    }
 
     // ENCODING AND DISPATCHING COMPUTE COMMANDS
     wgpu::CommandEncoderDescriptor encoderDesc = {};

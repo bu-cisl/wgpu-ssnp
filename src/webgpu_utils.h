@@ -14,7 +14,7 @@ struct WebGPUContext {
 };
 
 // Initializes WebGPU
-bool initWebGPU(WebGPUContext& context);
+void initWebGPU(WebGPUContext& context);
 
 // Reads shader source code from a file
 std::string readShaderFile(const std::string& filename);

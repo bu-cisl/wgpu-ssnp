@@ -11,10 +11,7 @@ using namespace std;
 int main() {
     // Initialize WebGPU
     WebGPUContext context;
-    if (!initWebGPU(context)) {
-        cerr << "Failed to initialize WebGPU!" << endl;
-        return -1;
-    }
+    initWebGPU(context);
 
     // Call scatter_factor
     vector<float> input = {5, 21, 65};

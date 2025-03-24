@@ -79,10 +79,7 @@ std::vector<float> c_gamma(WebGPUContext& context, const std::vector<float>& res
     // INITIALIZING WEBGPU
     wgpu::Device device = context.device;
     wgpu::Queue queue = context.queue;
-    if (!queue){
-        return {};
-    }
-
+    
     // LOADING AND COMPILING SHADER CODE
     std::string shaderCode = readShaderFile("src/c_gamma/c_gamma.wgsl");
     wgpu::ShaderModule shaderModule = createShaderModule(device, shaderCode);
@@ -95,17 +92,9 @@ std::vector<float> c_gamma(WebGPUContext& context, const std::vector<float>& res
     // CREATING BIND GROUP AND LAYOUT
     wgpu::BindGroupLayout bindGroupLayout = createBindGroupLayout(device);
     wgpu::BindGroup bindGroup = createBindGroup(device, bindGroupLayout, shapeBuffer, resBuffer, outputBuffer, params);
-    if (!bindGroup) {
-        std::cerr << "Failed to create bind group!" << std::endl;
-        return {};
-    }
 
     // CREATING COMPUTE PIPELINE
     wgpu::ComputePipeline computePipeline = createComputePipeline(device, shaderModule, bindGroupLayout);
-    if (!computePipeline) {
-        std::cerr << "Failed to create compute pipeline!" << std::endl;
-        return {};
-    }
 
     // ENCODING AND DISPATCHING COMPUTE COMMANDS
     wgpu::CommandEncoderDescriptor encoderDesc = {};

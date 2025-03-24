@@ -1,13 +1,12 @@
 #include "webgpu_utils.h"
 
 // INITIALIZING WEBGPU
-bool initWebGPU(WebGPUContext& context) {
+void initWebGPU(WebGPUContext& context) {
     // Create an instance
     wgpu::InstanceDescriptor instanceDescriptor = {};
     context.instance = wgpu::createInstance(instanceDescriptor);
     if (!context.instance) {
         std::cerr << "Failed to create WebGPU instance." << std::endl;
-        return false;
     }
 
     // Request adapter
@@ -16,7 +15,6 @@ bool initWebGPU(WebGPUContext& context) {
     context.adapter = context.instance.requestAdapter(adapterOptions);
     if (!context.adapter) {
         std::cerr << "Failed to request a WebGPU adapter." << std::endl;
-        return false;
     }
 
     // Request device
@@ -25,17 +23,13 @@ bool initWebGPU(WebGPUContext& context) {
     context.device = context.adapter.requestDevice(deviceDescriptor);
     if (!context.device) {
         std::cerr << "Failed to request a WebGPU device." << std::endl;
-        return false;
     }
 
     // Retrieve command queue
     context.queue = context.device.getQueue();
     if (!context.queue) {
         std::cerr << "Failed to retrieve command queue." << std::endl;
-        return false;
     }
-
-    return true;
 }
 
 // LOADING AND COMPILING SHADER CODE
