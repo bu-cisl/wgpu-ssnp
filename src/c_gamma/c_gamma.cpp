@@ -2,6 +2,7 @@
 #include <cstring>
 #include <fstream>
 #include <sstream>
+#include <numeric>
 #include <webgpu/webgpu.hpp>
 #include "c_gamma.h"
 #include "../webgpu_utils.h"
@@ -71,11 +72,7 @@ static wgpu::BindGroup createBindGroup(wgpu::Device& device, wgpu::BindGroupLayo
 
 std::vector<float> c_gamma(WebGPUContext& context, const std::vector<float>& res, const std::vector<int>& shape) {
     // Calculate the total number of elements in the output buffer
-    size_t num_elements = 1;
-    for (int dim : shape) {
-        num_elements *= dim;
-    }
-    buffer_len = num_elements;
+    buffer_len = std::accumulate(shape.begin(), shape.end(), 1, std::multiplies<int>());;
     std::vector<float> outputData(buffer_len, 0.0f);
     Params params = {res, shape};
 
@@ -118,7 +115,7 @@ std::vector<float> c_gamma(WebGPUContext& context, const std::vector<float>& res
     wgpu::ComputePassEncoder computePass = commandEncoder.beginComputePass(computePassDesc);
     computePass.setPipeline(computePipeline);
     computePass.setBindGroup(0, bindGroup, 0, nullptr);
-    computePass.dispatchWorkgroups(4, 4, 4);
+    computePass.dispatchWorkgroups(64,1,1);
     computePass.end();
 
     wgpu::CommandBufferDescriptor cmdBufferDesc = {};

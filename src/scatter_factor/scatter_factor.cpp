@@ -111,7 +111,7 @@ std::vector<float> scatter_factor(WebGPUContext& context, std::vector<float> inp
     wgpu::ComputePassEncoder computePass = commandEncoder.beginComputePass(computePassDesc);
     computePass.setPipeline(computePipeline);
     computePass.setBindGroup(0, bindGroup, 0, nullptr);
-    computePass.dispatchWorkgroups(buffer_len / 64 + 1, 1, 1);
+    computePass.dispatchWorkgroups(64, 1, 1);
     computePass.end();
 
     wgpu::CommandBufferDescriptor cmdBufferDesc = {};

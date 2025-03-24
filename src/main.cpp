@@ -22,28 +22,19 @@ int main() {
 
     // Print scatter_factor output
     cout << "scatter_factor output: " << endl;
-    cout << "[ ";
-    for (float o : output) {
-        cout << fixed << setprecision(8) << o << " ";
-    }
-    cout << "]" << endl;
+    for (float o : output) cout << fixed << setprecision(8) << o << " ";
+    cout << endl;
 
     // Test c_gamma
     std::vector<float> res = {5.2f, 2.2f};
     std::vector<int> shape = {3, 2};
-    vector<float> gamma_output = c_gamma(context, res, shape);
+    vector<float> cgamma = c_gamma(context, res, shape);
 
     // Print c_gamma output
     cout << "c_gamma output:" << endl;
 
-    for (int i = 0; i < shape[0]; i++) {
-        cout << "[ ";
-        for (int j = 0; j < shape[1]; j++) {
-            cout << fixed << setprecision(4) << gamma_output[i * shape[1] + j];
-            if (j < shape[1] - 1) cout << ", ";
-        }
-        cout << " ]" << endl;
-    }
+    for (float c : cgamma) cout << fixed << setprecision(4) << c << " ";
+    cout << endl;
 
     // Release WebGPU resources
     wgpuQueueRelease(context.queue);
