@@ -19,8 +19,8 @@ int main() {
     wgpu::Buffer scatterFactorResultBuffer = createBuffer(context.device, nullptr, input.size() * sizeof(float), static_cast<WGPUBufferUsage>(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
     scatter_factor(context, scatterFactorResultBuffer, input);
     cout << "scatter_factor output: " << endl;
-    vector<float> output = readBack(context.device, context.queue, input.size(), scatterFactorResultBuffer);
-    for (float o : output) cout << fixed << setprecision(8) << o << " ";
+    vector<float> scatter = readBack(context.device, context.queue, input.size(), scatterFactorResultBuffer);
+    for (float s : scatter) cout << fixed << setprecision(8) << s << " ";
     cout << endl;
 
     // Test c_gamma
@@ -34,11 +34,19 @@ int main() {
     cout << endl;
 
     // Test diffract
-    vector<float> uf = {1};
-    vector<float> ub = {1};
+    vector<float> uf = {1,2,3,4,5,6,7,8,9};
+    vector<float> ub = {9,8,7,6,5,4,3,2,1};
     wgpu::Buffer newUFBuffer = createBuffer(context.device, nullptr, sizeof(float) * uf.size(), static_cast<WGPUBufferUsage>(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
     wgpu::Buffer newUBBuffer = createBuffer(context.device, nullptr, sizeof(float) * ub.size(), static_cast<WGPUBufferUsage>(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
     diffract(context, newUFBuffer, newUBBuffer, uf, ub);
+    cout << "diffract output (new uf):" << endl;
+    vector<float> ufbuff = readBack(context.device, context.queue, shape[0]*shape[1], newUFBuffer);
+    for (float uf : ufbuff) cout << fixed << setprecision(4) << uf << " ";
+    cout << endl;
+    cout << "diffract output (new ub):" << endl;
+    vector<float> ubbuff = readBack(context.device, context.queue, shape[0]*shape[1], newUBBuffer);
+    for (float ub : ubbuff) cout << fixed << setprecision(4) << ub << " ";
+    cout << endl;
 
     // Release WebGPU resources
     wgpuQueueRelease(context.queue);
