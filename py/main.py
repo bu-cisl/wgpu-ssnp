@@ -24,7 +24,7 @@ def test_diffract():
     ub = np.array([[9.0 + 0j, 8.0 + 0j, 7.0 + 0j], 
                    [6.0 + 0j, 5.0 + 0j, 4.0 + 0j], 
                    [3.0 + 0j, 2.0 + 0j, 1.0 + 0j]])
-    res = (1, 1, 1)
+    res = (.1, .1, .1)
     dz = 1
     uf_new, ub_new = ssnp_model.diffract(uf, ub, res, dz)
 

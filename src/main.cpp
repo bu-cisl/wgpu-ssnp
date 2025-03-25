@@ -55,6 +55,8 @@ int main() {
     wgpuInstanceRelease(context.instance);
     scatterFactorResultBuffer.release();
     cgammaResultBuffer.release();
+    newUFBuffer.release();
+    newUBBuffer.release();
 
     return 0;
 }
