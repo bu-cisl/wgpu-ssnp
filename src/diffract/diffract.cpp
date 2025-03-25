@@ -1,9 +1,10 @@
+#include <iostream>
 #include <fstream>
 #include <sstream>
-#include <numeric>
 #include <webgpu/webgpu.hpp>
-#include "c_gamma.h"
+#include "diffract.h"
 #include "../webgpu_utils.h"
+#include "../cgamma/cgamma.h"
 
 // INPUT PARAMS
 struct Params {
@@ -67,8 +68,9 @@ static wgpu::BindGroup createBindGroup(wgpu::Device& device, wgpu::BindGroupLayo
 
     return device.createBindGroup(bindGroupDesc);
 }
+void diffract(WebGPUContext& context, wgpu::Buffer& newUFBuffer, wgpu::Buffer& newUDBuffer, std::vector<float> uf, std::vector<float> ub, std::optional<std::vector<float>> ub, std::optional<float> dz) {
+    // cgamma call
 
-void c_gamma(WebGPUContext& context, wgpu::Buffer& outputBuffer, const std::vector<float>& res, const std::vector<int>& shape) {
     // Calculate the total number of elements in the output buffer
     buffer_len = std::accumulate(shape.begin(), shape.end(), 1, std::multiplies<int>());
     Params params = {res, shape};
@@ -78,42 +80,42 @@ void c_gamma(WebGPUContext& context, wgpu::Buffer& outputBuffer, const std::vect
     wgpu::Queue queue = context.queue;
     
     // LOADING AND COMPILING SHADER CODE
-    std::string shaderCode = readShaderFile("src/c_gamma/c_gamma.wgsl");
-    wgpu::ShaderModule shaderModule = createShaderModule(device, shaderCode);
+    // std::string shaderCode = readShaderFile("src/diffract/diffract.wgsl");
+    // wgpu::ShaderModule shaderModule = createShaderModule(device, shaderCode);
 
     // CREATING BUFFERS FOR C_GAMMA
-    wgpu::Buffer shapeBuffer = createBuffer(device, params.shape.data(), sizeof(int) * params.shape.size(), wgpu::BufferUsage::Storage);
-    wgpu::Buffer resBuffer = createBuffer(device, params.res.data(), sizeof(float) * params.res.size(), wgpu::BufferUsage::Storage);
+    // wgpu::Buffer shapeBuffer = createBuffer(device, params.shape.data(), sizeof(int) * params.shape.size(), wgpu::BufferUsage::Storage);
+    // wgpu::Buffer resBuffer = createBuffer(device, params.res.data(), sizeof(float) * params.res.size(), wgpu::BufferUsage::Storage);
 
     // CREATING BIND GROUP AND LAYOUT
-    wgpu::BindGroupLayout bindGroupLayout = createBindGroupLayout(device);
-    wgpu::BindGroup bindGroup = createBindGroup(device, bindGroupLayout, shapeBuffer, resBuffer, outputBuffer, params);
+    // wgpu::BindGroupLayout bindGroupLayout = createBindGroupLayout(device);
+    // wgpu::BindGroup bindGroup = createBindGroup(device, bindGroupLayout, shapeBuffer, resBuffer, outputBuffer, params);
 
     // CREATING COMPUTE PIPELINE
-    wgpu::ComputePipeline computePipeline = createComputePipeline(device, shaderModule, bindGroupLayout);
+    // wgpu::ComputePipeline computePipeline = createComputePipeline(device, shaderModule, bindGroupLayout);
 
     // ENCODING AND DISPATCHING COMPUTE COMMANDS
-    wgpu::CommandEncoderDescriptor encoderDesc = {};
-    wgpu::CommandEncoder commandEncoder = device.createCommandEncoder(encoderDesc);
+    // wgpu::CommandEncoderDescriptor encoderDesc = {};
+    // wgpu::CommandEncoder commandEncoder = device.createCommandEncoder(encoderDesc);
 
-    wgpu::ComputePassDescriptor computePassDesc = {};
-    wgpu::ComputePassEncoder computePass = commandEncoder.beginComputePass(computePassDesc);
-    computePass.setPipeline(computePipeline);
-    computePass.setBindGroup(0, bindGroup, 0, nullptr);
-    computePass.dispatchWorkgroups(64,1,1);
-    computePass.end();
+    // wgpu::ComputePassDescriptor computePassDesc = {};
+    // wgpu::ComputePassEncoder computePass = commandEncoder.beginComputePass(computePassDesc);
+    // computePass.setPipeline(computePipeline);
+    // computePass.setBindGroup(0, bindGroup, 0, nullptr);
+    // computePass.dispatchWorkgroups(64,1,1);
+    // computePass.end();
 
-    wgpu::CommandBufferDescriptor cmdBufferDesc = {};
-    wgpu::CommandBuffer commandBuffer = commandEncoder.finish(cmdBufferDesc);
+    // wgpu::CommandBufferDescriptor cmdBufferDesc = {};
+    // wgpu::CommandBuffer commandBuffer = commandEncoder.finish(cmdBufferDesc);
 
-    queue.submit(1, &commandBuffer);
+    // queue.submit(1, &commandBuffer);
 
     // RELEASE RESOURCES
-    computePipeline.release();
-    bindGroup.release();
-    bindGroupLayout.release();
-    shapeBuffer.release();
-    resBuffer.release();
-    shaderModule.release();
-    commandBuffer.release();
+    // computePipeline.release();
+    // bindGroup.release();
+    // bindGroupLayout.release();
+    // shapeBuffer.release();
+    // resBuffer.release();
+    // shaderModule.release();
+    // commandBuffer.release();
 }
