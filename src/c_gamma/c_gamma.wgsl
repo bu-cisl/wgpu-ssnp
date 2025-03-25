@@ -15,23 +15,31 @@ fn near_0(index: i32, size: i32) -> f32 {
 @compute @workgroup_size(4, 4, 4)
 fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
     let num_dims: i32 = i32(arrayLength(&shape));
+    var valid: bool = true;
+    var sum_squares: f32 = 0.0;
 
     for (var dim: i32 = 0; dim < num_dims; dim++) {
         if (i32(global_id[dim]) >= shape[dim]) {
-            return;
+            valid = false;
+            break;
         }
+        let normalized = near_0(i32(global_id[dim]), shape[dim]) / res[dim];
+        sum_squares += normalized * normalized;
     }
 
-    var sum_squares: f32 = 0.0;
-    let alpha = near_0(i32(global_id[0]), shape[0]) / res[0];
-    let beta = near_0(i32(global_id[1]), shape[1]) / res[1];
-
-    sum_squares = alpha * alpha + beta * beta;
+    if (!valid) {
+        return;
+    }
 
     let value = 1.0 - sum_squares;
     let result = sqrt(max(value, eps));
 
-    var index: i32 = i32(global_id[0]) * shape[1] + i32(global_id[1]);
+    var index: i32 = 0;
+    var stride: i32 = 1;
+    for (var dim: i32 = num_dims - 1; dim >= 0; dim--) {
+        index += i32(global_id[dim]) * stride;
+        stride *= shape[dim];
+    }
 
     output[index] = result;
 }

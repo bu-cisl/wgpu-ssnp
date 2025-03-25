@@ -1,10 +1,11 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <cassert>
 #include <webgpu/webgpu.hpp>
 #include "diffract.h"
 #include "../webgpu_utils.h"
-#include "../cgamma/cgamma.h"
+#include "../c_gamma/c_gamma.h"
 
 // INPUT PARAMS
 struct Params {
@@ -15,65 +16,68 @@ struct Params {
 static size_t buffer_len;
 
 // CREATING BIND GROUP AND LAYOUT
-static wgpu::BindGroupLayout createBindGroupLayout(wgpu::Device& device) {
-    wgpu::BindGroupLayoutEntry shapeBufferLayout = {};
-    shapeBufferLayout.binding = 0;
-    shapeBufferLayout.visibility = wgpu::ShaderStage::Compute;
-    shapeBufferLayout.buffer.type = wgpu::BufferBindingType::ReadOnlyStorage;
+// static wgpu::BindGroupLayout createBindGroupLayout(wgpu::Device& device) {
+//     wgpu::BindGroupLayoutEntry shapeBufferLayout = {};
+//     shapeBufferLayout.binding = 0;
+//     shapeBufferLayout.visibility = wgpu::ShaderStage::Compute;
+//     shapeBufferLayout.buffer.type = wgpu::BufferBindingType::ReadOnlyStorage;
 
-    wgpu::BindGroupLayoutEntry resBufferLayout = {};
-    resBufferLayout.binding = 1;
-    resBufferLayout.visibility = wgpu::ShaderStage::Compute;
-    resBufferLayout.buffer.type = wgpu::BufferBindingType::ReadOnlyStorage;
+//     wgpu::BindGroupLayoutEntry resBufferLayout = {};
+//     resBufferLayout.binding = 1;
+//     resBufferLayout.visibility = wgpu::ShaderStage::Compute;
+//     resBufferLayout.buffer.type = wgpu::BufferBindingType::ReadOnlyStorage;
 
-    wgpu::BindGroupLayoutEntry outputBufferLayout = {};
-    outputBufferLayout.binding = 2;
-    outputBufferLayout.visibility = wgpu::ShaderStage::Compute;
-    outputBufferLayout.buffer.type = wgpu::BufferBindingType::Storage;
+//     wgpu::BindGroupLayoutEntry outputBufferLayout = {};
+//     outputBufferLayout.binding = 2;
+//     outputBufferLayout.visibility = wgpu::ShaderStage::Compute;
+//     outputBufferLayout.buffer.type = wgpu::BufferBindingType::Storage;
 
-    wgpu::BindGroupLayoutEntry entries[] = {shapeBufferLayout, resBufferLayout, outputBufferLayout};
+//     wgpu::BindGroupLayoutEntry entries[] = {shapeBufferLayout, resBufferLayout, outputBufferLayout};
 
-    wgpu::BindGroupLayoutDescriptor layoutDesc = {};
-    layoutDesc.entryCount = 3;
-    layoutDesc.entries = entries;
+//     wgpu::BindGroupLayoutDescriptor layoutDesc = {};
+//     layoutDesc.entryCount = 3;
+//     layoutDesc.entries = entries;
 
-    return device.createBindGroupLayout(layoutDesc);
-}
+//     return device.createBindGroupLayout(layoutDesc);
+// }
 
-static wgpu::BindGroup createBindGroup(wgpu::Device& device, wgpu::BindGroupLayout bindGroupLayout, wgpu::Buffer shapeBuffer, wgpu::Buffer resBuffer, wgpu::Buffer outputBuffer, const Params& params) {
-    wgpu::BindGroupEntry shapeEntry = {};
-    shapeEntry.binding = 0;
-    shapeEntry.buffer = shapeBuffer;
-    shapeEntry.offset = 0;
-    shapeEntry.size = sizeof(int) * params.shape.size();
+// static wgpu::BindGroup createBindGroup(wgpu::Device& device, wgpu::BindGroupLayout bindGroupLayout, wgpu::Buffer shapeBuffer, wgpu::Buffer resBuffer, wgpu::Buffer outputBuffer, const Params& params) {
+//     wgpu::BindGroupEntry shapeEntry = {};
+//     shapeEntry.binding = 0;
+//     shapeEntry.buffer = shapeBuffer;
+//     shapeEntry.offset = 0;
+//     shapeEntry.size = sizeof(int) * params.shape.size();
 
-    wgpu::BindGroupEntry resEntry = {};
-    resEntry.binding = 1;
-    resEntry.buffer = resBuffer;
-    resEntry.offset = 0;
-    resEntry.size = sizeof(float) * params.res.size();
+//     wgpu::BindGroupEntry resEntry = {};
+//     resEntry.binding = 1;
+//     resEntry.buffer = resBuffer;
+//     resEntry.offset = 0;
+//     resEntry.size = sizeof(float) * params.res.size();
 
-    wgpu::BindGroupEntry outputEntry = {};
-    outputEntry.binding = 2;
-    outputEntry.buffer = outputBuffer;
-    outputEntry.offset = 0;
-    outputEntry.size = sizeof(float) * buffer_len;
+//     wgpu::BindGroupEntry outputEntry = {};
+//     outputEntry.binding = 2;
+//     outputEntry.buffer = outputBuffer;
+//     outputEntry.offset = 0;
+//     outputEntry.size = sizeof(float) * buffer_len;
 
-    wgpu::BindGroupEntry entries[] = {shapeEntry, resEntry, outputEntry};
+//     wgpu::BindGroupEntry entries[] = {shapeEntry, resEntry, outputEntry};
 
-    wgpu::BindGroupDescriptor bindGroupDesc = {};
-    bindGroupDesc.layout = bindGroupLayout;
-    bindGroupDesc.entryCount = 3;
-    bindGroupDesc.entries = entries;
+//     wgpu::BindGroupDescriptor bindGroupDesc = {};
+//     bindGroupDesc.layout = bindGroupLayout;
+//     bindGroupDesc.entryCount = 3;
+//     bindGroupDesc.entries = entries;
 
-    return device.createBindGroup(bindGroupDesc);
-}
-void diffract(WebGPUContext& context, wgpu::Buffer& newUFBuffer, wgpu::Buffer& newUDBuffer, std::vector<float> uf, std::vector<float> ub, std::optional<std::vector<float>> ub, std::optional<float> dz) {
+//     return device.createBindGroup(bindGroupDesc);
+// }
+#include <iostream>
+void diffract(WebGPUContext& context, wgpu::Buffer& newUFBuffer, wgpu::Buffer& newUBBuffer, std::vector<float> uf, std::vector<float> ub, std::optional<std::vector<float>> res, std::optional<float> dz) {
     // cgamma call
+    assert(uf.size() == ub.size() && "uf and ub must have the same shape");
+    wgpu::Buffer cgammaBuffer = createBuffer(context.device, nullptr, sizeof(float) * uf.size(), static_cast<WGPUBufferUsage>(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
+    c_gamma(context, cgammaBuffer, res.value(), {float(uf.size())});
 
     // Calculate the total number of elements in the output buffer
-    buffer_len = std::accumulate(shape.begin(), shape.end(), 1, std::multiplies<int>());
-    Params params = {res, shape};
+    // Params params = {res, shape};
 
     // INITIALIZING WEBGPU
     wgpu::Device device = context.device;
@@ -114,8 +118,7 @@ void diffract(WebGPUContext& context, wgpu::Buffer& newUFBuffer, wgpu::Buffer& n
     // computePipeline.release();
     // bindGroup.release();
     // bindGroupLayout.release();
-    // shapeBuffer.release();
-    // resBuffer.release();
+    cgammaBuffer.release();
     // shaderModule.release();
     // commandBuffer.release();
 }

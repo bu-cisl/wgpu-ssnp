@@ -11,13 +11,13 @@ add_executable(
     src/webgpu_utils.cpp
     src/scatter_factor/scatter_factor.cpp 
     src/c_gamma/c_gamma.cpp 
+    src/diffract/diffract.cpp
 )
 
 set_target_properties(ssnp_cpp PROPERTIES
     CXX_STANDARD 17
     CXX_STANDARD_REQUIRED ON
     CXX_EXTENSIONS OFF
-    COMPILE_WARNING_AS_ERROR ON
 )
 
 if (MSVC)
