@@ -23,16 +23,6 @@ int main() {
     for (float s : scatter) cout << fixed << setprecision(8) << s << " ";
     cout << endl;
 
-    // Test c_gamma
-    vector<float> res = {5.2f, 2.2f};
-    vector<int> shape = {3, 2};
-    wgpu::Buffer cgammaResultBuffer = createBuffer(context.device, nullptr, sizeof(float) * shape[0]*shape[1], static_cast<WGPUBufferUsage>(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
-    c_gamma(context, cgammaResultBuffer, res, shape);
-    cout << "c_gamma output:" << endl;
-    vector<float> cgamma = readBack(context.device, context.queue, shape[0]*shape[1], cgammaResultBuffer);
-    for (float c : cgamma) cout << fixed << setprecision(4) << c << " ";
-    cout << endl;
-
     // Test diffract
     vector<float> uf = {1,2,3,4,5,6,7,8,9};
     vector<float> ub = {9,8,7,6,5,4,3,2,1};
