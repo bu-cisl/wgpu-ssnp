@@ -36,8 +36,8 @@ int main() {
     // Test diffract
     vector<float> uf = {1};
     vector<float> ub = {1};
-    wgpu::Buffer newUFBuffer = createBuffer(context.device, nullptr, sizeof(float) * shape[0]*shape[1], static_cast<WGPUBufferUsage>(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
-    wgpu::Buffer newUBBuffer = createBuffer(context.device, nullptr, sizeof(float) * shape[0]*shape[1], static_cast<WGPUBufferUsage>(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
+    wgpu::Buffer newUFBuffer = createBuffer(context.device, nullptr, sizeof(float) * uf.size(), static_cast<WGPUBufferUsage>(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
+    wgpu::Buffer newUBBuffer = createBuffer(context.device, nullptr, sizeof(float) * ub.size(), static_cast<WGPUBufferUsage>(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
     diffract(context, newUFBuffer, newUBBuffer, uf, ub);
 
     // Release WebGPU resources
