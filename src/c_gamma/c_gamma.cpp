@@ -12,6 +12,8 @@ struct Params {
 };
 
 static size_t buffer_len;
+static size_t res_buffer_len;
+static size_t shape_buffer_len;
 
 // CREATING BIND GROUP AND LAYOUT
 static wgpu::BindGroupLayout createBindGroupLayout(wgpu::Device& device) {
@@ -39,18 +41,18 @@ static wgpu::BindGroupLayout createBindGroupLayout(wgpu::Device& device) {
     return device.createBindGroupLayout(layoutDesc);
 }
 
-static wgpu::BindGroup createBindGroup(wgpu::Device& device, wgpu::BindGroupLayout bindGroupLayout, wgpu::Buffer shapeBuffer, wgpu::Buffer resBuffer, wgpu::Buffer outputBuffer, const Params& params) {
+static wgpu::BindGroup createBindGroup(wgpu::Device& device, wgpu::BindGroupLayout bindGroupLayout, wgpu::Buffer shapeBuffer, wgpu::Buffer resBuffer, wgpu::Buffer outputBuffer) {
     wgpu::BindGroupEntry shapeEntry = {};
     shapeEntry.binding = 0;
     shapeEntry.buffer = shapeBuffer;
     shapeEntry.offset = 0;
-    shapeEntry.size = sizeof(int) * params.shape.size();
+    shapeEntry.size = sizeof(int) * shape_buffer_len;
 
     wgpu::BindGroupEntry resEntry = {};
     resEntry.binding = 1;
     resEntry.buffer = resBuffer;
     resEntry.offset = 0;
-    resEntry.size = sizeof(float) * params.res.size();
+    resEntry.size = sizeof(float) * res_buffer_len;
 
     wgpu::BindGroupEntry outputEntry = {};
     outputEntry.binding = 2;
@@ -71,6 +73,8 @@ static wgpu::BindGroup createBindGroup(wgpu::Device& device, wgpu::BindGroupLayo
 void c_gamma(WebGPUContext& context, wgpu::Buffer& outputBuffer, const std::vector<float>& res, const std::vector<int>& shape) {
     // Calculate the total number of elements in the output buffer
     buffer_len = std::accumulate(shape.begin(), shape.end(), 1, std::multiplies<int>());
+    res_buffer_len = res.size();
+    shape_buffer_len = shape.size();
     Params params = {res, shape};
 
     // INITIALIZING WEBGPU
@@ -87,7 +91,7 @@ void c_gamma(WebGPUContext& context, wgpu::Buffer& outputBuffer, const std::vect
 
     // CREATING BIND GROUP AND LAYOUT
     wgpu::BindGroupLayout bindGroupLayout = createBindGroupLayout(device);
-    wgpu::BindGroup bindGroup = createBindGroup(device, bindGroupLayout, shapeBuffer, resBuffer, outputBuffer, params);
+    wgpu::BindGroup bindGroup = createBindGroup(device, bindGroupLayout, shapeBuffer, resBuffer, outputBuffer);
 
     // CREATING COMPUTE PIPELINE
     wgpu::ComputePipeline computePipeline = createComputePipeline(device, shaderModule, bindGroupLayout);

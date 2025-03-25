@@ -9,39 +9,46 @@
 
 // INPUT PARAMS
 struct Params {
-    std::vector<float> res;
-    std::vector<int> shape;
+    float dz;
 };
 
-static size_t buffer_len;
-
 // CREATING BIND GROUP AND LAYOUT
-// static wgpu::BindGroupLayout createBindGroupLayout(wgpu::Device& device) {
-//     wgpu::BindGroupLayoutEntry shapeBufferLayout = {};
-//     shapeBufferLayout.binding = 0;
-//     shapeBufferLayout.visibility = wgpu::ShaderStage::Compute;
-//     shapeBufferLayout.buffer.type = wgpu::BufferBindingType::ReadOnlyStorage;
+static wgpu::BindGroupLayout createBindGroupLayout(wgpu::Device& device) {
+    wgpu::BindGroupLayoutEntry ufBufferLayout = {};
+    ufBufferLayout.binding = 0;
+    ufBufferLayout.visibility = wgpu::ShaderStage::Compute;
+    ufBufferLayout.buffer.type = wgpu::BufferBindingType::ReadOnlyStorage;
 
-//     wgpu::BindGroupLayoutEntry resBufferLayout = {};
-//     resBufferLayout.binding = 1;
-//     resBufferLayout.visibility = wgpu::ShaderStage::Compute;
-//     resBufferLayout.buffer.type = wgpu::BufferBindingType::ReadOnlyStorage;
+    wgpu::BindGroupLayoutEntry ubBufferLayout = {};
+    ubBufferLayout.binding = 1;
+    ubBufferLayout.visibility = wgpu::ShaderStage::Compute;
+    ubBufferLayout.buffer.type = wgpu::BufferBindingType::ReadOnlyStorage;
 
-//     wgpu::BindGroupLayoutEntry outputBufferLayout = {};
-//     outputBufferLayout.binding = 2;
-//     outputBufferLayout.visibility = wgpu::ShaderStage::Compute;
-//     outputBufferLayout.buffer.type = wgpu::BufferBindingType::Storage;
+    wgpu::BindGroupLayoutEntry newUFBufferLayout = {};
+    newUFBufferLayout.binding = 2;
+    newUFBufferLayout.visibility = wgpu::ShaderStage::Compute;
+    newUFBufferLayout.buffer.type = wgpu::BufferBindingType::Storage;
 
-//     wgpu::BindGroupLayoutEntry entries[] = {shapeBufferLayout, resBufferLayout, outputBufferLayout};
+    wgpu::BindGroupLayoutEntry newUBBufferLayout = {};
+    newUBBufferLayout.binding = 3;
+    newUBBufferLayout.visibility = wgpu::ShaderStage::Compute;
+    newUBBufferLayout.buffer.type = wgpu::BufferBindingType::Storage;
 
-//     wgpu::BindGroupLayoutDescriptor layoutDesc = {};
-//     layoutDesc.entryCount = 3;
-//     layoutDesc.entries = entries;
+    wgpu::BindGroupLayoutEntry uniformBufferLayout = {};
+    uniformBufferLayout.binding = 4;
+    uniformBufferLayout.visibility = wgpu::ShaderStage::Compute;
+    uniformBufferLayout.buffer.type = wgpu::BufferBindingType::Uniform;
 
-//     return device.createBindGroupLayout(layoutDesc);
-// }
+    wgpu::BindGroupLayoutEntry entries[] = {ufBufferLayout, ubBufferLayout, uniformBufferLayout};
 
-// static wgpu::BindGroup createBindGroup(wgpu::Device& device, wgpu::BindGroupLayout bindGroupLayout, wgpu::Buffer shapeBuffer, wgpu::Buffer resBuffer, wgpu::Buffer outputBuffer, const Params& params) {
+    wgpu::BindGroupLayoutDescriptor layoutDesc = {};
+    layoutDesc.entryCount = 5;
+    layoutDesc.entries = entries;
+
+    return device.createBindGroupLayout(layoutDesc);
+}
+
+// static wgpu::BindGroup createBindGroup(wgpu::Device& device, wgpu::BindGroupLayout bindGroupLayout, wgpu::Buffer ufBuffer, wgpu::Buffer ubBuffer, wgpu::Buffer newUFBuffer, wgpu::Buffer newUBBuffer, wgpu::Buffer uniformBuffer) {
 //     wgpu::BindGroupEntry shapeEntry = {};
 //     shapeEntry.binding = 0;
 //     shapeEntry.buffer = shapeBuffer;
@@ -69,31 +76,31 @@ static size_t buffer_len;
 
 //     return device.createBindGroup(bindGroupDesc);
 // }
-#include <iostream>
+
 void diffract(WebGPUContext& context, wgpu::Buffer& newUFBuffer, wgpu::Buffer& newUBBuffer, std::vector<float> uf, std::vector<float> ub, std::optional<std::vector<float>> res, std::optional<float> dz) {
     // cgamma call
     assert(uf.size() == ub.size() && "uf and ub must have the same shape");
-    wgpu::Buffer cgammaBuffer = createBuffer(context.device, nullptr, sizeof(float) * uf.size(), static_cast<WGPUBufferUsage>(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
-    c_gamma(context, cgammaBuffer, res.value(), {float(uf.size())});
 
-    // Calculate the total number of elements in the output buffer
-    // Params params = {res, shape};
+    Params params = {dz.value()};
 
     // INITIALIZING WEBGPU
     wgpu::Device device = context.device;
     wgpu::Queue queue = context.queue;
     
     // LOADING AND COMPILING SHADER CODE
-    // std::string shaderCode = readShaderFile("src/diffract/diffract.wgsl");
-    // wgpu::ShaderModule shaderModule = createShaderModule(device, shaderCode);
+    std::string shaderCode = readShaderFile("src/diffract/diffract.wgsl");
+    wgpu::ShaderModule shaderModule = createShaderModule(device, shaderCode);
 
-    // CREATING BUFFERS FOR C_GAMMA
-    // wgpu::Buffer shapeBuffer = createBuffer(device, params.shape.data(), sizeof(int) * params.shape.size(), wgpu::BufferUsage::Storage);
-    // wgpu::Buffer resBuffer = createBuffer(device, params.res.data(), sizeof(float) * params.res.size(), wgpu::BufferUsage::Storage);
+    // CREATING BUFFERS FOR DIFFRACT
+    wgpu::Buffer cgammaBuffer = createBuffer(context.device, nullptr, sizeof(float) * uf.size(), static_cast<WGPUBufferUsage>(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
+    c_gamma(context, cgammaBuffer, res.value(), {float(uf.size())});
+    wgpu::Buffer ufBuffer = createBuffer(device, uf.data(), sizeof(float) * uf.size(), wgpu::BufferUsage::Storage);
+    wgpu::Buffer ubBuffer = createBuffer(device, ub.data(), sizeof(float) * ub.size(), wgpu::BufferUsage::Storage);
+    wgpu::Buffer uniformBuffer = createBuffer(device, &params, sizeof(Params), wgpu::BufferUsage::Uniform);
 
     // CREATING BIND GROUP AND LAYOUT
-    // wgpu::BindGroupLayout bindGroupLayout = createBindGroupLayout(device);
-    // wgpu::BindGroup bindGroup = createBindGroup(device, bindGroupLayout, shapeBuffer, resBuffer, outputBuffer, params);
+    wgpu::BindGroupLayout bindGroupLayout = createBindGroupLayout(device);
+    // wgpu::BindGroup bindGroup = createBindGroup(device, bindGroupLayout, ufBuffer, ubBuffer, newUFBuffer, newUBBuffer, uniformBuffer);
 
     // CREATING COMPUTE PIPELINE
     // wgpu::ComputePipeline computePipeline = createComputePipeline(device, shaderModule, bindGroupLayout);
