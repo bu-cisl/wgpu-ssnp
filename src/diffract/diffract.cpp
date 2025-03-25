@@ -118,7 +118,7 @@ void diffract(WebGPUContext& context, wgpu::Buffer& newUFBuffer, wgpu::Buffer& n
 
     // CREATING BUFFERS FOR DIFFRACT
     wgpu::Buffer cgammaBuffer = createBuffer(context.device, nullptr, sizeof(float) * uf.size(), static_cast<WGPUBufferUsage>(wgpu::BufferUsage::Storage));
-    c_gamma(context, cgammaBuffer, res.value(), {int(uf.size())});
+    c_gamma(context, cgammaBuffer, res.value(), {int(buffer_len)});
     wgpu::Buffer ufBuffer = createBuffer(device, uf.data(), sizeof(float) * buffer_len, wgpu::BufferUsage::Storage);
     wgpu::Buffer ubBuffer = createBuffer(device, ub.data(), sizeof(float) * buffer_len, wgpu::BufferUsage::Storage);
     wgpu::Buffer uniformBuffer = createBuffer(device, &params, sizeof(Params), wgpu::BufferUsage::Uniform);

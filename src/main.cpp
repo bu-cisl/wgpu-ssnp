@@ -40,11 +40,11 @@ int main() {
     wgpu::Buffer newUBBuffer = createBuffer(context.device, nullptr, sizeof(float) * ub.size(), static_cast<WGPUBufferUsage>(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
     diffract(context, newUFBuffer, newUBBuffer, uf, ub);
     cout << "diffract output (new uf):" << endl;
-    vector<float> ufbuff = readBack(context.device, context.queue, shape[0]*shape[1], newUFBuffer);
+    vector<float> ufbuff = readBack(context.device, context.queue, uf.size(), newUFBuffer);
     for (float uf : ufbuff) cout << fixed << setprecision(4) << uf << " ";
     cout << endl;
     cout << "diffract output (new ub):" << endl;
-    vector<float> ubbuff = readBack(context.device, context.queue, shape[0]*shape[1], newUBBuffer);
+    vector<float> ubbuff = readBack(context.device, context.queue, ub.size(), newUBBuffer);
     for (float ub : ubbuff) cout << fixed << setprecision(4) << ub << " ";
     cout << endl;
 

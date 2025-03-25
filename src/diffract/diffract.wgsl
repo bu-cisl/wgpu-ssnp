@@ -14,7 +14,7 @@ fn main(@builtin(global_invocation_id) global_id : vec3<u32>) {
 
     let pi = radians(180.0);
     let kz = 2.0 * pi * 0.1 * cgamma[idx]; // res[2] = 0.1
-    let eva = exp(clamp((cgamma[idx] - 0.2) * 5.0, 0.0, 1e10));
+    let eva = exp(clamp((cgamma[idx] - 0.2) * 5.0, -1e38, 0.0));
     
     let cos_kz_dz = cos(kz * params);
     let sin_kz_dz = sin(kz * params);
