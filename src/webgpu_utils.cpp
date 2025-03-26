@@ -1,5 +1,4 @@
 #include "webgpu_utils.h"
-#include <cstring>
 
 // INITIALIZING WEBGPU
 void initWebGPU(WebGPUContext& context) {
@@ -18,9 +17,19 @@ void initWebGPU(WebGPUContext& context) {
         std::cerr << "Failed to request a WebGPU adapter." << std::endl;
     }
 
+    // Get adapter's limits
+    WGPUSupportedLimits supportedLimits = {};
+    wgpuAdapterGetLimits(context.adapter, &supportedLimits);
+
     // Request device
     wgpu::DeviceDescriptor deviceDescriptor = {};
     deviceDescriptor.label = "Default Device";
+
+    // Align device limits to that of adapter
+    WGPURequiredLimits requiredLimits = {};
+    requiredLimits.limits = supportedLimits.limits;
+    requiredLimits.limits.maxBufferSize = requiredLimits.limits.maxBufferSize-1; // for some reason defaulted to 256 MB before
+    deviceDescriptor.requiredLimits = &requiredLimits;
     context.device = context.adapter.requestDevice(deviceDescriptor);
     if (!context.device) {
         std::cerr << "Failed to request a WebGPU device." << std::endl;
@@ -31,6 +40,25 @@ void initWebGPU(WebGPUContext& context) {
     if (!context.queue) {
         std::cerr << "Failed to retrieve command queue." << std::endl;
     }
+}
+
+// Function to fetch the workgroup limits
+WorkgroupLimits getWorkgroupLimits(wgpu::Device& device) {
+    WGPUSupportedLimits limits = {};
+    WorkgroupLimits result;
+
+    bool success = wgpuDeviceGetLimits(device, &limits);
+    if (success) {
+        result.maxWorkgroupSizeX = double(limits.limits.maxComputeWorkgroupSizeX);
+        result.maxWorkgroupSizeY = double(limits.limits.maxComputeWorkgroupSizeY);
+        result.maxWorkgroupSizeZ = double(limits.limits.maxComputeWorkgroupSizeZ);
+        result.maxWorkgroupsPerDimension = double(limits.limits.maxComputeWorkgroupsPerDimension);
+    } else {
+        std::cerr << "Error fetching workgroup limits." << std::endl;
+        result = { -1.0, -1.0, -1.0, -1.0 }; // Return default error values
+    }
+
+    return result;
 }
 
 // LOADING AND COMPILING SHADER CODE
@@ -141,7 +169,7 @@ std::vector<float> readBack(wgpu::Device& device, wgpu::Queue& queue, size_t buf
                 std::cerr << "Failed to get mapped range!" << std::endl;
             }
         } else {
-            std::cerr << "Failed to map buffer! Status: " << static_cast<int>(status) << std::endl;
+            std::cerr << "Failed to map buffer! Status: " << int(status) << std::endl;
         }
         mappingComplete = true;
     });

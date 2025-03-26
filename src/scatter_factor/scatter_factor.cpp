@@ -1,8 +1,4 @@
-#include <fstream>
-#include <sstream>
-#include <webgpu/webgpu.hpp>
 #include "scatter_factor.h"
-#include "../webgpu_utils.h"
 
 // INPUT PARAMS
 struct Params {
@@ -99,7 +95,7 @@ void scatter_factor(WebGPUContext& context, wgpu::Buffer& outputBuffer, std::vec
     wgpu::ComputePassEncoder computePass = commandEncoder.beginComputePass(computePassDesc);
     computePass.setPipeline(computePipeline);
     computePass.setBindGroup(0, bindGroup, 0, nullptr);
-    computePass.dispatchWorkgroups(64, 1, 1);
+    computePass.dispatchWorkgroups(std::ceil(double(buffer_len)/256.0),1,1);
     computePass.end();
 
     wgpu::CommandBufferDescriptor cmdBufferDesc = {};

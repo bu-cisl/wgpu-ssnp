@@ -1,10 +1,4 @@
-#include <fstream>
-#include <sstream>
-#include <cassert>
-#include <webgpu/webgpu.hpp>
 #include "diffract.h"
-#include "../webgpu_utils.h"
-#include "../c_gamma/c_gamma.h"
 
 // INPUT PARAMS
 struct Params {
@@ -129,7 +123,7 @@ void diffract(WebGPUContext& context, wgpu::Buffer& newUFBuffer, wgpu::Buffer& n
     wgpu::ShaderModule shaderModule = createShaderModule(device, shaderCode);
 
     // CREATING BUFFERS FOR DIFFRACT
-    wgpu::Buffer cgammaBuffer = createBuffer(context.device, nullptr, sizeof(float) * uf.size(), static_cast<WGPUBufferUsage>(wgpu::BufferUsage::Storage));
+    wgpu::Buffer cgammaBuffer = createBuffer(context.device, nullptr, sizeof(float) * uf.size(), WGPUBufferUsage(wgpu::BufferUsage::Storage));
     c_gamma(context, cgammaBuffer, res.value(), {int(buffer_len)});
     wgpu::Buffer ufBuffer = createBuffer(device, uf.data(), sizeof(float) * buffer_len, wgpu::BufferUsage::Storage);
     wgpu::Buffer ubBuffer = createBuffer(device, ub.data(), sizeof(float) * buffer_len, wgpu::BufferUsage::Storage);
@@ -151,7 +145,7 @@ void diffract(WebGPUContext& context, wgpu::Buffer& newUFBuffer, wgpu::Buffer& n
     wgpu::ComputePassEncoder computePass = commandEncoder.beginComputePass(computePassDesc);
     computePass.setPipeline(computePipeline);
     computePass.setBindGroup(0, bindGroup, 0, nullptr);
-    computePass.dispatchWorkgroups(64,1,1);
+    computePass.dispatchWorkgroups(std::ceil(double(buffer_len)/256.0),1,1);
     computePass.end();
 
     wgpu::CommandBufferDescriptor cmdBufferDesc = {};

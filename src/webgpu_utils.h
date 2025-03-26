@@ -5,6 +5,7 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <cstring>
 
 struct WebGPUContext {
     wgpu::Instance instance = nullptr;
@@ -13,8 +14,17 @@ struct WebGPUContext {
     wgpu::Queue queue = nullptr;
 };
 
+struct WorkgroupLimits {
+    double maxWorkgroupSizeX;
+    double maxWorkgroupSizeY;
+    double maxWorkgroupSizeZ;
+    double maxWorkgroupsPerDimension;
+};
+
 // Initializes WebGPU
 void initWebGPU(WebGPUContext& context);
+
+WorkgroupLimits getWorkgroupLimits(wgpu::Device& device);
 
 // Reads shader source code from a file
 std::string readShaderFile(const std::string& filename);
