@@ -10,7 +10,7 @@ def test_scatter_factor():
     print(python_result)
 
 def test_c_gamma():
-    res = (0.1, 0.1, 0.1)
+    res = (0.1, 0.4, 0.1)
     shape = (3, 3)
     gamma_result = ssnp_model.c_gamma(res, shape)
 
@@ -54,8 +54,8 @@ def test_tilt():
     print(tilt_result)
 
 if __name__ == "__main__":
-    # test_scatter_factor()
+    test_scatter_factor()
     test_c_gamma()
-    # test_diffract()
+    test_diffract()
     test_binary_pupil()
-    # test_tilt()
+    test_tilt()

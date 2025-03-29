@@ -14,32 +14,30 @@ fn near_0(index: i32, size: i32) -> f32 {
 
 @compute @workgroup_size(256)
 fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
-    let num_dims: i32 = i32(arrayLength(&shape));
-    var valid: bool = true;
-    var sum_squares: f32 = 0.0;
+    let index: i32 = i32(global_id.x); // Use only the x-dimension for indexing
 
-    for (var dim: i32 = 0; dim < num_dims; dim++) {
-        if (i32(global_id[dim]) >= shape[dim]) {
-            valid = false;
-            break;
-        }
-        let normalized = near_0(i32(global_id[dim]), shape[dim]) / res[dim];
-        sum_squares += normalized * normalized;
-    }
+    let size_x: i32 = shape[0];
+    let size_y: i32 = shape[1];
+    let total_size: i32 = size_x * size_y;
 
-    if (!valid) {
+    if (index >= total_size) {
         return;
     }
 
-    let value = 1.0 - sum_squares;
-    let result = sqrt(max(value, eps));
+    let resolution_x: f32 = res[1];
+    let resolution_y: f32 = res[2];
 
-    var index: i32 = 0;
-    var stride: i32 = 1;
-    for (var dim: i32 = num_dims - 1; dim >= 0; dim--) {
-        index += i32(global_id[dim]) * stride;
-        stride *= shape[dim];
-    }
+    let index_x: i32 = index / size_y;
+    let index_y: i32 = index % size_y;
 
-    output[index] = result;
+
+    let c_alpha: f32 = near_0(index_y, size_y) / resolution_y;
+    let c_beta: f32 = near_0(index_x, size_x) / resolution_x;
+
+    let alpha_square: f32 = c_alpha * c_alpha;
+    let beta_square: f32 = c_beta * c_beta;
+
+    let gamma: f32 = sqrt(max(1.0 - (alpha_square + beta_square), eps));
+
+    output[index] = gamma;
 }

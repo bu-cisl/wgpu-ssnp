@@ -35,15 +35,16 @@ int main() {
     c_gamma(context, cGammaResultBuffer, res, shape);
     cout << "c_gamma output:" << endl;
     vector<float> cgammaBuff = readBack(context.device, context.queue, len, cGammaResultBuffer);
-    for (float c : cgammaBuff) cout << fixed << setprecision(8) << c << " ";
+    for (float c : cgammaBuff) cout << fixed << setprecision(4) << c << " ";
     cout << endl;
 
     // Test diffract
     vector<float> uf = {1,2,3,4,5,6,7,8,9};
     vector<float> ub = {9,8,7,6,5,4,3,2,1};
+    vector<int> uf_ub_shape = {3,3}; // we need to note original shape of matrix before flattening
     wgpu::Buffer newUFBuffer = createBuffer(context.device, nullptr, sizeof(float) * uf.size(), WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
     wgpu::Buffer newUBBuffer = createBuffer(context.device, nullptr, sizeof(float) * ub.size(), WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
-    diffract(context, newUFBuffer, newUBBuffer, uf, ub);
+    diffract(context, newUFBuffer, newUBBuffer, uf, ub, uf_ub_shape);
     cout << "diffract output (new uf):" << endl;
     vector<float> ufbuff = readBack(context.device, context.queue, uf.size(), newUFBuffer);
     for (float uf : ufbuff) cout << fixed << setprecision(4) << uf << " ";

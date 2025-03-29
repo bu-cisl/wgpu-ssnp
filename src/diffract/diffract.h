@@ -16,6 +16,7 @@ void diffract(
     wgpu::Buffer& newUBBuffer, 
     std::vector<float> uf, 
     std::vector<float> ub, 
+    std::vector<int> shape,
     std::optional<std::vector<float>> res = std::vector<float>{0.1, 0.1, 0.1}, 
     std::optional<float> dz = 1
 );

@@ -84,7 +84,7 @@ void binary_pupil(
 
     // CREATING BUFFERS FOR BINARY_PUPIL
     wgpu::Buffer cgammaBuffer = createBuffer(device, nullptr, sizeof(float) * buffer_len, WGPUBufferUsage(wgpu::BufferUsage::Storage));
-    c_gamma(context, cgammaBuffer, res.value(), {int(buffer_len)});
+    c_gamma(context, cgammaBuffer, res.value(), shape);
     wgpu::Buffer uniformBuffer = createBuffer(device, &params, sizeof(Params), wgpu::BufferUsage::Uniform);
 
     // CREATING BIND GROUP AND LAYOUT

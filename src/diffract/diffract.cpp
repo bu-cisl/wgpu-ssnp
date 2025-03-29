@@ -115,7 +115,7 @@ static wgpu::BindGroup createBindGroup(
 
 void diffract(
     WebGPUContext& context, wgpu::Buffer& newUFBuffer, wgpu::Buffer& newUBBuffer, 
-    std::vector<float> uf, std::vector<float> ub, 
+    std::vector<float> uf, std::vector<float> ub, std::vector<int> shape,
     std::optional<std::vector<float>> res, std::optional<float> dz
 ) {
     // cgamma call
@@ -134,7 +134,7 @@ void diffract(
 
     // CREATING BUFFERS FOR DIFFRACT
     wgpu::Buffer cgammaBuffer = createBuffer(context.device, nullptr, sizeof(float) * uf.size(), WGPUBufferUsage(wgpu::BufferUsage::Storage));
-    c_gamma(context, cgammaBuffer, res.value(), {int(buffer_len)});
+    c_gamma(context, cgammaBuffer, res.value(), shape);
     wgpu::Buffer ufBuffer = createBuffer(device, uf.data(), sizeof(float) * buffer_len, wgpu::BufferUsage::Storage);
     wgpu::Buffer ubBuffer = createBuffer(device, ub.data(), sizeof(float) * buffer_len, wgpu::BufferUsage::Storage);
     wgpu::Buffer resBuffer = createBuffer(device, res.value().data(), sizeof(float)*res_buffer_len, wgpu::BufferUsage::Storage);
