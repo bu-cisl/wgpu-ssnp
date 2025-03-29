@@ -1,5 +1,6 @@
 #include "binary_pupil.h"
 
+// INPUT PARAMS
 struct Params {
     float na;
 };
@@ -32,7 +33,10 @@ static wgpu::BindGroupLayout createBindGroupLayout(wgpu::Device& device) {
     return device.createBindGroupLayout(layoutDesc);
 }
 
-static wgpu::BindGroup createBindGroup(wgpu::Device& device, wgpu::BindGroupLayout bindGroupLayout, wgpu::Buffer cgammaBuffer, wgpu::Buffer maskBuffer, wgpu::Buffer uniformBuffer) {
+static wgpu::BindGroup createBindGroup(
+    wgpu::Device& device, wgpu::BindGroupLayout, 
+    wgpu::Buffer cgammaBuffer, wgpu::Buffer maskBuffer, wgpu::Buffer uniformBuffer
+) {
     wgpu::BindGroupEntry cgammaEntry = {};
     cgammaEntry.binding = 0;
     cgammaEntry.buffer = cgammaBuffer;
@@ -54,11 +58,19 @@ static wgpu::BindGroup createBindGroup(wgpu::Device& device, wgpu::BindGroupLayo
     wgpu::BindGroupEntry entries[] = {cgammaEntry, maskEntry, uniformEntry};
 
     wgpu::BindGroupDescriptor bindGroupDesc = {};
-    bindGroupDesc.layout = bindGroupLayout;
+    bindGroupDesc.layout = layout;
     bindGroupDesc.entryCount = 3;
     bindGroupDesc.entries = entries;
 
     return device.createBindGroup(bindGroupDesc);
 }
 
-void binary_pupil(WebGPUContext& context, wgpu::Buffer& maskBuffer, std::vector<float> cgamma, float na);
+void binary_pupil(
+    WebGPUContext& context,
+    wgpu::Buffer& maskBuffer,
+    std::optional<std::vector<float>> res,
+    std::optional<float> na,
+    std::vector<int32_t> shape
+) {
+
+}
