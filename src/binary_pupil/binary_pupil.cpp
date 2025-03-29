@@ -70,7 +70,8 @@ void binary_pupil(
     std::optional<std::vector<float>> res, std::optional<float> na,
     const std::vector<int>& shape
 ) {
-    buffer_len = std::accumulate(shape.begin(), shape.end(), 1, std::multiplies<int>());
+    assert(shape.size() >= 2 && "shape must contain at least two values");
+    buffer_len = shape[0] * shape[1];
     Params params = {na.value()};
 
     // INITIALIZING WEBGPU
@@ -83,7 +84,7 @@ void binary_pupil(
 
     // CREATING BUFFERS FOR BINARY_PUPIL
     wgpu::Buffer cgammaBuffer = createBuffer(device, nullptr, sizeof(float) * buffer_len, WGPUBufferUsage(wgpu::BufferUsage::Storage));
-    c_gamma(context, cgammaBuffer, res.value(), shape);
+    c_gamma(context, cgammaBuffer, res.value(), {int(buffer_len)});
     wgpu::Buffer uniformBuffer = createBuffer(device, &params, sizeof(Params), wgpu::BufferUsage::Uniform);
 
     // CREATING BIND GROUP AND LAYOUT

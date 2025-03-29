@@ -185,6 +185,7 @@ std::vector<float> readBack(wgpu::Device& device, wgpu::Queue& queue, size_t buf
     return output;
 }
 
+// Temporary uint32 version of readBack for binary_pupil
 std::vector<uint32_t> readBack2(wgpu::Device& device, wgpu::Queue& queue, size_t buffer_len, wgpu::Buffer& outputBuffer) {
     std::vector<uint32_t> output(buffer_len);
 
