@@ -15,7 +15,7 @@ void binary_pupil(
     wgpu::Buffer& maskBuffer,
     std::optional<std::vector<float>> res = std::vector<float>{0.1, 0.1, 0.1},
     std::optional<float> na = 1.0f,
-    std::vector<int32_t> shape = {}
+    const std::vector<int>& shape = {}
 );
 
 #endif 

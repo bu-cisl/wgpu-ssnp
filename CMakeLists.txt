@@ -12,6 +12,7 @@ add_executable(
     src/scatter_factor/scatter_factor.cpp 
     src/c_gamma/c_gamma.cpp 
     src/diffract/diffract.cpp
+    src/binary_pupil/binary_pupil.cpp
 )
 
 set_target_properties(ssnp_cpp PROPERTIES
