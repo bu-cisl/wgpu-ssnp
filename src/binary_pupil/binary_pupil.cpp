@@ -106,15 +106,30 @@ void binary_pupil(
     );
 
     // CREATING COMPUTE PIPELINE
-
+    wgpu::ComputePipeline computePipeline = createComputePipeline(device, shaderModule, bindGroupLayout);
 
     // ENCODING AND DISPATCHING COMPUTE COMMANDS
+    wgpu::CommandEncoderDescriptor encoderDesc = {};
+    wgpu::CommandEncoder commandEncoder = device.createCommandEncoder(encoderDesc);
 
+    wgpu::ComputePassDescriptor computePassDesc = {};
+    wgpu::ComputePassEncoder computePass = commandEncoder.beginComputePass(computePassDesc);
+    computePass.setPipeline(computePipeline);
+    computePass.setBindGroup(0, bindGroup, 0, nullptr);
+    computePass.dispatchWorkgroups(std::ceil(double(buffer_len)/256.0),1,1);
+    computePass.end();
+
+    wgpu::CommandBufferDescriptor cmdBufferDesc = {};
+    wgpu::CommandBuffer commandBuffer = commandEncoder.finish(cmdBufferDesc);
+
+    queue.submit(1, &commandBuffer);
 
     // RELEASE RESOURCES
-
-
-    if (!queue || !shaderModule || !bindGroup){
-        return;
-    }
+    bindGroup.release();
+    bindGroupLayout.release();
+    cgammaBuffer.release();
+    uniformBuffer.release();
+    shaderModule.release();
+    computePipeline.release();
+    commandBuffer.release();
 }

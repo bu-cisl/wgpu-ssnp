@@ -1,6 +1,7 @@
 #define WEBGPU_CPP_IMPLEMENTATION
 #include "scatter_factor/scatter_factor.h"
 #include "diffract/diffract.h"
+#include "binary_pupil/binary_pupil.h"
 #include "webgpu_utils.h"
 #include <vector>
 #include <iostream>
@@ -37,6 +38,25 @@ int main() {
     for (float ub : ubbuff) cout << fixed << setprecision(4) << ub << " ";
     cout << endl;
 
+    // Test binary_pupil
+    vector<int> shape = {3, 3};
+    wgpu::Buffer maskBuffer = createBuffer(
+        context.device, 
+        nullptr, 
+        sizeof(uint32_t) * shape[0] * shape[1], 
+        WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc)
+    );
+
+    std::vector<float> res = {0.1f, 0.1f, 0.1f};
+    float na = 0.5f;
+
+    binary_pupil(context, maskBuffer, res, na, shape);
+
+    cout << "binary_pupil output: ";
+    vector<float> maskBuff = readBack(context.device, context.queue, shape.size(), maskBuffer);
+    for (float val : maskBuff) cout << int(val) << " ";
+    cout << endl;
+
     // Release WebGPU resources
     wgpuQueueRelease(context.queue);
     wgpuDeviceRelease(context.device);
@@ -45,6 +65,7 @@ int main() {
     scatterFactorResultBuffer.release();
     newUFBuffer.release();
     newUBBuffer.release();
+    maskBuffer.release();
 
     return 0;
 }
