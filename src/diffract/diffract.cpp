@@ -54,7 +54,13 @@ static wgpu::BindGroupLayout createBindGroupLayout(wgpu::Device& device) {
     return device.createBindGroupLayout(layoutDesc);
 }
 
-static wgpu::BindGroup createBindGroup(wgpu::Device& device, wgpu::BindGroupLayout bindGroupLayout, wgpu::Buffer ufBuffer, wgpu::Buffer ubBuffer, wgpu::Buffer resBuffer, wgpu::Buffer cgammaBuffer, wgpu::Buffer newUFBuffer, wgpu::Buffer newUBBuffer, wgpu::Buffer uniformBuffer) {
+static wgpu::BindGroup createBindGroup(
+    wgpu::Device& device, wgpu::BindGroupLayout bindGroupLayout, 
+    wgpu::Buffer ufBuffer, wgpu::Buffer ubBuffer, 
+    wgpu::Buffer resBuffer, wgpu::Buffer cgammaBuffer, 
+    wgpu::Buffer newUFBuffer, wgpu::Buffer newUBBuffer, 
+    wgpu::Buffer uniformBuffer
+) {
     wgpu::BindGroupEntry ufEntry = {};
     ufEntry.binding = 0;
     ufEntry.buffer = ufBuffer;
@@ -107,9 +113,11 @@ static wgpu::BindGroup createBindGroup(wgpu::Device& device, wgpu::BindGroupLayo
     return device.createBindGroup(bindGroupDesc);
 }
 
-void diffract(WebGPUContext& context, wgpu::Buffer& newUFBuffer, wgpu::Buffer& newUBBuffer, 
-    std::vector<float> uf, std::vector<float> ub, std::optional<std::vector<float>> res, 
-    std::optional<float> dz) {
+void diffract(
+    WebGPUContext& context, wgpu::Buffer& newUFBuffer, wgpu::Buffer& newUBBuffer, 
+    std::vector<float> uf, std::vector<float> ub, 
+    std::optional<std::vector<float>> res, std::optional<float> dz
+) {
     // cgamma call
     assert(uf.size() == ub.size() && "uf and ub must have the same shape");
     buffer_len = uf.size();

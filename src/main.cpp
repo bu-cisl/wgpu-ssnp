@@ -23,6 +23,9 @@ int main() {
     for (float s : scatter) cout << fixed << setprecision(8) << s << " ";
     cout << endl;
 
+    // Test c_gamma
+
+
     // Test diffract
     vector<float> uf = {1,2,3,4,5,6,7,8,9};
     vector<float> ub = {9,8,7,6,5,4,3,2,1};
@@ -39,22 +42,14 @@ int main() {
     cout << endl;
 
     // Test binary_pupil
-    vector<int> shape = {3, 3};
-    wgpu::Buffer maskBuffer = createBuffer(
-        context.device, 
-        nullptr, 
-        sizeof(uint32_t) * shape[0] * shape[1], 
-        WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc)
-    );
-
-    std::vector<float> res = {0.1f, 0.1f, 0.1f};
-    float na = 0.5f;
-
+    vector<int> shape = {4, 4};
+    wgpu::Buffer maskBuffer = createBuffer(context.device, nullptr, sizeof(uint32_t) * shape[0] * shape[1], WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
+    std::vector<float> res = {1.1f, 0.4f, 0.1f};
+    float na = 0.9f;
     binary_pupil(context, maskBuffer, res, na, shape);
-
     cout << "binary_pupil output: ";
-    vector<float> maskBuff = readBack(context.device, context.queue, shape.size(), maskBuffer);
-    for (float val : maskBuff) cout << int(val) << " ";
+    vector<uint32_t> maskBuff = readBack2(context.device, context.queue, shape[0] * shape[1], maskBuffer);
+    for (uint32_t val : maskBuff) cout << val << " ";
     cout << endl;
 
     // Release WebGPU resources

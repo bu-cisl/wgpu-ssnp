@@ -40,5 +40,6 @@ wgpu::ComputePipeline createComputePipeline(wgpu::Device& device, wgpu::ShaderMo
 
 // Readback from GPU to CPU
 std::vector<float> readBack(wgpu::Device& device, wgpu::Queue& queue, size_t buffer_len, wgpu::Buffer& outputBuffer);
+std::vector<uint32_t> readBack2(wgpu::Device& device, wgpu::Queue& queue, size_t buffer_len, wgpu::Buffer& outputBuffer);
 
 #endif

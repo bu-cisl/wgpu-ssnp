@@ -33,7 +33,10 @@ static wgpu::BindGroupLayout createBindGroupLayout(wgpu::Device& device) {
     return device.createBindGroupLayout(layoutDesc);
 }
 
-static wgpu::BindGroup createBindGroup(wgpu::Device& device, wgpu::BindGroupLayout bindGroupLayout, wgpu::Buffer cgammaBuffer, wgpu::Buffer maskBuffer, wgpu::Buffer uniformBuffer) {
+static wgpu::BindGroup createBindGroup(
+    wgpu::Device& device, wgpu::BindGroupLayout bindGroupLayout, 
+    wgpu::Buffer cgammaBuffer, wgpu::Buffer maskBuffer, wgpu::Buffer uniformBuffer
+) {
     wgpu::BindGroupEntry cgammaEntry = {};
     cgammaEntry.binding = 0;
     cgammaEntry.buffer = cgammaBuffer;
@@ -63,10 +66,8 @@ static wgpu::BindGroup createBindGroup(wgpu::Device& device, wgpu::BindGroupLayo
 }
 
 void binary_pupil(
-    WebGPUContext& context,
-    wgpu::Buffer& maskBuffer,
-    std::optional<std::vector<float>> res,
-    std::optional<float> na,
+    WebGPUContext& context, wgpu::Buffer& maskBuffer,
+    std::optional<std::vector<float>> res, std::optional<float> na,
     const std::vector<int>& shape
 ) {
     buffer_len = std::accumulate(shape.begin(), shape.end(), 1, std::multiplies<int>());
@@ -81,29 +82,13 @@ void binary_pupil(
     wgpu::ShaderModule shaderModule = createShaderModule(device, shaderCode);
 
     // CREATING BUFFERS FOR BINARY_PUPIL
-    wgpu::Buffer cgammaBuffer = createBuffer(
-        device, 
-        nullptr, 
-        sizeof(float) * buffer_len, 
-        WGPUBufferUsage(wgpu::BufferUsage::Storage)
-    );
+    wgpu::Buffer cgammaBuffer = createBuffer(device, nullptr, sizeof(float) * buffer_len, WGPUBufferUsage(wgpu::BufferUsage::Storage));
     c_gamma(context, cgammaBuffer, res.value(), shape);
-    wgpu::Buffer uniformBuffer = createBuffer(
-        device, 
-        &params, 
-        sizeof(Params), 
-        wgpu::BufferUsage::Uniform
-    );
+    wgpu::Buffer uniformBuffer = createBuffer(device, &params, sizeof(Params), wgpu::BufferUsage::Uniform);
 
     // CREATING BIND GROUP AND LAYOUT
     wgpu::BindGroupLayout bindGroupLayout = createBindGroupLayout(device);
-    wgpu::BindGroup bindGroup = createBindGroup(
-        device, 
-        bindGroupLayout, 
-        cgammaBuffer, 
-        maskBuffer, 
-        uniformBuffer
-    );
+    wgpu::BindGroup bindGroup = createBindGroup(device, bindGroupLayout, cgammaBuffer, maskBuffer, uniformBuffer);
 
     // CREATING COMPUTE PIPELINE
     wgpu::ComputePipeline computePipeline = createComputePipeline(device, shaderModule, bindGroupLayout);

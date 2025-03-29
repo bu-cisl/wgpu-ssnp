@@ -10,8 +10,8 @@ def test_scatter_factor():
     print(python_result)
 
 def test_c_gamma():
-    res = (5.2, 2.2)
-    shape = (3, 2)
+    res = (1.1, 0.4, 0.1)
+    shape = (4, 4)
     gamma_result = ssnp_model.c_gamma(res, shape)
 
     print("Python c_gamma result:")
@@ -34,9 +34,9 @@ def test_diffract():
     print(ub_new)
 
 def test_binary_pupil():
-    shape = (5, 4)
-    na = 0.7
-    res = (0.1, 0.1, 0.1)
+    shape = (4, 4)
+    na = 0.9
+    res = (1.1, 0.4, 0.1)
     mask = ssnp_model.binary_pupil(shape, na, res)
 
     print("Python binary_pupil result:")
