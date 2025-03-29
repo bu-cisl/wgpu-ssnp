@@ -26,7 +26,7 @@ int main() {
     // Test c_gamma
     vector<int> shape = {3, 3};
     vector<float> res = {0.1f, 0.4f, 0.1f};
-    size_t len = std::accumulate(shape.begin(), shape.end(), 1, std::multiplies<int>());
+    size_t len = shape[0]*shape[1];
     wgpu::Buffer cGammaResultBuffer = createBuffer(
         context.device, nullptr, 
         sizeof(float) * len, 

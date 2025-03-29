@@ -2,7 +2,6 @@
 #define C_GAMMA_H
 #include <fstream>
 #include <sstream>
-#include <numeric>
 #include <vector>
 #include <cmath>
 #include <webgpu/webgpu.hpp>

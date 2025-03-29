@@ -67,7 +67,7 @@ static wgpu::BindGroup createBindGroup(wgpu::Device& device, wgpu::BindGroupLayo
 
 void c_gamma(WebGPUContext& context, wgpu::Buffer& outputBuffer, const std::vector<float>& res, const std::vector<int>& shape) {
     // Calculate the total number of elements in the output buffer
-    buffer_len = std::accumulate(shape.begin(), shape.end(), 1, std::multiplies<int>());
+    buffer_len = shape[0]*shape[1];
     res_buffer_len = res.size();
     shape_buffer_len = shape.size();
     Params params = {res, shape};
