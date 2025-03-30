@@ -68,6 +68,28 @@ int main() {
     for (uint32_t val : maskbuff) cout << val << " ";
     cout << endl;
 
+    // Test tilt
+    vector<uint32_t> tilt_shape = {2, 2};
+    vector<float> tilt_angles = {
+        M_PI, M_PI/5, M_PI/2, M_PI/3
+    };
+    float NA = 0.7f;
+    vector<float> tilt_res = {0.1f, 0.3f, 0.5f};
+    bool trunc = false;
+    
+    size_t tilt_output_size = 4 * 2;  
+    wgpu::Buffer tiltBuffer = createBuffer(
+        context.device, nullptr, 
+        sizeof(float) * tilt_output_size, 
+        WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc)
+    );
+    
+    tilt(context, tiltBuffer, tilt_angles, tilt_shape, NA, tilt_res, trunc);
+    
+    cout << "tilt output:" << endl;
+    vector<float> tiltBuff = readBack(context.device, context.queue, tilt_output_size, tiltBuffer);
+    for (float val : tiltBuff) cout << fixed << scientific << setprecision(4) << val << " ";
+
     // Release WebGPU resources
     wgpuQueueRelease(context.queue);
     wgpuDeviceRelease(context.device);
@@ -78,6 +100,7 @@ int main() {
     newUFBuffer.release();
     newUBBuffer.release();
     maskBuffer.release();
+    tiltBuffer.release();
 
     return 0;
 }

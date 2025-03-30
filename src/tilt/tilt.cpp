@@ -173,6 +173,25 @@ void tilt(
     if (!queue || !bindGroup || !shaderModule){
         return;
     }
+
+    // CREATING COMPUTE PIPELINE
+    wgpu::ComputePipeline computePipeline = createComputePipeline(device, shaderModule, bindGroupLayout);
+
+    // ENCODING AND DISPATCHING COMPUTE COMMANDS
+    wgpu::CommandEncoderDescriptor encoderDesc = {};
+    wgpu::CommandEncoder commandEncoder = device.createCommandEncoder(encoderDesc);
+
+    wgpu::ComputePassDescriptor computePassDesc = {};
+    wgpu::ComputePassEncoder computePass = commandEncoder.beginComputePass(computePassDesc);
+    computePass.setPipeline(computePipeline);
+    computePass.setBindGroup(0, bindGroup, 0, nullptr);
+    computePass.dispatchWorkgroups(std::ceil(double(angles_buffer_len)/256.0),1,1);
+    computePass.end();
+
+    wgpu::CommandBufferDescriptor cmdBufferDesc = {};
+    wgpu::CommandBuffer commandBuffer = commandEncoder.finish(cmdBufferDesc);
+
+    queue.submit(1, &commandBuffer);
     
     // RELEASE RESOURCES
     bindGroup.release();
@@ -183,4 +202,6 @@ void tilt(
     uniformNABuffer.release();
     uniformTruncBuffer.release();
     shaderModule.release();
+    computePipeline.release();
+    commandBuffer.release();
 }
