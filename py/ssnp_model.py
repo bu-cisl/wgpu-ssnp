@@ -73,7 +73,7 @@ def tilt(shape: tuple[int], angles: Tensor, NA: float= 0.65, res: tuple[float] =
 		factor = torch.trunc(c_ba * norm).T
 	else:
 		factor = (c_ba * norm).T
-	print(f"factor (after truncation check): \n{factor}")
+	print(f"factor (after truncation check): {factor.shape} \n{factor}")
 
 	xr = torch.arange(shape[1], device=device).view(1,1,-1).to(dtype=torch.complex128)
 	xr = (2j * torch.pi / shape[1]) * factor[1].reshape(-1,1,1) * xr
@@ -108,7 +108,7 @@ def tilt2(shape: tuple[int], angles: Tensor, NA: float= 0.65, res: tuple[float] 
 		factor = torch.trunc(scaled_c_ba).T
 	else:
 		factor = scaled_c_ba.T
-	print(f"factor2 (after truncation check): \n{factor}")
+	print(f"factor (after truncation check): {factor.shape} \n{factor}")
 
 	x_indices = torch.arange(shape[1], device=device).view(1, 1, -1).to(dtype=torch.complex128)
 	factor_x = factor[1].reshape(-1, 1, 1)
