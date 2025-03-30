@@ -73,7 +73,7 @@ def tilt(shape: tuple[int], angles: Tensor, NA: float= 0.65, res: tuple[float] =
 		factor = torch.trunc(c_ba * norm).T
 	else:
 		factor = (c_ba * norm).T
-	# print(f"factor (after truncation check): \n{factor}")
+	print(f"factor (after truncation check): \n{factor}")
 
 	xr = torch.arange(shape[1], device=device).view(1,1,-1).to(dtype=torch.complex128)
 	xr = (2j * torch.pi / shape[1]) * factor[1].reshape(-1,1,1) * xr
@@ -90,6 +90,42 @@ def tilt(shape: tuple[int], angles: Tensor, NA: float= 0.65, res: tuple[float] =
 
 	# normalize by center point value
 	out /= out[:, tuple(i // 2 for i in shape)].clone()
+	return out
+
+def tilt2(shape: tuple[int], angles: Tensor, NA: float= 0.65, res: tuple[float] = (0.1, 0.1, 0.1), trunc: bool = True, device: str = 'cpu') -> Tensor:
+	sin_component = torch.sin(angles)
+	cos_component = torch.cos(angles)
+	
+	c_ba = NA * torch.stack((sin_component, cos_component), dim=1)
+	
+	shape_tensor = torch.tensor(shape)
+	res_tensor = torch.tensor(res[1:])
+	norm = shape_tensor * res_tensor
+	norm = norm.view(1, 2)
+	
+	scaled_c_ba = c_ba * norm
+	if trunc:
+		factor = torch.trunc(scaled_c_ba).T
+	else:
+		factor = scaled_c_ba.T
+	print(f"factor2 (after truncation check): \n{factor}")
+
+	x_indices = torch.arange(shape[1], device=device).view(1, 1, -1).to(dtype=torch.complex128)
+	factor_x = factor[1].reshape(-1, 1, 1)
+	exponent_x = (2j * torch.pi / shape[1]) * factor_x * x_indices
+	xr = exponent_x.exp()
+	
+	y_indices = torch.arange(shape[0], device=device).view(1, -1, 1).to(dtype=torch.complex128)
+	factor_y = factor[0].reshape(-1, 1, 1)
+	exponent_y = (2j * torch.pi / shape[0]) * factor_y * y_indices
+	yr = exponent_y.exp()
+	
+	out = xr * yr
+	
+	normalization_indices = tuple(i // 2 for i in shape)
+	normalization_values = out[:, normalization_indices].clone()
+	out /= normalization_values
+
 	return out
 
 def merge_prop(uf: Tensor, ub: Tensor, res: tuple[float] = (0.1, 0.1, 0.1)) -> Tensor:
