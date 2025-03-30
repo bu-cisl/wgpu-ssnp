@@ -2,6 +2,7 @@
 #include "scatter_factor/scatter_factor.h"
 #include "diffract/diffract.h"
 #include "binary_pupil/binary_pupil.h"
+#include "tilt/tilt.h"
 #include "webgpu_utils.h"
 #include <vector>
 #include <iostream>

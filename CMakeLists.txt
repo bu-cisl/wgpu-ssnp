@@ -13,6 +13,7 @@ add_executable(
     src/c_gamma/c_gamma.cpp 
     src/diffract/diffract.cpp
     src/binary_pupil/binary_pupil.cpp
+    src/tilt/tilt.cpp
 )
 
 set_target_properties(ssnp_cpp PROPERTIES
