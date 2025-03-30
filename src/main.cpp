@@ -70,14 +70,12 @@ int main() {
 
     // Test tilt
     vector<uint32_t> tilt_shape = {2, 2};
-    vector<float> tilt_angles = {
-        M_PI, M_PI/5, M_PI/2, M_PI/3
-    };
+    vector<float> tilt_angles = {M_PI, M_PI/2, M_PI/3, M_PI/6};
     float NA = 0.7f;
     vector<float> tilt_res = {0.1f, 0.3f, 0.5f};
     bool trunc = false;
     
-    size_t tilt_output_size = 4 * 2;  
+    size_t tilt_output_size = tilt_angles.size() * 2;  
     wgpu::Buffer tiltBuffer = createBuffer(
         context.device, nullptr, 
         sizeof(float) * tilt_output_size, 
