@@ -127,20 +127,14 @@ void tilt(
     const std::vector<uint32_t>& shape,
     float NA,
     const std::vector<float>& res,
-    bool trunc,
-    uint32_t numAnglePairs
+    bool trunc
 ) {
     // Validate inputs
     assert(shape.size() == 2 && "Shape must be 2D (height, width)");
     assert(res.size() == 3 && "Resolution must have 3 components");
-    //assert(angles.size() % 2 == 0 && "Angles must have pairs of values");
-    
-    if (numAnglePairs == 0) {
-        numAnglePairs = angles.size() / 2;
-    }
     
     angles_buffer_len = angles.size();
-    factors_buffer_len = 4 * numAnglePairs;
+    factors_buffer_len = 2 * angles.size();
     
     Params params = {
         NA,
