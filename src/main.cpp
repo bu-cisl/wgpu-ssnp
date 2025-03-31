@@ -69,10 +69,10 @@ int main() {
     cout << endl;
 
     // Test tilt
-    vector<uint32_t> tilt_shape = {2, 2};
-    vector<float> tilt_angles = {M_PI, M_PI/2, M_PI/3, M_PI/6};
-    float NA = 0.7f;
-    vector<float> tilt_res = {0.1f, 0.3f, 0.5f};
+    vector<uint32_t> tilt_shape = {3, 3};
+    vector<float> tilt_angles = {2*M_PI, M_PI/2, M_PI/6};
+    float NA = 0.5f;
+    vector<float> tilt_res = {0.69f, 0.2f, 0.1f};
     bool trunc = false;
     
     size_t tilt_output_size = tilt_angles.size() * 2;  

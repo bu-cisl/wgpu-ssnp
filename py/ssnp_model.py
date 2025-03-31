@@ -63,7 +63,7 @@ def tilt(shape: tuple[int], angles: Tensor, NA: float= 0.65, res: tuple[float] =
 		),
 		dim=1
 	)
-	# print(f"c_ba (sine and cosine components): \n{c_ba}")
+	# print(f"c_ba: {c_ba.shape} \n{c_ba}")
 
 	norm = torch.tensor(shape) * torch.tensor(res[1:])
 	norm = norm.view(1, 2)
@@ -73,7 +73,7 @@ def tilt(shape: tuple[int], angles: Tensor, NA: float= 0.65, res: tuple[float] =
 		factor = torch.trunc(c_ba * norm).T
 	else:
 		factor = (c_ba * norm).T
-	print(f"factor (after truncation check): {factor.shape} \n{factor}")
+	# print(f"factor (after truncation check): {factor.shape} \n{factor}")
 
 	xr = torch.arange(shape[1], device=device).view(1,1,-1).to(dtype=torch.complex128)
 	xr = (2j * torch.pi / shape[1]) * factor[1].reshape(-1,1,1) * xr
@@ -95,21 +95,27 @@ def tilt(shape: tuple[int], angles: Tensor, NA: float= 0.65, res: tuple[float] =
 def tilt2(shape: tuple[int], angles: Tensor, NA: float= 0.65, res: tuple[float] = (0.1, 0.1, 0.1), trunc: bool = True, device: str = 'cpu') -> Tensor:
 	sin_component = torch.sin(angles)
 	cos_component = torch.cos(angles)
+	print(f"sin: {sin_component}, {sin_component.shape}")
+	print(f"cos: {cos_component}, {cos_component.shape}")
 	
 	c_ba = NA * torch.stack((sin_component, cos_component), dim=1)
+	print(f"c_ba: {c_ba.shape} \n{c_ba}")
 	
 	shape_tensor = torch.tensor(shape)
 	res_tensor = torch.tensor(res[1:])
 	norm = shape_tensor * res_tensor
 	norm = norm.view(1, 2)
+	print(f"norm: {norm}")
 	
 	scaled_c_ba = c_ba * norm
+	print(f"scaled_c_ba: {scaled_c_ba}")
 	if trunc:
 		factor = torch.trunc(scaled_c_ba).T
 	else:
 		factor = scaled_c_ba.T
-	print(f"factor (after truncation check): {factor.shape} \n{factor}")
-
+	print(f"factor: {factor.shape} \n{factor}")
+	return factor
+	"""
 	x_indices = torch.arange(shape[1], device=device).view(1, 1, -1).to(dtype=torch.complex128)
 	factor_x = factor[1].reshape(-1, 1, 1)
 	exponent_x = (2j * torch.pi / shape[1]) * factor_x * x_indices
@@ -127,6 +133,7 @@ def tilt2(shape: tuple[int], angles: Tensor, NA: float= 0.65, res: tuple[float] 
 	out /= normalization_values
 
 	return out
+	"""
 
 def merge_prop(uf: Tensor, ub: Tensor, res: tuple[float] = (0.1, 0.1, 0.1)) -> Tensor:
 	assert uf.device == ub.device, 'uf and ub must be on the same device'

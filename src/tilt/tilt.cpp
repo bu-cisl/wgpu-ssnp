@@ -133,7 +133,7 @@ void tilt(
     // Validate inputs
     assert(shape.size() == 2 && "Shape must be 2D (height, width)");
     assert(res.size() == 3 && "Resolution must have 3 components");
-    assert(angles.size() % 2 == 0 && "Angles must have pairs of values");
+    //assert(angles.size() % 2 == 0 && "Angles must have pairs of values");
     
     if (numAnglePairs == 0) {
         numAnglePairs = angles.size() / 2;

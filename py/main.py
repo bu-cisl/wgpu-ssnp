@@ -43,13 +43,13 @@ def test_binary_pupil():
     print(mask)
 
 def test_tilt():
-    shape = (2, 2)
-    angles = torch.tensor([[torch.pi, torch.pi / 2], [torch.pi/3, torch.pi/6]]) 
-    NA = 0.7
-    res = (0.1, 0.3, 0.5)
+    shape = (3, 3)
+    angles = torch.tensor([2 * torch.pi, torch.pi / 2, torch.pi /6, torch.pi]) 
+    NA = 0.5
+    res = (0.69, 0.2, 0.1)
     trunc = False
-    tilt_result = ssnp_model.tilt(shape, angles, NA, res, trunc)
-    #tilt_result_2 = ssnp_model.tilt2(shape, angles, NA, res, trunc)
+    #tilt_result = ssnp_model.tilt(shape, angles, NA, res, trunc)
+    tilt_result_2 = ssnp_model.tilt2(shape, angles, NA, res, trunc)
 
     #print("Python tilt result:")
     #print(tilt_result)

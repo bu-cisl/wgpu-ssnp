@@ -9,32 +9,23 @@
 fn main(@builtin(global_invocation_id) global_id : vec3<u32>) {
     let idx = global_id.x;
     
-    // Total output elements = shape[0] * shape[1] * 2 (2 components per position)
-    let total_elements = shape[0u] * shape[1u] * 2u;
-    if (idx >= total_elements) {
-        return;
+    // Total outputs = 2 × number of angles
+    let total_factors = arrayLength(&angles) * 2;
+    if (idx >= total_factors) {
+        return; // Exit if out of bounds
     }
 
-    // Calculate spatial coordinates (i,j) and component index (0=x, 1=y)
-    let i = idx / (shape[1u] * 2u);
-    let j = (idx / 2u) % shape[1u];
-    let component = idx % 2u; // 0 for x, 1 for y
+    let angle_idx = idx / 2;
+    let angle = angles[angle_idx];
+    let is_sin_component = (idx % 2 == 0); // sin for even indices, cos for odd
 
-    // Get angle (only first angle pair is used for spatial position [i,j])
-    let angle_idx = i * shape[1u] + j;
-    let angle = angles[angle_idx % arrayLength(&angles)];
-
-    // Compute c_ba component (sin for x, cos for y)
-    let c_ba = NA * select(cos(angle), sin(angle), component == 0u);
-
-    // Compute norm component
+    let c_ba = NA * select(cos(angle), sin(angle), is_sin_component);
     let norm = select(
-        f32(shape[1u]) * res[2u], // y-component uses res[2]
-        f32(shape[0u]) * res[1u], // x-component uses res[1]
-        component == 0u
+        f32(shape[1]) * res[2], // y-component (cos)
+        f32(shape[0]) * res[1], // x-component (sin)
+        is_sin_component
     );
 
-    // Compute and optionally truncate
     var factor = c_ba * norm;
     if (trunc_flag == 1u) {
         factor = trunc(factor);
