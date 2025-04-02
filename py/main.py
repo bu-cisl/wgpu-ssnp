@@ -55,8 +55,6 @@ def test_tilt():
 
 def test_merge_prop():
     res = (0.1, 0.1, 0.1)
-    shape = (4, 4)
-    
     uf = torch.tensor([[1.0 + 0j, 2.0 + 0j, 3.0 + 0j], 
                        [4.0 + 0j, 5.0 + 0j, 6.0 + 0j], 
                        [7.0 + 0j, 8.0 + 0j, 9.0 + 0j]], dtype=torch.complex64)
@@ -73,8 +71,6 @@ def test_merge_prop():
 
 def test_split_prop():
     res = (0.1, 0.1, 0.1)
-    shape = (4, 4)
-    
     uf = torch.tensor([[1.0 + 0j, 2.0 + 0j, 3.0 + 0j], 
                        [4.0 + 0j, 5.0 + 0j, 6.0 + 0j], 
                        [7.0 + 0j, 8.0 + 0j, 9.0 + 0j]], dtype=torch.complex64)

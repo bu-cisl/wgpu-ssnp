@@ -14,6 +14,8 @@ add_executable(
     src/diffract/diffract.cpp
     src/binary_pupil/binary_pupil.cpp
     src/tilt/tilt.cpp
+    src/merge_prop/merge_prop.cpp
+    src/split_prop/split_prop.cpp
 )
 
 set_target_properties(ssnp_cpp PROPERTIES
