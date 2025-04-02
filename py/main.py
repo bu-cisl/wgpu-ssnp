@@ -55,12 +55,12 @@ def test_tilt():
 
 def test_merge_prop():
     res = (0.1, 0.1, 0.1)
-    uf = torch.tensor([[1.0 + 0j, 2.0 + 0j, 3.0 + 0j], 
-                       [4.0 + 0j, 5.0 + 0j, 6.0 + 0j], 
-                       [7.0 + 0j, 8.0 + 0j, 9.0 + 0j]], dtype=torch.complex64)
-    ub = torch.tensor([[9.0 + 0j, 8.0 + 0j, 7.0 + 0j], 
-                       [6.0 + 0j, 5.0 + 0j, 4.0 + 0j], 
-                       [3.0 + 0j, 2.0 + 0j, 1.0 + 0j]], dtype=torch.complex64)
+    uf = torch.tensor([[1.0 + 9.0j, 2.0 + 8.0j, 3.0 + 7.0j], 
+                       [4.0 + 6.0j, 5.0 + 5.0j, 6.0 + 4.0j], 
+                       [7.0 + 3.0j, 8.0 + 2.0j, 9.0 + 1.0j]], dtype=torch.complex64)
+    ub = torch.tensor([[9.0 + 1.0j, 8.0 + 2.0j, 7.0 + 3.0j], 
+                       [6.0 + 4.0j, 5.0 + 5.0j, 4.0 + 6.0j], 
+                       [3.0 + 7.0j, 2.0 + 8.0j, 1.0 + 9.0j]], dtype=torch.complex64)
     
     uf_new, ub_new = ssnp_model.merge_prop(uf, ub, res)
     

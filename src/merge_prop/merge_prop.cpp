@@ -18,7 +18,7 @@ static wgpu::BindGroupLayout createBindGroupLayout(wgpu::Device& device) {
     wgpu::BindGroupLayoutEntry resBufferLayout = {};
     resBufferLayout.binding = 2;
     resBufferLayout.visibility = wgpu::ShaderStage::Compute;
-    resBufferLayout.buffer.type = wgpu::BufferBindingType::Uniform;
+    resBufferLayout.buffer.type = wgpu::BufferBindingType::ReadOnlyStorage;
 
     wgpu::BindGroupLayoutEntry cgammaBufferLayout = {};
     cgammaBufferLayout.binding = 3;

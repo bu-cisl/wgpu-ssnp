@@ -3,8 +3,10 @@
 #include "diffract/diffract.h"
 #include "binary_pupil/binary_pupil.h"
 #include "tilt/tilt.h"
+#include "merge_prop/merge_prop.h"
 #include "webgpu_utils.h"
 #include <vector>
+#include <complex>
 #include <iostream>
 #include <iomanip>
 
@@ -88,6 +90,40 @@ int main() {
     vector<float> tiltBuff = readBack(context.device, context.queue, tilt_output_size, tiltBuffer);
     for (float val : tiltBuff) cout << fixed << scientific << setprecision(4) << val << " ";
 
+    // Test merge_prop
+    vector<float> merge_res = {0.1f, 0.1f, 0.1f};
+    vector<complex<float>> uf_merge = {
+        {1.0f, 9.0f}, {2.0f, 8.0f}, {3.0f, 7.0f},
+        {4.0f, 6.0f}, {5.0f, 5.0f}, {6.0f, 4.0f},
+        {7.0f, 3.0f}, {8.0f, 2.0f}, {9.0f, 1.0f}
+    };
+    vector<complex<float>> ub_merge = {
+        {9.0f, 1.0f}, {8.0f, 2.0f}, {7.0f, 3.0f},
+        {6.0f, 4.0f}, {5.0f, 5.0f}, {4.0f, 6.0f},
+        {3.0f, 7.0f}, {2.0f, 8.0f}, {1.0f, 9.0f}
+    };
+    wgpu::Buffer ufMergeNewBuffer = createBuffer(
+        context.device, 
+        nullptr, 
+        sizeof(float) * 2 * uf_merge.size(), // ×2 for complex
+        WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc)
+    );
+    wgpu::Buffer ubMergeNewBuffer = createBuffer(
+        context.device, 
+        nullptr, 
+        sizeof(float) * 2 * ub_merge.size(), // ×2 for complex
+        WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc)
+    );
+    merge_prop(
+        context,
+        ufMergeNewBuffer,
+        ubMergeNewBuffer,
+        uf_merge,
+        ub_merge,
+        uf_ub_shape,
+        merge_res
+    );
+
     // Release WebGPU resources
     wgpuQueueRelease(context.queue);
     wgpuDeviceRelease(context.device);
@@ -99,6 +135,8 @@ int main() {
     newUBBuffer.release();
     maskBuffer.release();
     tiltBuffer.release();
+    ufMergeNewBuffer.release();
+    ubMergeNewBuffer.release();
 
     return 0;
 }
