@@ -89,6 +89,7 @@ int main() {
     cout << "tilt output:" << endl;
     vector<float> tiltBuff = readBack(context.device, context.queue, tilt_output_size, tiltBuffer);
     for (float val : tiltBuff) cout << fixed << scientific << setprecision(4) << val << " ";
+    cout << "\n" << endl;
 
     // Test merge_prop
     vector<float> merge_res = {0.1f, 0.1f, 0.1f};
@@ -123,6 +124,14 @@ int main() {
         uf_ub_shape,
         merge_res
     );
+    cout << "merge_prop output (uf_new):" << endl;
+    vector<float> ufMergeBuff = readBack(context.device, context.queue, 2 * uf_merge.size(), ufMergeNewBuffer);
+    for (float uf : ufMergeBuff) cout << fixed << setprecision(4) << uf << " ";
+    cout << endl;
+    cout << "merge_prop output (ub_new):" << endl;
+    vector<float> ubMergeBuff = readBack(context.device, context.queue, 2 * ub_merge.size(), ubMergeNewBuffer);
+    for (float ub : ubMergeBuff) cout << fixed << setprecision(4) << ub << " ";
+    cout << endl;
 
     // Release WebGPU resources
     wgpuQueueRelease(context.queue);
