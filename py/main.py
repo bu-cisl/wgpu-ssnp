@@ -53,9 +53,47 @@ def test_tilt():
     print("Python tilt factor result:")
     # print(tilt_result)
 
+def test_merge_prop():
+    res = (0.1, 0.1, 0.1)
+    shape = (4, 4)
+    
+    uf = torch.tensor([[1.0 + 0j, 2.0 + 0j, 3.0 + 0j], 
+                       [4.0 + 0j, 5.0 + 0j, 6.0 + 0j], 
+                       [7.0 + 0j, 8.0 + 0j, 9.0 + 0j]], dtype=torch.complex64)
+    ub = torch.tensor([[9.0 + 0j, 8.0 + 0j, 7.0 + 0j], 
+                       [6.0 + 0j, 5.0 + 0j, 4.0 + 0j], 
+                       [3.0 + 0j, 2.0 + 0j, 1.0 + 0j]], dtype=torch.complex64)
+    
+    uf_new, ub_new = ssnp_model.merge_prop(uf, ub, res)
+    
+    print("Python merge result (uf_new):")
+    print(uf_new)
+    print("Python merge result (ub_new):")
+    print(ub_new)
+
+def test_split_prop():
+    res = (0.1, 0.1, 0.1)
+    shape = (4, 4)
+    
+    uf = torch.tensor([[1.0 + 0j, 2.0 + 0j, 3.0 + 0j], 
+                       [4.0 + 0j, 5.0 + 0j, 6.0 + 0j], 
+                       [7.0 + 0j, 8.0 + 0j, 9.0 + 0j]], dtype=torch.complex64)
+    ub = torch.tensor([[9.0 + 0j, 8.0 + 0j, 7.0 + 0j], 
+                       [6.0 + 0j, 5.0 + 0j, 4.0 + 0j], 
+                       [3.0 + 0j, 2.0 + 0j, 1.0 + 0j]], dtype=torch.complex64)
+    
+    uf_new, ub_new = ssnp_model.split_prop(uf, ub, res)
+    
+    print("Python split result (uf_new):")
+    print(uf_new)
+    print("Python split result (ub_new):")
+    print(ub_new)
+
 if __name__ == "__main__":
     test_scatter_factor()
     test_c_gamma()
     test_diffract()
     test_binary_pupil()
     test_tilt()
+    test_merge_prop()
+    test_split_prop()
