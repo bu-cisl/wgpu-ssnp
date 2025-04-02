@@ -164,10 +164,6 @@ void tilt(
         factorsBuffer, uniformNABuffer, uniformTruncBuffer
     );
 
-    if (!queue || !bindGroup || !shaderModule){
-        return;
-    }
-
     // CREATING COMPUTE PIPELINE
     wgpu::ComputePipeline computePipeline = createComputePipeline(device, shaderModule, bindGroupLayout);
 

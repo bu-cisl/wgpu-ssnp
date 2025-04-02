@@ -69,7 +69,7 @@ int main() {
     cout << endl;
 
     // Test tilt
-    vector<uint32_t> tilt_shape = {3, 3};
+    vector<uint32_t> tilt_shape = {8, 8};
     vector<float> tilt_angles = {2*M_PI, M_PI/2, M_PI/6};
     float NA = 0.5f;
     vector<float> tilt_res = {0.69f, 0.2f, 0.1f};

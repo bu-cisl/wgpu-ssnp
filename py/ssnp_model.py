@@ -7,31 +7,25 @@ def scatter_factor(n: Tensor, res_z: float = 0.1, dz: float = 1, n0: float = 1.0
 	return (2*torch.pi*res_z / n0)**2 * dz * n * (2*n0 + n)
 
 def diffract(uf: Tensor, ub: Tensor, res: tuple[float] = (0.1, 0.1, 0.1), dz: float = 1) -> tuple[Tensor]:
+
 	assert uf.shape == ub.shape, 'uf and ub must have the same shape'
 
 	cgamma = c_gamma(res, uf.shape, device=uf.device)
-	# print(f"cgamma dtype: {cgamma.dtype}, shape: {cgamma.shape}")
 	kz = 2 * torch.pi * res[2] * cgamma
-	# print(f"kz dtype: {kz.dtype}, shape: {kz.shape}")
 	eva = torch.exp(torch.clamp((cgamma - 0.2) * 5, max=0))
-	# print(f"eva dtype: {eva.dtype}, shape: {eva.shape}")
 
 	p_mat = torch.stack([torch.cos(kz * dz), torch.sin(kz * dz) / kz,
 			-torch.sin(kz * dz) * kz, torch.cos(kz * dz)])
-	# print(f"p_mat dtype: {p_mat.dtype}, shape: {p_mat.shape}")
 	
 	p_mat *= eva
-	# print(f"p_mat after scaling dtype: {p_mat.dtype}, shape: {p_mat.shape}")
 
 	uf_new1 = p_mat[0] * uf
 	uf_new2 = p_mat[1] * ub
 	uf_new = uf_new1 + uf_new2
-	# print(f"uf_new dtype: {uf_new.dtype}, shape: {uf_new.shape}")
 
 	ub_new1 = p_mat[2] * uf
 	ub_new2 = p_mat[3] * ub
 	ub_new = ub_new1 + ub_new2
-	# print(f"ub_new dtype: {ub_new.dtype}, shape: {ub_new.shape}")
 
 	return uf_new, ub_new
 
@@ -40,11 +34,7 @@ def c_gamma(res: tuple[float], shape: tuple[int], device: str = 'cpu') -> Tensor
 		return torch.fmod(torch.arange(size, device=device) / size + 0.5, 1) - 0.5
 
 	eps = torch.tensor(1E-8, device=device)
-
-	c_beta, c_alpha = [
-		_near_0(size).to(torch.complex64) / resolution for size, resolution in zip(shape, res[-2:])
-	]
-
+	c_beta, c_alpha = [_near_0(size).to(torch.complex64) / resolution for size, resolution in zip(shape, res[-2:])]
 	alpha_square = torch.abs(c_alpha) ** 2
 	beta_square = torch.abs(c_beta) ** 2
 
@@ -56,6 +46,7 @@ def binary_pupil(shape: tuple[int], na: float, res: tuple[float] = (0.1, 0.1, 0.
 	return mask
 
 def tilt(shape: tuple[int], angles: Tensor, NA: float= 0.65, res: tuple[float] = (0.1, 0.1, 0.1), trunc: bool = True, device: str = 'cpu') -> Tensor:
+
 	c_ba = NA*torch.stack(
 		(
 			torch.sin(angles),
@@ -63,79 +54,32 @@ def tilt(shape: tuple[int], angles: Tensor, NA: float= 0.65, res: tuple[float] =
 		),
 		dim=1
 	)
-	# print(f"c_ba: {c_ba.shape} \n{c_ba}")
 
 	norm = torch.tensor(shape) * torch.tensor(res[1:])
 	norm = norm.view(1, 2)
-	# print(f"norm (shape * resolution): \n{norm}")
 
 	if trunc:
 		factor = torch.trunc(c_ba * norm).T
 	else:
 		factor = (c_ba * norm).T
-	# print(f"factor (after truncation check): {factor.shape} \n{factor}")
 
+	print(f"factor: {factor.shape} \n{factor}")
 	xr = torch.arange(shape[1], device=device).view(1,1,-1).to(dtype=torch.complex128)
 	xr = (2j * torch.pi / shape[1]) * factor[1].reshape(-1,1,1) * xr
 	xr.exp_()
-	# print(f"xr (exponential in x direction): \n{xr}")
 
 	yr = torch.arange(shape[0], device=device).view(1,-1,1).to(dtype=torch.complex128)
 	yr = (2j * torch.pi / shape[0]) * factor[0].reshape(-1,1,1) * yr
 	yr.exp_()
-	# print(f"yr (exponential in y direction): \n{yr}")
 
 	out = xr * yr
-	# print(f"out: \n{out}")
 
 	# normalize by center point value
-	out /= out[:, tuple(i // 2 for i in shape)].clone()
+	out /= out[:, *(i // 2 for i in shape)].clone().view(-1, 1, 1)
 	return out
-
-def tilt2(shape: tuple[int], angles: Tensor, NA: float= 0.65, res: tuple[float] = (0.1, 0.1, 0.1), trunc: bool = True, device: str = 'cpu') -> Tensor:
-	sin_component = torch.sin(angles)
-	cos_component = torch.cos(angles)
-	print(f"sin: {sin_component}, {sin_component.shape}")
-	print(f"cos: {cos_component}, {cos_component.shape}")
-	
-	c_ba = NA * torch.stack((sin_component, cos_component), dim=1)
-	print(f"c_ba: {c_ba.shape} \n{c_ba}")
-	
-	shape_tensor = torch.tensor(shape)
-	res_tensor = torch.tensor(res[1:])
-	norm = shape_tensor * res_tensor
-	norm = norm.view(1, 2)
-	print(f"norm: {norm}")
-	
-	scaled_c_ba = c_ba * norm
-	print(f"scaled_c_ba: {scaled_c_ba}")
-	if trunc:
-		factor = torch.trunc(scaled_c_ba).T
-	else:
-		factor = scaled_c_ba.T
-	print(f"factor: {factor.shape} \n{factor}")
-	return factor
-	"""
-	x_indices = torch.arange(shape[1], device=device).view(1, 1, -1).to(dtype=torch.complex128)
-	factor_x = factor[1].reshape(-1, 1, 1)
-	exponent_x = (2j * torch.pi / shape[1]) * factor_x * x_indices
-	xr = exponent_x.exp()
-	
-	y_indices = torch.arange(shape[0], device=device).view(1, -1, 1).to(dtype=torch.complex128)
-	factor_y = factor[0].reshape(-1, 1, 1)
-	exponent_y = (2j * torch.pi / shape[0]) * factor_y * y_indices
-	yr = exponent_y.exp()
-	
-	out = xr * yr
-	
-	normalization_indices = tuple(i // 2 for i in shape)
-	normalization_values = out[:, normalization_indices].clone()
-	out /= normalization_values
-
-	return out
-	"""
 
 def merge_prop(uf: Tensor, ub: Tensor, res: tuple[float] = (0.1, 0.1, 0.1)) -> Tensor:
+
 	assert uf.device == ub.device, 'uf and ub must be on the same device'
 	
 	kz = c_gamma(res, uf.shape, device=uf.device) * (2 * torch.pi * res[2])
@@ -145,6 +89,7 @@ def merge_prop(uf: Tensor, ub: Tensor, res: tuple[float] = (0.1, 0.1, 0.1)) -> T
 	return uf_new, ub_new
 
 def split_prop(uf: Tensor, ub: Tensor, res: tuple[float] = (0.1, 0.1, 0.1)) -> Tensor:
+
 	assert uf.device == ub.device, 'uf and ub must be on the same device'
 
 	kz = c_gamma(res, uf.shape, device=uf.device) * (2 * torch.pi * res[2])
@@ -155,6 +100,7 @@ def split_prop(uf: Tensor, ub: Tensor, res: tuple[float] = (0.1, 0.1, 0.1)) -> T
 	return uf_new, ub_new
 
 class SNNPBeam:
+
 	def __init__(
 			self,
 			res: tuple[float] = (0.1, 0.1, 0.1),
