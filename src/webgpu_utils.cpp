@@ -140,6 +140,36 @@ wgpu::ComputePipeline createComputePipeline(wgpu::Device& device, wgpu::ShaderMo
     return pipeline;
 }
 
+// ENCODING AND DISPATCHING COMPUTE COMMANDS
+wgpu::CommandBuffer createComputeCommandBuffer(
+    wgpu::Device& device,
+    wgpu::ComputePipeline& computePipeline,
+    wgpu::BindGroup& bindGroup,
+    uint32_t workgroupsX,
+    uint32_t workgroupsY,
+    uint32_t workgroupsZ
+) {
+    wgpu::CommandEncoderDescriptor encoderDesc = {};
+    wgpu::CommandEncoder commandEncoder = device.createCommandEncoder(encoderDesc);
+
+    wgpu::ComputePassDescriptor computePassDesc = {};
+    wgpu::ComputePassEncoder computePass = commandEncoder.beginComputePass(computePassDesc);
+    computePass.setPipeline(computePipeline);
+    computePass.setBindGroup(0, bindGroup, 0, nullptr);
+    computePass.dispatchWorkgroups(workgroupsX, workgroupsY, workgroupsZ);
+    computePass.end();
+
+    wgpu::CommandBufferDescriptor cmdBufferDesc = {};
+    return commandEncoder.finish(cmdBufferDesc);
+}
+
+void dispatchComputeCommands(
+    wgpu::Queue& queue,
+    wgpu::CommandBuffer& commandBuffer
+) {
+    queue.submit(1, &commandBuffer);
+}
+
 // READBACK
 std::vector<float> readBack(wgpu::Device& device, wgpu::Queue& queue, size_t buffer_len, wgpu::Buffer& outputBuffer) {
     std::vector<float> output(buffer_len);

@@ -35,7 +35,14 @@ static wgpu::BindGroupLayout createBindGroupLayout(wgpu::Device& device) {
     return device.createBindGroupLayout(layoutDesc);
 }
 
-static wgpu::BindGroup createBindGroup(wgpu::Device& device, wgpu::BindGroupLayout bindGroupLayout, wgpu::Buffer inputBuffer, wgpu::Buffer outputBuffer, wgpu::Buffer uniformBuffer) {
+static wgpu::BindGroup createBindGroup(
+    wgpu::Device& device, 
+    wgpu::BindGroupLayout 
+    bindGroupLayout, 
+    wgpu::Buffer inputBuffer, 
+    wgpu::Buffer outputBuffer, 
+    wgpu::Buffer uniformBuffer
+) {
     wgpu::BindGroupEntry inputEntry = {};
     inputEntry.binding = 0;
     inputEntry.buffer = inputBuffer;
@@ -64,8 +71,15 @@ static wgpu::BindGroup createBindGroup(wgpu::Device& device, wgpu::BindGroupLayo
     return device.createBindGroup(bindGroupDesc);
 }
 
-void scatter_factor(WebGPUContext& context, wgpu::Buffer& outputBuffer, std::vector<float> inputData, std::optional<float> res_z, std::optional<float> dz, std::optional<float> n0) {
-    buffer_len = inputData.size();
+void scatter_factor(
+    WebGPUContext& context, 
+    wgpu::Buffer& outputBuffer, 
+    std::vector<float> n, 
+    std::optional<float> res_z, 
+    std::optional<float> dz, 
+    std::optional<float> n0
+) {
+    buffer_len = n.size();
     Params params = {res_z.value(), dz.value(), n0.value()};
 
     // INITIALIZING WEBGPU
@@ -76,32 +90,42 @@ void scatter_factor(WebGPUContext& context, wgpu::Buffer& outputBuffer, std::vec
     std::string shaderCode = readShaderFile("src/scatter_factor/scatter_factor.wgsl");
     wgpu::ShaderModule shaderModule = createShaderModule(device, shaderCode);
 
-    // CREATING BUFFERS FOR SCATTER_FACTOR
-    wgpu::Buffer inputBuffer = createBuffer(device, inputData.data(), buffer_len * sizeof(float), wgpu::BufferUsage::Storage);
-    wgpu::Buffer uniformBuffer = createBuffer(device, &params, sizeof(Params), wgpu::BufferUsage::Uniform);
+    // CREATING BUFFERS
+    wgpu::Buffer inputBuffer = createBuffer(
+        device, 
+        n.data(), 
+        buffer_len * sizeof(float), 
+        wgpu::BufferUsage::Storage
+    );
+    wgpu::Buffer uniformBuffer = createBuffer(
+        device, 
+        &params, 
+        sizeof(Params), 
+        wgpu::BufferUsage::Uniform
+    );
 
     // CREATING BIND GROUP AND LAYOUT
     wgpu::BindGroupLayout bindGroupLayout = createBindGroupLayout(device);
-    wgpu::BindGroup bindGroup = createBindGroup(device, bindGroupLayout, inputBuffer, outputBuffer, uniformBuffer);
+    wgpu::BindGroup bindGroup = createBindGroup(
+        device, 
+        bindGroupLayout, 
+        inputBuffer, 
+        outputBuffer, 
+        uniformBuffer
+    );
 
     // CREATING COMPUTE PIPELINE
     wgpu::ComputePipeline computePipeline = createComputePipeline(device, shaderModule, bindGroupLayout);
 
     // ENCODING AND DISPATCHING COMPUTE COMMANDS
-    wgpu::CommandEncoderDescriptor encoderDesc = {};
-    wgpu::CommandEncoder commandEncoder = device.createCommandEncoder(encoderDesc);
-
-    wgpu::ComputePassDescriptor computePassDesc = {};
-    wgpu::ComputePassEncoder computePass = commandEncoder.beginComputePass(computePassDesc);
-    computePass.setPipeline(computePipeline);
-    computePass.setBindGroup(0, bindGroup, 0, nullptr);
-    computePass.dispatchWorkgroups(std::ceil(double(buffer_len)/256.0),1,1);
-    computePass.end();
-
-    wgpu::CommandBufferDescriptor cmdBufferDesc = {};
-    wgpu::CommandBuffer commandBuffer = commandEncoder.finish(cmdBufferDesc);
-
-    queue.submit(1, &commandBuffer);
+    uint32_t workgroupsX = std::ceil(double(buffer_len)/256.0);
+    wgpu::CommandBuffer commandBuffer = createComputeCommandBuffer(
+        device, 
+        computePipeline, 
+        bindGroup, 
+        workgroupsX
+    );
+    dispatchComputeCommands(queue, commandBuffer);
 
     // RELEASE RESOURCES
     computePipeline.release();

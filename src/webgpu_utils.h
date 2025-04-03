@@ -1,7 +1,6 @@
 #ifndef WEBGPU_UTILS_H
 #define WEBGPU_UTILS_H
 #include <webgpu/webgpu.hpp>
-#include <iostream>
 #include <fstream>
 #include <sstream>
 #include <vector>
@@ -37,6 +36,21 @@ wgpu::Buffer createBuffer(wgpu::Device& device, const void* data, size_t size, w
 
 // Compute pipeline utilities
 wgpu::ComputePipeline createComputePipeline(wgpu::Device& device, wgpu::ShaderModule shaderModule, wgpu::BindGroupLayout bindGroupLayout);
+
+// Encoding and dispatching compute commands
+wgpu::CommandBuffer createComputeCommandBuffer(
+    wgpu::Device& device,
+    wgpu::ComputePipeline& computePipeline,
+    wgpu::BindGroup& bindGroup,
+    uint32_t workgroupsX,
+    uint32_t workgroupsY = 1,
+    uint32_t workgroupsZ = 1
+);
+
+void dispatchComputeCommands(
+    wgpu::Queue& queue,
+    wgpu::CommandBuffer& commandBuffer
+);
 
 // Readback from GPU to CPU
 std::vector<float> readBack(wgpu::Device& device, wgpu::Queue& queue, size_t buffer_len, wgpu::Buffer& outputBuffer);
