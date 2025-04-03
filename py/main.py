@@ -92,4 +92,4 @@ if __name__ == "__main__":
     test_binary_pupil()
     test_tilt()
     test_merge_prop()
-    # test_split_prop()
+    test_split_prop()

@@ -12,7 +12,7 @@
 #include "../webgpu_utils.h"
 #include "../c_gamma/c_gamma.h"
 
-void merge_prop(
+void split_prop(
     WebGPUContext& context,
     wgpu::Buffer& newUFBuffer,
     wgpu::Buffer& newUBBuffer,

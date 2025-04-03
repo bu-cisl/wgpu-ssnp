@@ -4,6 +4,7 @@
 #include "binary_pupil/binary_pupil.h"
 #include "tilt/tilt.h"
 #include "merge_prop/merge_prop.h"
+#include "split_prop/split_prop.h"
 #include "webgpu_utils.h"
 #include <vector>
 #include <complex>
@@ -133,6 +134,36 @@ int main() {
     for (float ub : ubMergeBuff) cout << fixed << setprecision(4) << ub << " ";
     cout << endl;
 
+    wgpu::Buffer ufSplitNewBuffer = createBuffer(
+        context.device, 
+        nullptr, 
+        sizeof(float) * 2 * uf_merge.size(), // ×2 for complex
+        WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc)
+    );
+    wgpu::Buffer ubSplitNewBuffer = createBuffer(
+        context.device, 
+        nullptr, 
+        sizeof(float) * 2 * ub_merge.size(), // ×2 for complex
+        WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc)
+    );
+    split_prop(
+        context,
+        ufSplitNewBuffer,
+        ubSplitNewBuffer,
+        uf_merge,
+        ub_merge,
+        uf_ub_shape,
+        merge_res
+    );
+    cout << "split_prop output (uf_new):" << endl;
+    vector<float> ufSplitBuff = readBack(context.device, context.queue, 2 * uf_merge.size(), ufSplitNewBuffer);
+    for (float uf : ufSplitBuff) cout << fixed << scientific << setprecision(4) << uf << " ";
+    cout << endl;
+    cout << "split_prop output (ub_new):" << endl;
+    vector<float> ubSplitBuff = readBack(context.device, context.queue, 2 * ub_merge.size(), ubSplitNewBuffer);
+    for (float ub : ubSplitBuff) cout << fixed << scientific <<  setprecision(4) << ub << " ";
+    cout << endl;
+
     // Release WebGPU resources
     wgpuQueueRelease(context.queue);
     wgpuDeviceRelease(context.device);
@@ -146,6 +177,8 @@ int main() {
     tiltBuffer.release();
     ufMergeNewBuffer.release();
     ubMergeNewBuffer.release();
+    ufSplitNewBuffer.release();
+    ubSplitNewBuffer.release();
 
     return 0;
 }
