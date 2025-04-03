@@ -5,6 +5,7 @@
 #include <sstream>
 #include <vector>
 #include <cstring>
+#include <iostream>
 
 struct WebGPUContext {
     wgpu::Instance instance = nullptr;
@@ -37,7 +38,7 @@ wgpu::Buffer createBuffer(wgpu::Device& device, const void* data, size_t size, w
 // Compute pipeline utilities
 wgpu::ComputePipeline createComputePipeline(wgpu::Device& device, wgpu::ShaderModule shaderModule, wgpu::BindGroupLayout bindGroupLayout);
 
-// Encoding and dispatching compute commands
+// Create command buffer
 wgpu::CommandBuffer createComputeCommandBuffer(
     wgpu::Device& device,
     wgpu::ComputePipeline& computePipeline,
@@ -45,11 +46,6 @@ wgpu::CommandBuffer createComputeCommandBuffer(
     uint32_t workgroupsX,
     uint32_t workgroupsY = 1,
     uint32_t workgroupsZ = 1
-);
-
-void dispatchComputeCommands(
-    wgpu::Queue& queue,
-    wgpu::CommandBuffer& commandBuffer
 );
 
 // Readback from GPU to CPU

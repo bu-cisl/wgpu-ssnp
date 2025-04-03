@@ -42,7 +42,7 @@ void initWebGPU(WebGPUContext& context) {
     }
 }
 
-// Function to fetch the workgroup limits
+// FETCH WORKGROUP LIMITS
 WorkgroupLimits getWorkgroupLimits(wgpu::Device& device) {
     WGPUSupportedLimits limits = {};
     WorkgroupLimits result;
@@ -140,7 +140,7 @@ wgpu::ComputePipeline createComputePipeline(wgpu::Device& device, wgpu::ShaderMo
     return pipeline;
 }
 
-// ENCODING AND DISPATCHING COMPUTE COMMANDS
+// CREATE COMMAND BUFFER
 wgpu::CommandBuffer createComputeCommandBuffer(
     wgpu::Device& device,
     wgpu::ComputePipeline& computePipeline,
@@ -163,18 +163,10 @@ wgpu::CommandBuffer createComputeCommandBuffer(
     return commandEncoder.finish(cmdBufferDesc);
 }
 
-void dispatchComputeCommands(
-    wgpu::Queue& queue,
-    wgpu::CommandBuffer& commandBuffer
-) {
-    queue.submit(1, &commandBuffer);
-}
-
-// READBACK
+// READBACK RESULTS FROM GPU TO CPU
 std::vector<float> readBack(wgpu::Device& device, wgpu::Queue& queue, size_t buffer_len, wgpu::Buffer& outputBuffer) {
     std::vector<float> output(buffer_len);
 
-    // READING BACK RESULTS
     wgpu::BufferDescriptor readbackBufferDesc = {};
     readbackBufferDesc.size = buffer_len * sizeof(float);
     readbackBufferDesc.usage = wgpu::BufferUsage::CopyDst | wgpu::BufferUsage::MapRead;
@@ -215,11 +207,9 @@ std::vector<float> readBack(wgpu::Device& device, wgpu::Queue& queue, size_t buf
     return output;
 }
 
-// Temporary uint32 version of readBack for binary_pupil
 std::vector<uint32_t> readBack2(wgpu::Device& device, wgpu::Queue& queue, size_t buffer_len, wgpu::Buffer& outputBuffer) {
     std::vector<uint32_t> output(buffer_len);
 
-    // READING BACK RESULTS
     wgpu::BufferDescriptor readbackBufferDesc = {};
     readbackBufferDesc.size = buffer_len * sizeof(uint32_t);
     readbackBufferDesc.usage = wgpu::BufferUsage::CopyDst | wgpu::BufferUsage::MapRead;

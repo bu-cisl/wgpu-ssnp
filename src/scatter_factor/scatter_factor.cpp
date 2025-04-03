@@ -37,8 +37,7 @@ static wgpu::BindGroupLayout createBindGroupLayout(wgpu::Device& device) {
 
 static wgpu::BindGroup createBindGroup(
     wgpu::Device& device, 
-    wgpu::BindGroupLayout 
-    bindGroupLayout, 
+    wgpu::BindGroupLayout bindGroupLayout, 
     wgpu::Buffer inputBuffer, 
     wgpu::Buffer outputBuffer, 
     wgpu::Buffer uniformBuffer
@@ -91,18 +90,8 @@ void scatter_factor(
     wgpu::ShaderModule shaderModule = createShaderModule(device, shaderCode);
 
     // CREATING BUFFERS
-    wgpu::Buffer inputBuffer = createBuffer(
-        device, 
-        n.data(), 
-        buffer_len * sizeof(float), 
-        wgpu::BufferUsage::Storage
-    );
-    wgpu::Buffer uniformBuffer = createBuffer(
-        device, 
-        &params, 
-        sizeof(Params), 
-        wgpu::BufferUsage::Uniform
-    );
+    wgpu::Buffer inputBuffer = createBuffer(device, n.data(), buffer_len * sizeof(float), wgpu::BufferUsage::Storage);
+    wgpu::Buffer uniformBuffer = createBuffer(device, &params, sizeof(Params), wgpu::BufferUsage::Uniform);
 
     // CREATING BIND GROUP AND LAYOUT
     wgpu::BindGroupLayout bindGroupLayout = createBindGroupLayout(device);
@@ -119,13 +108,8 @@ void scatter_factor(
 
     // ENCODING AND DISPATCHING COMPUTE COMMANDS
     uint32_t workgroupsX = std::ceil(double(buffer_len)/256.0);
-    wgpu::CommandBuffer commandBuffer = createComputeCommandBuffer(
-        device, 
-        computePipeline, 
-        bindGroup, 
-        workgroupsX
-    );
-    dispatchComputeCommands(queue, commandBuffer);
+    wgpu::CommandBuffer commandBuffer = createComputeCommandBuffer(device, computePipeline, bindGroup, workgroupsX);
+    queue.submit(1, &commandBuffer);
 
     // RELEASE RESOURCES
     computePipeline.release();
