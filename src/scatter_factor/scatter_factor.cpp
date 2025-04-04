@@ -90,7 +90,7 @@ void scatter_factor(
     wgpu::ShaderModule shaderModule = createShaderModule(device, shaderCode);
 
     // CREATING BUFFERS
-    wgpu::Buffer inputBuffer = createBuffer(device, n.data(), buffer_len * sizeof(float), wgpu::BufferUsage::Storage);
+    wgpu::Buffer inputBuffer = createBuffer(device, n.data(), sizeof(float) * buffer_len, wgpu::BufferUsage::Storage);
     wgpu::Buffer uniformBuffer = createBuffer(device, &params, sizeof(Params), wgpu::BufferUsage::Uniform);
 
     // CREATING BIND GROUP AND LAYOUT
