@@ -112,10 +112,11 @@ void scatter_factor(
     queue.submit(1, &commandBuffer);
 
     // RELEASE RESOURCES
+    commandBuffer.release();
     computePipeline.release();
     bindGroup.release();
     bindGroupLayout.release();
+    shaderModule.release();
     inputBuffer.release();
     uniformBuffer.release();
-    shaderModule.release();
 }

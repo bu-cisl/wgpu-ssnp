@@ -34,8 +34,11 @@ static wgpu::BindGroupLayout createBindGroupLayout(wgpu::Device& device) {
 }
 
 static wgpu::BindGroup createBindGroup(
-    wgpu::Device& device, wgpu::BindGroupLayout bindGroupLayout, 
-    wgpu::Buffer cgammaBuffer, wgpu::Buffer maskBuffer, wgpu::Buffer uniformBuffer
+    wgpu::Device& device, 
+    wgpu::BindGroupLayout bindGroupLayout, 
+    wgpu::Buffer cgammaBuffer, 
+    wgpu::Buffer maskBuffer, 
+    wgpu::Buffer uniformBuffer
 ) {
     wgpu::BindGroupEntry cgammaEntry = {};
     cgammaEntry.binding = 0;
@@ -66,13 +69,14 @@ static wgpu::BindGroup createBindGroup(
 }
 
 void binary_pupil(
-    WebGPUContext& context, wgpu::Buffer& maskBuffer,
-    std::optional<std::vector<float>> res, std::optional<float> na,
-    const std::vector<int>& shape
+    WebGPUContext& context, 
+    wgpu::Buffer& maskBuffer,
+    std::vector<int> shape,
+    float na,
+    std::optional<std::vector<float>> res 
 ) {
-    assert(shape.size() >= 2 && "shape must contain at least two values");
     buffer_len = shape[0] * shape[1];
-    Params params = {na.value()};
+    Params params = {na};
 
     // INITIALIZING WEBGPU
     wgpu::Device device = context.device;
@@ -83,7 +87,7 @@ void binary_pupil(
     wgpu::ShaderModule shaderModule = createShaderModule(device, shaderCode);
 
     // CREATING BUFFERS FOR BINARY_PUPIL
-    wgpu::Buffer cgammaBuffer = createBuffer(device, nullptr, sizeof(float) * buffer_len, WGPUBufferUsage(wgpu::BufferUsage::Storage));
+    wgpu::Buffer cgammaBuffer = createBuffer(device, nullptr, sizeof(float) * buffer_len, wgpu::BufferUsage::Storage);
     c_gamma(context, cgammaBuffer, res.value(), shape);
     wgpu::Buffer uniformBuffer = createBuffer(device, &params, sizeof(Params), wgpu::BufferUsage::Uniform);
 
@@ -95,27 +99,16 @@ void binary_pupil(
     wgpu::ComputePipeline computePipeline = createComputePipeline(device, shaderModule, bindGroupLayout);
 
     // ENCODING AND DISPATCHING COMPUTE COMMANDS
-    wgpu::CommandEncoderDescriptor encoderDesc = {};
-    wgpu::CommandEncoder commandEncoder = device.createCommandEncoder(encoderDesc);
-
-    wgpu::ComputePassDescriptor computePassDesc = {};
-    wgpu::ComputePassEncoder computePass = commandEncoder.beginComputePass(computePassDesc);
-    computePass.setPipeline(computePipeline);
-    computePass.setBindGroup(0, bindGroup, 0, nullptr);
-    computePass.dispatchWorkgroups(std::ceil(double(buffer_len)/256.0),1,1);
-    computePass.end();
-
-    wgpu::CommandBufferDescriptor cmdBufferDesc = {};
-    wgpu::CommandBuffer commandBuffer = commandEncoder.finish(cmdBufferDesc);
-
+    uint32_t workgroupsX = std::ceil(double(buffer_len)/256.0);
+    wgpu::CommandBuffer commandBuffer = createComputeCommandBuffer(device, computePipeline, bindGroup, workgroupsX);
     queue.submit(1, &commandBuffer);
 
     // RELEASE RESOURCES
+    commandBuffer.release();
+    computePipeline.release();
     bindGroup.release();
     bindGroupLayout.release();
+    shaderModule.release();
     cgammaBuffer.release();
     uniformBuffer.release();
-    shaderModule.release();
-    computePipeline.release();
-    commandBuffer.release();
 }

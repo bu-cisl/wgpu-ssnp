@@ -102,11 +102,11 @@ void c_gamma(WebGPUContext& context, wgpu::Buffer& outputBuffer, std::vector<flo
     queue.submit(1, &commandBuffer);
 
     // RELEASE RESOURCES
+    commandBuffer.release();
     computePipeline.release();
     bindGroup.release();
     bindGroupLayout.release();
-    shapeBuffer.release();
-    resBuffer.release();
     shaderModule.release();
-    commandBuffer.release();
+    resBuffer.release();
+    shapeBuffer.release();
 }

@@ -65,7 +65,7 @@ int main() {
         sizeof(uint32_t) * shape[0] * shape[1], 
         WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc)
     );
-    binary_pupil(context, maskBuffer, res, na, shape);
+    binary_pupil(context, maskBuffer, shape, na, res);
     cout << "binary_pupil output:" << endl;
     vector<uint32_t> maskbuff = readBack2(context.device, context.queue, shape[0] * shape[1], maskBuffer);
     for (uint32_t val : maskbuff) cout << val << " ";
