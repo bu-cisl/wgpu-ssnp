@@ -78,7 +78,7 @@ static wgpu::BindGroup createBindGroup(
     resEntry.binding = 2;
     resEntry.buffer = resBuffer;
     resEntry.offset = 0;
-    resEntry.size = sizeof(float) * res_buffer_len;  // vec3<f32>
+    resEntry.size = sizeof(float) * res_buffer_len; 
 
     wgpu::BindGroupEntry cgammaEntry = {};
     cgammaEntry.binding = 3;
@@ -119,8 +119,8 @@ void split_prop(
     WebGPUContext& context,
     wgpu::Buffer& ufNewBuffer,
     wgpu::Buffer& ubNewBuffer,
-    const std::vector<std::complex<float>>& uf,
-    const std::vector<std::complex<float>>& ub,
+    std::vector<std::complex<float>>& uf,
+    std::vector<std::complex<float>>& ub,
     std::vector<int> shape,
     std::optional<std::vector<float>> res
 ) {
@@ -137,12 +137,7 @@ void split_prop(
     wgpu::ShaderModule shaderModule = createShaderModule(device, shaderCode);
 
     // CREATING BUFFERS FOR SPLIT_PROP
-    wgpu::Buffer cgammaBuffer = createBuffer(
-        context.device, 
-        nullptr, 
-        sizeof(float) * buffer_len,
-        wgpu::BufferUsage::Storage
-    );
+    wgpu::Buffer cgammaBuffer = createBuffer(context.device, nullptr, sizeof(float) * buffer_len, wgpu::BufferUsage::Storage);
     c_gamma(context, cgammaBuffer, res.value(), shape);
 
     // Flatten uf and ub
@@ -155,18 +150,8 @@ void split_prop(
         ubFlat[2*i + 1] = ub[i].imag();
     }
 
-    wgpu::Buffer ufBuffer = createBuffer(
-        device, 
-        ufFlat.data(), 
-        sizeof(float) * ufFlat.size(),  // ×2 for complex
-        wgpu::BufferUsage::Storage
-    );
-    wgpu::Buffer ubBuffer = createBuffer(
-        device, 
-        ubFlat.data(), 
-        sizeof(float) * ubFlat.size(),  // ×2 for complex
-        wgpu::BufferUsage::Storage
-    );
+    wgpu::Buffer ufBuffer = createBuffer(device, ufFlat.data(), sizeof(float) * ufFlat.size(), wgpu::BufferUsage::Storage);
+    wgpu::Buffer ubBuffer = createBuffer(device, ubFlat.data(), sizeof(float) * ubFlat.size(), wgpu::BufferUsage::Storage);
     wgpu::Buffer resBuffer = createBuffer(device, res.value().data(), sizeof(float)*res_buffer_len, wgpu::BufferUsage::Storage);
 
     // CREATING BIND GROUP AND LAYOUT
@@ -185,30 +170,19 @@ void split_prop(
     // CREATING COMPUTE PIPELINE
     wgpu::ComputePipeline computePipeline = createComputePipeline(device, shaderModule, bindGroupLayout);
 
-    // ENCODING AND DISPATCHING COMPUTE COMMANDS
-    wgpu::CommandEncoderDescriptor encoderDesc = {};
-    wgpu::CommandEncoder commandEncoder = device.createCommandEncoder(encoderDesc);
-
-    wgpu::ComputePassDescriptor computePassDesc = {};
-    wgpu::ComputePassEncoder computePass = commandEncoder.beginComputePass(computePassDesc);
-    computePass.setPipeline(computePipeline);
-    computePass.setBindGroup(0, bindGroup, 0, nullptr);
-    computePass.dispatchWorkgroups(std::ceil(double(buffer_len)/256.0),1,1);
-    computePass.end();
-
-    wgpu::CommandBufferDescriptor cmdBufferDesc = {};
-    wgpu::CommandBuffer commandBuffer = commandEncoder.finish(cmdBufferDesc);
-
+    // CREATING COMPUTE PIPELINE
+    uint32_t workgroupsX = std::ceil(double(buffer_len)/256.0);
+    wgpu::CommandBuffer commandBuffer = createComputeCommandBuffer(device, computePipeline, bindGroup, workgroupsX);
     queue.submit(1, &commandBuffer);
 
     // RELEASE RESOURCES
+    commandBuffer.release();
+    computePipeline.release();
     bindGroup.release();
     bindGroupLayout.release();
+    shaderModule.release();
     cgammaBuffer.release();
     ufBuffer.release();
     ubBuffer.release();
     resBuffer.release();
-    shaderModule.release();
-    computePipeline.release();
-    commandBuffer.release();
 }
