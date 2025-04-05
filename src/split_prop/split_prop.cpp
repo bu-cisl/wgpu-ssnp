@@ -136,7 +136,7 @@ void split_prop(
     std::string shaderCode = readShaderFile("src/split_prop/split_prop.wgsl");
     wgpu::ShaderModule shaderModule = createShaderModule(device, shaderCode);
 
-    // CREATING BUFFERS FOR SPLIT_PROP
+    // CREATING BUFFERS
     wgpu::Buffer cgammaBuffer = createBuffer(context.device, nullptr, sizeof(float) * buffer_len, wgpu::BufferUsage::Storage);
     c_gamma(context, cgammaBuffer, res.value(), shape);
 
@@ -170,7 +170,7 @@ void split_prop(
     // CREATING COMPUTE PIPELINE
     wgpu::ComputePipeline computePipeline = createComputePipeline(device, shaderModule, bindGroupLayout);
 
-    // CREATING COMPUTE PIPELINE
+    // ENCODING AND DISPATCHING COMPUTE COMMANDS
     uint32_t workgroupsX = std::ceil(double(buffer_len)/256.0);
     wgpu::CommandBuffer commandBuffer = createComputeCommandBuffer(device, computePipeline, bindGroup, workgroupsX);
     queue.submit(1, &commandBuffer);

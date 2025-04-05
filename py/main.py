@@ -18,12 +18,12 @@ def test_c_gamma():
     print(gamma_result)
 
 def test_diffract():
-    uf = np.array([[1.0 + 0j, 2.0 + 0j, 3.0 + 0j], 
-                   [4.0 + 0j, 5.0 + 0j, 6.0 + 0j], 
-                   [7.0 + 0j, 8.0 + 0j, 9.0 + 0j]])
-    ub = np.array([[9.0 + 0j, 8.0 + 0j, 7.0 + 0j], 
-                   [6.0 + 0j, 5.0 + 0j, 4.0 + 0j], 
-                   [3.0 + 0j, 2.0 + 0j, 1.0 + 0j]])
+    uf = np.array([[1.0 + 9.0j, 2.0 + 8.0j, 3.0 + 7.0j], 
+                   [4.0 + 6.0j, 5.0 + 5.0j, 6.0 + 4.0j], 
+                   [7.0 + 3.0j, 8.0 + 2.0j, 9.0 + 1.0j]])
+    ub = np.array([[9.0 + 1.0j, 8.0 + 2.0j, 7.0 + 3.0j], 
+                   [6.0 + 4.0j, 5.0 + 5.0j, 4.0 + 6.0j], 
+                   [3.0 + 7.0j, 2.0 + 8.0j, 1.0 + 9.0j]])
     res = (.1, .1, .1)
     dz = 1
     uf_new, ub_new = ssnp_model.diffract(uf, ub, res, dz)
@@ -50,8 +50,8 @@ def test_tilt():
     trunc = False
     tilt_result = ssnp_model.tilt(shape, angles, NA, res, trunc)
 
-    print("Python tilt factor result:")
-    # print(tilt_result)
+    #print("Python tilt result:")
+    #print(tilt_result)
 
 def test_merge_prop():
     res = (0.1, 0.1, 0.1)

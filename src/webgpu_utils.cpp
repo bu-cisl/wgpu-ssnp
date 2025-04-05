@@ -207,7 +207,8 @@ std::vector<float> readBack(wgpu::Device& device, wgpu::Queue& queue, size_t buf
     return output;
 }
 
-std::vector<uint32_t> readBack2(wgpu::Device& device, wgpu::Queue& queue, size_t buffer_len, wgpu::Buffer& outputBuffer) {
+// Temporary Fix for uint32_t types
+std::vector<uint32_t> readBackInt(wgpu::Device& device, wgpu::Queue& queue, size_t buffer_len, wgpu::Buffer& outputBuffer) {
     std::vector<uint32_t> output(buffer_len);
 
     wgpu::BufferDescriptor readbackBufferDesc = {};

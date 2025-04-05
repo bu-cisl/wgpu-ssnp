@@ -55,10 +55,14 @@ static wgpu::BindGroupLayout createBindGroupLayout(wgpu::Device& device) {
 }
 
 static wgpu::BindGroup createBindGroup(
-    wgpu::Device& device, wgpu::BindGroupLayout bindGroupLayout, 
-    wgpu::Buffer ufBuffer, wgpu::Buffer ubBuffer, 
-    wgpu::Buffer resBuffer, wgpu::Buffer cgammaBuffer, 
-    wgpu::Buffer newUFBuffer, wgpu::Buffer newUBBuffer, 
+    wgpu::Device& device, 
+    wgpu::BindGroupLayout bindGroupLayout, 
+    wgpu::Buffer ufBuffer, 
+    wgpu::Buffer ubBuffer, 
+    wgpu::Buffer resBuffer, 
+    wgpu::Buffer cgammaBuffer, 
+    wgpu::Buffer newUFBuffer, 
+    wgpu::Buffer newUBBuffer, 
     wgpu::Buffer uniformBuffer
 ) {
     wgpu::BindGroupEntry ufEntry = {};
@@ -114,11 +118,15 @@ static wgpu::BindGroup createBindGroup(
 }
 
 void diffract(
-    WebGPUContext& context, wgpu::Buffer& newUFBuffer, wgpu::Buffer& newUBBuffer, 
-    std::vector<float> uf, std::vector<float> ub, std::vector<int> shape,
-    std::optional<std::vector<float>> res, std::optional<float> dz
+    WebGPUContext& context, 
+    wgpu::Buffer& newUFBuffer, 
+    wgpu::Buffer& newUBBuffer, 
+    std::vector<float> uf, 
+    std::vector<float> ub, 
+    std::vector<int> shape,
+    std::optional<std::vector<float>> res, 
+    std::optional<float> dz
 ) {
-    // cgamma call
     assert(uf.size() == ub.size() && "uf and ub must have the same shape");
     buffer_len = uf.size();
     res_buffer_len = res.value().size();
@@ -132,12 +140,12 @@ void diffract(
     std::string shaderCode = readShaderFile("src/diffract/diffract.wgsl");
     wgpu::ShaderModule shaderModule = createShaderModule(device, shaderCode);
 
-    // CREATING BUFFERS FOR DIFFRACT
+    // CREATING BUFFERS
     wgpu::Buffer cgammaBuffer = createBuffer(context.device, nullptr, sizeof(float) * uf.size(), WGPUBufferUsage(wgpu::BufferUsage::Storage));
     c_gamma(context, cgammaBuffer, res.value(), shape);
     wgpu::Buffer ufBuffer = createBuffer(device, uf.data(), sizeof(float) * buffer_len, wgpu::BufferUsage::Storage);
     wgpu::Buffer ubBuffer = createBuffer(device, ub.data(), sizeof(float) * buffer_len, wgpu::BufferUsage::Storage);
-    wgpu::Buffer resBuffer = createBuffer(device, res.value().data(), sizeof(float)*res_buffer_len, wgpu::BufferUsage::Storage);
+    wgpu::Buffer resBuffer = createBuffer(device, res.value().data(), sizeof(float) * res_buffer_len, wgpu::BufferUsage::Storage);
     wgpu::Buffer uniformBuffer = createBuffer(device, &params, sizeof(Params), wgpu::BufferUsage::Uniform);
 
     // CREATING BIND GROUP AND LAYOUT
@@ -148,30 +156,19 @@ void diffract(
     wgpu::ComputePipeline computePipeline = createComputePipeline(device, shaderModule, bindGroupLayout);
 
     // ENCODING AND DISPATCHING COMPUTE COMMANDS
-    wgpu::CommandEncoderDescriptor encoderDesc = {};
-    wgpu::CommandEncoder commandEncoder = device.createCommandEncoder(encoderDesc);
-
-    wgpu::ComputePassDescriptor computePassDesc = {};
-    wgpu::ComputePassEncoder computePass = commandEncoder.beginComputePass(computePassDesc);
-    computePass.setPipeline(computePipeline);
-    computePass.setBindGroup(0, bindGroup, 0, nullptr);
-    computePass.dispatchWorkgroups(std::ceil(double(buffer_len)/256.0),1,1);
-    computePass.end();
-
-    wgpu::CommandBufferDescriptor cmdBufferDesc = {};
-    wgpu::CommandBuffer commandBuffer = commandEncoder.finish(cmdBufferDesc);
-
+    uint32_t workgroupsX = std::ceil(double(buffer_len)/256.0);
+    wgpu::CommandBuffer commandBuffer = createComputeCommandBuffer(device, computePipeline, bindGroup, workgroupsX);
     queue.submit(1, &commandBuffer);
 
     // RELEASE RESOURCES
+    commandBuffer.release();
+    computePipeline.release();
     bindGroup.release();
     bindGroupLayout.release();
+    shaderModule.release();
     cgammaBuffer.release();
     ufBuffer.release();
     ubBuffer.release();
     resBuffer.release();
     uniformBuffer.release();
-    shaderModule.release();
-    computePipeline.release();
-    commandBuffer.release();
 }

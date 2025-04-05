@@ -86,7 +86,7 @@ void binary_pupil(
     std::string shaderCode = readShaderFile("src/binary_pupil/binary_pupil.wgsl");
     wgpu::ShaderModule shaderModule = createShaderModule(device, shaderCode);
 
-    // CREATING BUFFERS FOR BINARY_PUPIL
+    // CREATING BUFFERS
     wgpu::Buffer cgammaBuffer = createBuffer(device, nullptr, sizeof(float) * buffer_len, wgpu::BufferUsage::Storage);
     c_gamma(context, cgammaBuffer, res.value(), shape);
     wgpu::Buffer uniformBuffer = createBuffer(device, &params, sizeof(Params), wgpu::BufferUsage::Uniform);
