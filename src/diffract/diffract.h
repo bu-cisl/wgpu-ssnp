@@ -5,6 +5,7 @@
 #include <cassert>
 #include <cmath>
 #include <vector>
+#include <complex>
 #include <optional>
 #include <webgpu/webgpu.hpp>
 #include "../webgpu_utils.h"
@@ -14,8 +15,8 @@ void diffract(
     WebGPUContext& context, 
     wgpu::Buffer& newUFBuffer, 
     wgpu::Buffer& newUBBuffer, 
-    std::vector<float> uf, 
-    std::vector<float> ub, 
+    std::vector<std::complex<float>> uf,
+    std::vector<std::complex<float>> ub,
     std::vector<int> shape,
     std::optional<std::vector<float>> res = std::vector<float>{0.1, 0.1, 0.1}, 
     std::optional<float> dz = 1.0

@@ -1,4 +1,5 @@
 #include "diffract.h"
+#include <iostream>
 
 // INPUT PARAMS
 struct Params {
@@ -69,13 +70,13 @@ static wgpu::BindGroup createBindGroup(
     ufEntry.binding = 0;
     ufEntry.buffer = ufBuffer;
     ufEntry.offset = 0;
-    ufEntry.size = sizeof(float) * buffer_len;
+    ufEntry.size = sizeof(float) * 2 * buffer_len;
 
     wgpu::BindGroupEntry ubEntry = {};
     ubEntry.binding = 1;
     ubEntry.buffer = ubBuffer;
     ubEntry.offset = 0;
-    ubEntry.size = sizeof(float) * buffer_len;
+    ubEntry.size = sizeof(float) * 2 * buffer_len;
 
     wgpu::BindGroupEntry resEntry = {};
     resEntry.binding = 2;
@@ -93,13 +94,13 @@ static wgpu::BindGroup createBindGroup(
     newUFEntry.binding = 4;
     newUFEntry.buffer = newUFBuffer;
     newUFEntry.offset = 0;
-    newUFEntry.size = sizeof(float) * buffer_len;
+    newUFEntry.size = sizeof(float) * 2 * buffer_len;
 
     wgpu::BindGroupEntry newUBEntry = {};
     newUBEntry.binding = 5;
     newUBEntry.buffer = newUBBuffer;
     newUBEntry.offset = 0;
-    newUBEntry.size = sizeof(float) * buffer_len;
+    newUBEntry.size = sizeof(float) * 2 * buffer_len;
 
     wgpu::BindGroupEntry uniformEntry = {};
     uniformEntry.binding = 6;
@@ -121,8 +122,8 @@ void diffract(
     WebGPUContext& context, 
     wgpu::Buffer& newUFBuffer, 
     wgpu::Buffer& newUBBuffer, 
-    std::vector<float> uf, 
-    std::vector<float> ub, 
+    std::vector<std::complex<float>> uf,
+    std::vector<std::complex<float>> ub,
     std::vector<int> shape,
     std::optional<std::vector<float>> res, 
     std::optional<float> dz
@@ -141,10 +142,24 @@ void diffract(
     wgpu::ShaderModule shaderModule = createShaderModule(device, shaderCode);
 
     // CREATING BUFFERS
-    wgpu::Buffer cgammaBuffer = createBuffer(context.device, nullptr, sizeof(float) * uf.size(), WGPUBufferUsage(wgpu::BufferUsage::Storage));
+    wgpu::Buffer cgammaBuffer = createBuffer(context.device, nullptr, sizeof(float) * buffer_len, WGPUBufferUsage(wgpu::BufferUsage::Storage));
     c_gamma(context, cgammaBuffer, res.value(), shape);
-    wgpu::Buffer ufBuffer = createBuffer(device, uf.data(), sizeof(float) * buffer_len, wgpu::BufferUsage::Storage);
-    wgpu::Buffer ubBuffer = createBuffer(device, ub.data(), sizeof(float) * buffer_len, wgpu::BufferUsage::Storage);
+
+    // Flatten complex numbers
+    std::vector<float> ufFlat(buffer_len * 2);
+    std::vector<float> ubFlat(buffer_len * 2);
+    for (size_t i = 0; i < buffer_len; ++i) {
+        ufFlat[2*i] = uf[i].real();
+        ufFlat[2*i + 1] = uf[i].imag();
+        ubFlat[2*i] = ub[i].real();
+        ubFlat[2*i + 1] = ub[i].imag();
+    }
+    std::cout << "buffer_len: " << buffer_len << "\n";
+    std::cout << "ufFlat size: " << ufFlat.size() << "\n";
+    std::cout << "Creating buffer of size: " << sizeof(float)*ufFlat.size() << " bytes\n";
+
+    wgpu::Buffer ufBuffer = createBuffer(device, ufFlat.data(), sizeof(float) * ufFlat.size(), wgpu::BufferUsage::Storage);
+    wgpu::Buffer ubBuffer = createBuffer(device, ubFlat.data(), sizeof(float) * ubFlat.size(), wgpu::BufferUsage::Storage);
     wgpu::Buffer resBuffer = createBuffer(device, res.value().data(), sizeof(float) * res_buffer_len, wgpu::BufferUsage::Storage);
     wgpu::Buffer uniformBuffer = createBuffer(device, &params, sizeof(Params), wgpu::BufferUsage::Uniform);
 

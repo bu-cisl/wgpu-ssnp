@@ -49,29 +49,37 @@ int main() {
     cout << endl;
 
     // Test diffract
-    vector<float> diffract_uf = {1,2,3,4,5,6,7,8,9};
-    vector<float> diffract_ub = {9,8,7,6,5,4,3,2,1};
+    vector<complex<float>> diffract_uf = {
+        {1.0f, 9.0f}, {2.0f, 8.0f}, {3.0f, 7.0f},
+        {4.0f, 6.0f}, {5.0f, 5.0f}, {6.0f, 4.0f},
+        {7.0f, 3.0f}, {8.0f, 2.0f}, {9.0f, 1.0f}
+    };
+    vector<complex<float>> diffract_ub = {
+        {9.0f, 1.0f}, {8.0f, 2.0f}, {7.0f, 3.0f},
+        {6.0f, 4.0f}, {5.0f, 5.0f}, {4.0f, 6.0f},
+        {3.0f, 7.0f}, {2.0f, 8.0f}, {1.0f, 9.0f}
+    };
     size_t diffract_size = diffract_uf.size();
     vector<int> diffract_shape = {3,3}; // we need to note original shape of matrix before flattening
     wgpu::Buffer diffractUFBuffer = createBuffer(
         context.device, 
         nullptr, 
-        sizeof(float) * diffract_size, 
+        sizeof(float) * 2 * diffract_size, 
         WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc)
     );
     wgpu::Buffer diffractUBBuffer = createBuffer(
         context.device, 
         nullptr, 
-        sizeof(float) * diffract_size, 
+        sizeof(float) * 2 * diffract_size, 
         WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc)
     );
     diffract(context, diffractUFBuffer, diffractUBBuffer, diffract_uf, diffract_ub, diffract_shape);
     cout << "diffract output (new uf):" << endl;
-    vector<float> diffractUF = readBack(context.device, context.queue, diffract_size, diffractUFBuffer);
+    vector<float> diffractUF = readBack(context.device, context.queue, 2 * diffract_size, diffractUFBuffer);
     for (float uf : diffractUF) cout << fixed << setprecision(4) << uf << " ";
     cout << endl;
     cout << "diffract output (new ub):" << endl;
-    vector<float> diffractUB = readBack(context.device, context.queue, diffract_size, diffractUBBuffer);
+    vector<float> diffractUB = readBack(context.device, context.queue, 2 * diffract_size, diffractUBBuffer);
     for (float ub : diffractUB) cout << fixed << setprecision(4) << ub << " ";
     cout << endl;
 
