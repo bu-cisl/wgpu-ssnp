@@ -77,7 +77,7 @@ static wgpu::BindGroup createBindGroup(
     shapeEntry.binding = 1;
     shapeEntry.buffer = shapeBuffer;
     shapeEntry.offset = 0;
-    shapeEntry.size = sizeof(uint32_t) * 2; // Always 2 elements for shape
+    shapeEntry.size = sizeof(int) * 2; // Always 2 elements for shape
 
     wgpu::BindGroupEntry resEntry = {};
     resEntry.binding = 2;
@@ -123,22 +123,22 @@ static wgpu::BindGroup createBindGroup(
 void tilt(
     WebGPUContext& context,
     wgpu::Buffer& factorsBuffer,
-    const std::vector<float>& angles,
-    const std::vector<uint32_t>& shape,
-    float NA,
-    const std::vector<float>& res,
-    bool trunc
+    std::vector<float> angles,
+    std::vector<int> shape,
+    std::optional<float> NA,
+    std::optional<std::vector<float>> res,
+    std::optional<bool> trunc
 ) {
     // Validate inputs
     assert(shape.size() == 2 && "Shape must be 2D (height, width)");
-    assert(res.size() == 3 && "Resolution must have 3 components");
+    assert(res.value().size() == 3 && "Resolution must have 3 components");
     
     angles_buffer_len = angles.size();
     factors_buffer_len = 2 * angles.size();
     
     Params params = {
-        NA,
-        trunc ? 1u : 0u
+        NA.value(),
+        trunc.value() ? 1u : 0u
     };
 
     // INITIALIZING WEBGPU
@@ -151,47 +151,41 @@ void tilt(
     
     // CREATING BUFFERS FOR TILT
     wgpu::Buffer anglesBuffer = createBuffer(device, angles.data(), sizeof(float) * angles_buffer_len, wgpu::BufferUsage::Storage);
-    wgpu::Buffer shapeBuffer = createBuffer(device, shape.data(), sizeof(uint32_t) * 2, wgpu::BufferUsage::Storage);
-    wgpu::Buffer resBuffer = createBuffer(device, res.data(), sizeof(float) * 3, wgpu::BufferUsage::Storage);
+    wgpu::Buffer shapeBuffer = createBuffer(device, shape.data(), sizeof(int) * 2, wgpu::BufferUsage::Storage);
+    wgpu::Buffer resBuffer = createBuffer(device, res.value().data(), sizeof(float) * 3, wgpu::BufferUsage::Storage);
     wgpu::Buffer uniformNABuffer = createBuffer(device, &params.NA, sizeof(float), wgpu::BufferUsage::Uniform);
     wgpu::Buffer uniformTruncBuffer = createBuffer(device, &params.trunc_flag, sizeof(uint32_t), wgpu::BufferUsage::Uniform);
 
     // CREATING BIND GROUP AND LAYOUT
     wgpu::BindGroupLayout bindGroupLayout = createBindGroupLayout(device);
     wgpu::BindGroup bindGroup = createBindGroup(
-        device, bindGroupLayout,
-        anglesBuffer, shapeBuffer, resBuffer,
-        factorsBuffer, uniformNABuffer, uniformTruncBuffer
+        device, 
+        bindGroupLayout,
+        anglesBuffer, 
+        shapeBuffer, 
+        resBuffer,
+        factorsBuffer, 
+        uniformNABuffer, 
+        uniformTruncBuffer
     );
 
     // CREATING COMPUTE PIPELINE
     wgpu::ComputePipeline computePipeline = createComputePipeline(device, shaderModule, bindGroupLayout);
 
     // ENCODING AND DISPATCHING COMPUTE COMMANDS
-    wgpu::CommandEncoderDescriptor encoderDesc = {};
-    wgpu::CommandEncoder commandEncoder = device.createCommandEncoder(encoderDesc);
-
-    wgpu::ComputePassDescriptor computePassDesc = {};
-    wgpu::ComputePassEncoder computePass = commandEncoder.beginComputePass(computePassDesc);
-    computePass.setPipeline(computePipeline);
-    computePass.setBindGroup(0, bindGroup, 0, nullptr);
-    computePass.dispatchWorkgroups(std::ceil(double(angles_buffer_len)/256.0),1,1);
-    computePass.end();
-
-    wgpu::CommandBufferDescriptor cmdBufferDesc = {};
-    wgpu::CommandBuffer commandBuffer = commandEncoder.finish(cmdBufferDesc);
-
+    uint32_t workgroupsX = std::ceil(double(angles_buffer_len)/256.0);
+    wgpu::CommandBuffer commandBuffer = createComputeCommandBuffer(device, computePipeline, bindGroup, workgroupsX);
     queue.submit(1, &commandBuffer);
     
     // RELEASE RESOURCES
+    commandBuffer.release();
+    computePipeline.release();
     bindGroup.release();
     bindGroupLayout.release();
+    shaderModule.release();
     anglesBuffer.release();
     shapeBuffer.release();
     resBuffer.release();
     uniformNABuffer.release();
     uniformTruncBuffer.release();
-    shaderModule.release();
-    computePipeline.release();
-    commandBuffer.release();
 }

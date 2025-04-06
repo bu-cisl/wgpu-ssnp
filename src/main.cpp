@@ -93,9 +93,9 @@ int main() {
     cout << endl;
 
     // Test tilt
-    vector<uint32_t> tilt_shape = {8, 8};
+    vector<int> tilt_shape = {8, 8};
     vector<float> tilt_angles = {2*M_PI, M_PI/2, M_PI/6};
-    float tilt_na = 0.5f;
+    float tilt_NA = 0.5f;
     vector<float> tilt_res = {0.69f, 0.2f, 0.1f};
     bool trunc = false;
     size_t tilt_output_size = tilt_angles.size() * 2;  
@@ -104,7 +104,7 @@ int main() {
         sizeof(float) * tilt_output_size, 
         WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc)
     );
-    tilt(context, tiltResultBuffer, tilt_angles, tilt_shape, tilt_na, tilt_res, trunc);
+    tilt(context, tiltResultBuffer, tilt_angles, tilt_shape, tilt_NA, tilt_res, trunc);
     cout << "tilt (factor) output:" << endl;
     vector<float> tilt = readBack(context.device, context.queue, tilt_output_size, tiltResultBuffer);
     for (float t : tilt) cout << fixed << scientific << setprecision(4) << t << " ";

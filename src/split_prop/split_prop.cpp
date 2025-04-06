@@ -119,8 +119,8 @@ void split_prop(
     WebGPUContext& context,
     wgpu::Buffer& ufNewBuffer,
     wgpu::Buffer& ubNewBuffer,
-    std::vector<std::complex<float>>& uf,
-    std::vector<std::complex<float>>& ub,
+    std::vector<std::complex<float>> uf,
+    std::vector<std::complex<float>> ub,
     std::vector<int> shape,
     std::optional<std::vector<float>> res
 ) {
