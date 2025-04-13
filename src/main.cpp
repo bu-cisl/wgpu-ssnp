@@ -101,15 +101,16 @@ int main() {
     cout << endl;
 
     // Test tilt
-    vector<int> tilt_shape = {8, 8};
+    vector<int> tilt_shape = {2, 2};
     vector<float> tilt_angles = {2*M_PI, M_PI/2, M_PI/6};
     float tilt_NA = 0.5f;
     vector<float> tilt_res = {0.69f, 0.2f, 0.1f};
     bool trunc = false;
-    size_t tilt_output_size = tilt_angles.size() * 2;  
+    size_t tilt_output_size = tilt_angles.size() * tilt_shape[0] * tilt_shape[1];  
+    size_t tilt_buffer_size = tilt_output_size * 2;
     wgpu::Buffer tiltResultBuffer = createBuffer(
         context.device, nullptr, 
-        sizeof(float) * tilt_output_size, 
+        sizeof(float) * tilt_buffer_size, 
         WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc)
     );
     tilt(context, tiltResultBuffer, tilt_angles, tilt_shape, tilt_NA, tilt_res, trunc);

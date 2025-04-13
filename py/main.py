@@ -43,7 +43,7 @@ def test_binary_pupil():
     print(mask)
 
 def test_tilt():
-    shape = (8, 8)
+    shape = (2, 2)
     angles = torch.tensor([2 * torch.pi, torch.pi / 2, torch.pi /6]) 
     NA = 0.5
     res = (0.69, 0.2, 0.1)

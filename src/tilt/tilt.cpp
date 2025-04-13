@@ -86,10 +86,10 @@ static wgpu::BindGroup createBindGroup(
     resEntry.size = sizeof(float) * 3; // Always 3 elements for res
 
     wgpu::BindGroupEntry outEntry = {};
-    factorsEntry.binding = 3;
-    factorsEntry.buffer = outBuffer
-    factorsEntry.offset = 0;
-    factorsEntry.size = sizeof(float) * 2 * out_buffer_len;
+    outEntry.binding = 3;
+    outEntry.buffer = outBuffer;
+    outEntry.offset = 0;
+    outEntry.size = sizeof(float) * 2 * out_buffer_len;
 
     wgpu::BindGroupEntry uniformNAEntry = {};
     uniformNAEntry.binding = 4;
@@ -122,7 +122,7 @@ static wgpu::BindGroup createBindGroup(
 
 void tilt(
     WebGPUContext& context,
-    wgpu::Buffer& factorsBuffer,
+    wgpu::Buffer& outBuffer,
     std::vector<float> angles,
     std::vector<int> shape,
     std::optional<float> NA,
@@ -134,7 +134,7 @@ void tilt(
     assert(res.value().size() == 3 && "Resolution must have 3 components");
     
     angles_buffer_len = angles.size();
-    factors_buffer_len = 2 * angles.size();
+    out_buffer_len = angles.size() * shape[0] * shape[1];  
     
     Params params = {
         NA.value(),
@@ -164,7 +164,7 @@ void tilt(
         anglesBuffer, 
         shapeBuffer, 
         resBuffer,
-        factorsBuffer, 
+        outBuffer, 
         uniformNABuffer, 
         uniformTruncBuffer
     );
