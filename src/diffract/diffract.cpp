@@ -1,5 +1,4 @@
 #include "diffract.h"
-#include <iostream>
 
 // INPUT PARAMS
 struct Params {
@@ -154,9 +153,6 @@ void diffract(
         ubFlat[2*i] = ub[i].real();
         ubFlat[2*i + 1] = ub[i].imag();
     }
-    std::cout << "buffer_len: " << buffer_len << "\n";
-    std::cout << "ufFlat size: " << ufFlat.size() << "\n";
-    std::cout << "Creating buffer of size: " << sizeof(float)*ufFlat.size() << " bytes\n";
 
     wgpu::Buffer ufBuffer = createBuffer(device, ufFlat.data(), sizeof(float) * ufFlat.size(), wgpu::BufferUsage::Storage);
     wgpu::Buffer ubBuffer = createBuffer(device, ubFlat.data(), sizeof(float) * ubFlat.size(), wgpu::BufferUsage::Storage);

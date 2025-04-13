@@ -63,7 +63,6 @@ def tilt(shape: tuple[int], angles: Tensor, NA: float= 0.65, res: tuple[float] =
 	else:
 		factor = (c_ba * norm).T
 
-	print(f"factor: {factor.shape} \n{factor}")
 	xr = torch.arange(shape[1], device=device).view(1,1,-1).to(dtype=torch.complex128)
 	xr = (2j * torch.pi / shape[1]) * factor[1].reshape(-1,1,1) * xr
 	xr.exp_()
@@ -73,7 +72,7 @@ def tilt(shape: tuple[int], angles: Tensor, NA: float= 0.65, res: tuple[float] =
 	yr.exp_()
 
 	out = xr * yr
-	print(f"out: {out.shape} \n{out}")
+	print(out)
 
 	# normalize by center point value
 	out /= out[:, *(i // 2 for i in shape)].clone().view(-1, 1, 1)

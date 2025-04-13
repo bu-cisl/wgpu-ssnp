@@ -50,8 +50,8 @@ def test_tilt():
     trunc = False
     tilt_result = ssnp_model.tilt(shape, angles, NA, res, trunc)
 
-    #print("Python tilt result:")
-    #print(tilt_result)
+    print("Python tilt result:")
+    print(tilt_result)
 
 def test_merge_prop():
     res = (0.1, 0.1, 0.1)
@@ -86,10 +86,10 @@ def test_split_prop():
     print(ub_new)
 
 if __name__ == "__main__":
-    test_scatter_factor()
-    test_c_gamma()
-    test_diffract()
-    test_binary_pupil()
+    #test_scatter_factor()
+    #test_c_gamma()
+    #test_diffract()
+    #test_binary_pupil()
     test_tilt()
-    test_merge_prop()
-    test_split_prop()
+    #test_merge_prop()
+    #test_split_prop()

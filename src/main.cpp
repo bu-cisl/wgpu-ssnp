@@ -114,8 +114,8 @@ int main() {
         WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc)
     );
     tilt(context, tiltResultBuffer, tilt_angles, tilt_shape, tilt_NA, tilt_res, trunc);
-    cout << "tilt (factor) output:" << endl;
-    vector<float> tilt = readBack(context.device, context.queue, tilt_output_size, tiltResultBuffer);
+    cout << "tilt output:" << endl;
+    vector<float> tilt = readBack(context.device, context.queue, tilt_buffer_size, tiltResultBuffer);
     for (float t : tilt) cout << fixed << scientific << setprecision(4) << t << " ";
     cout << endl;
 
