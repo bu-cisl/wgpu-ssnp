@@ -11,7 +11,7 @@
 
 void tilt(
     WebGPUContext& context,
-    wgpu::Buffer& factorsBuffer,
+    wgpu::Buffer& outBuffer,
     std::vector<float> angles,
     std::vector<int> shape,
     std::optional<float> NA = 0.65,

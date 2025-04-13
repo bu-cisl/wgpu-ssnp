@@ -7,7 +7,7 @@ struct Params {
 };
 
 static size_t angles_buffer_len;
-static size_t factors_buffer_len;
+static size_t out_buffer_len;
 
 // CREATING BIND GROUP AND LAYOUT
 static wgpu::BindGroupLayout createBindGroupLayout(wgpu::Device& device) {
@@ -26,10 +26,10 @@ static wgpu::BindGroupLayout createBindGroupLayout(wgpu::Device& device) {
     resBufferLayout.visibility = wgpu::ShaderStage::Compute;
     resBufferLayout.buffer.type = wgpu::BufferBindingType::ReadOnlyStorage;
 
-    wgpu::BindGroupLayoutEntry factorsBufferLayout = {};
-    factorsBufferLayout.binding = 3;
-    factorsBufferLayout.visibility = wgpu::ShaderStage::Compute;
-    factorsBufferLayout.buffer.type = wgpu::BufferBindingType::Storage;
+    wgpu::BindGroupLayoutEntry outBufferLayout = {};
+    outBufferLayout.binding = 3;
+    outBufferLayout.visibility = wgpu::ShaderStage::Compute;
+    outBufferLayout.buffer.type = wgpu::BufferBindingType::Storage;
 
     wgpu::BindGroupLayoutEntry uniformNALayout = {};
     uniformNALayout.binding = 4;
@@ -45,7 +45,7 @@ static wgpu::BindGroupLayout createBindGroupLayout(wgpu::Device& device) {
         anglesBufferLayout,
         shapeBufferLayout,
         resBufferLayout,
-        factorsBufferLayout,
+        outBufferLayout,
         uniformNALayout,
         uniformTruncLayout
     };
@@ -63,7 +63,7 @@ static wgpu::BindGroup createBindGroup(
     wgpu::Buffer anglesBuffer,
     wgpu::Buffer shapeBuffer,
     wgpu::Buffer resBuffer,
-    wgpu::Buffer factorsBuffer,
+    wgpu::Buffer outBuffer, 
     wgpu::Buffer uniformNABuffer,
     wgpu::Buffer uniformTruncBuffer
 ) {
@@ -85,11 +85,11 @@ static wgpu::BindGroup createBindGroup(
     resEntry.offset = 0;
     resEntry.size = sizeof(float) * 3; // Always 3 elements for res
 
-    wgpu::BindGroupEntry factorsEntry = {};
+    wgpu::BindGroupEntry outEntry = {};
     factorsEntry.binding = 3;
-    factorsEntry.buffer = factorsBuffer;
+    factorsEntry.buffer = outBuffer
     factorsEntry.offset = 0;
-    factorsEntry.size = sizeof(float) * factors_buffer_len;
+    factorsEntry.size = sizeof(float) * 2 * out_buffer_len;
 
     wgpu::BindGroupEntry uniformNAEntry = {};
     uniformNAEntry.binding = 4;
@@ -107,7 +107,7 @@ static wgpu::BindGroup createBindGroup(
         anglesEntry,
         shapeEntry,
         resEntry,
-        factorsEntry,
+        outEntry,
         uniformNAEntry,
         uniformTruncEntry
     };

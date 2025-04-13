@@ -73,6 +73,7 @@ def tilt(shape: tuple[int], angles: Tensor, NA: float= 0.65, res: tuple[float] =
 	yr.exp_()
 
 	out = xr * yr
+	print(f"out: {out.shape} \n{out}")
 
 	# normalize by center point value
 	out /= out[:, *(i // 2 for i in shape)].clone().view(-1, 1, 1)
