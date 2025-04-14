@@ -26,3 +26,6 @@
 
 # Ignore VS code settings
 .vscode
+
+# Ignore extra output during testing
+input_matrix.txt

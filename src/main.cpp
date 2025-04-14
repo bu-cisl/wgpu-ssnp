@@ -1,3 +1,4 @@
+// main.cpp
 #define WEBGPU_CPP_IMPLEMENTATION
 #include "scatter_factor/scatter_factor.h"
 #include "diffract/diffract.h"
@@ -5,205 +6,272 @@
 #include "tilt/tilt.h"
 #include "merge_prop/merge_prop.h"
 #include "split_prop/split_prop.h"
+#include "c_gamma/c_gamma.h"  
 #include "webgpu_utils.h"
 #include <vector>
 #include <complex>
 #include <iostream>
 #include <iomanip>
+#include <fstream>
+#include <sstream>
+#include <cmath>
 
 using namespace std;
 
-int main() {
-    // Initialize WebGPU
+// ---------------------------------------------------------------------
+// Helper function to read a matrix of floats from a text file.
+// Format: 
+//   First line: <rows> <cols>
+//   Then one line per row with space‐separated floats.
+// ---------------------------------------------------------------------
+bool readMatrixFromFile(const string &filename, vector<float>& data, vector<int>& shape) {
+    ifstream infile(filename);
+    if (!infile.is_open()) {
+        cerr << "Error: could not open input file " << filename << endl;
+        return false;
+    }
+    int rows, cols;
+    infile >> rows >> cols;
+    shape = {rows, cols};
+    data.resize(rows * cols);
+    for (int i = 0; i < rows * cols; i++) {
+        if (!(infile >> data[i])) {
+            cerr << "Error reading data at index " << i << endl;
+            return false;
+        }
+    }
+    infile.close();
+    return true;
+}
+
+// ---------------------------------------------------------------------
+// Helper: Compute and print summary (count, mean, std, min, max) for float data.
+// ---------------------------------------------------------------------
+void printSummary(const string& label, const vector<float>& data) {
+    if (data.empty()){
+        cout << label << ": empty data" << endl;
+        return;
+    }
+    float sum = 0.0f;
+    float min_val = data[0];
+    float max_val = data[0];
+    for (float val : data) {
+        sum += val;
+        if (val < min_val) min_val = val;
+        if (val > max_val) max_val = val;
+    }
+    float mean = sum / data.size();
+    float accum = 0.0f;
+    for (float val : data) {
+        accum += (val - mean) * (val - mean);
+    }
+    float std = sqrt(accum / data.size());
+    cout << label << ": count=" << data.size() 
+         << " mean=" << fixed << setprecision(8) << mean 
+         << " std=" << fixed << setprecision(8) << std 
+         << " min=" << fixed << setprecision(8) << min_val 
+         << " max=" << fixed << setprecision(8) << max_val << endl;
+}
+
+// ---------------------------------------------------------------------
+// Helper: For outputs of complex functions stored as interleaved floats,
+// compute the summary of the magnitudes.
+// ---------------------------------------------------------------------
+void printComplexSummary(const string& label, const vector<float>& data) {
+    vector<float> mags;
+    // Assumes data is in [real, imag, real, imag, ...] order.
+    for (size_t i = 0; i < data.size(); i += 2) {
+        float mag = sqrt(data[i] * data[i] + data[i+1] * data[i+1]);
+        mags.push_back(mag);
+    }
+    printSummary(label, mags);
+}
+
+// ---------------------------------------------------------------------
+// Helper: For integer arrays (binary pupil mask).
+// ---------------------------------------------------------------------
+void printIntSummary(const string& label, const vector<uint32_t>& data) {
+    if (data.empty()){
+        cout << label << ": empty data" << endl;
+        return;
+    }
+    uint32_t sum = 0;
+    uint32_t min_val = data[0];
+    uint32_t max_val = data[0];
+    for (uint32_t val : data) {
+        sum += val;
+        if (val < min_val) min_val = val;
+        if (val > max_val) max_val = val;
+    }
+    double mean = double(sum) / data.size();
+    cout << label << ": count=" << data.size() 
+         << " sum=" << sum 
+         << " mean=" << fixed << setprecision(8) << mean 
+         << " min=" << min_val 
+         << " max=" << max_val << endl;
+}
+
+int main(int argc, char** argv) {
+    // Initialize WebGPU.
     WebGPUContext context;
     initWebGPU(context);
 
-    // Test scatter_factor
-    vector<float> scatter_input = {5, 21, 65};
+    // -----------------------------------------------------------------
+    // Prepare input parameters.
+    // Use the same input matrix for all tests.
+    // -----------------------------------------------------------------
+    vector<int> matrix_shape;
+    vector<float> inputMatrix;
+    if (argc > 1) {
+        if (!readMatrixFromFile(argv[1], inputMatrix, matrix_shape)) {
+            cerr << "Failed to read input file. Using default test data." << endl;
+            matrix_shape = {3,3};
+            inputMatrix = {5.0f, 21.0f, 65.0f, 5.0f, 21.0f, 65.0f, 5.0f, 21.0f, 65.0f};
+        }
+    } else {
+        matrix_shape = {3,3};
+        inputMatrix = {5.0f, 21.0f, 65.0f, 5.0f, 21.0f, 65.0f, 5.0f, 21.0f, 65.0f};
+    }
+    // For functions expecting complex input, convert the float values.
+    vector<complex<float>> complexInput;
+    for (float val : inputMatrix) {
+        complexInput.push_back({val, 0.0f});
+    }
+    // Fixed resolution.
+    vector<float> res = {0.1f, 0.1f, 0.1f};
+
+    // ------------------------- Test: scatter_factor -------------------------
+    cout << "Phase: Running scatter_factor test in C++" << endl;
     wgpu::Buffer scatterResultBuffer = createBuffer(
         context.device, 
         nullptr, 
-        sizeof(float) * scatter_input.size(), 
+        sizeof(float) * inputMatrix.size(), 
         WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc)
     );
-    scatter_factor(context, scatterResultBuffer, scatter_input);
-    cout << "scatter_factor output: " << endl;
-    vector<float> scatter = readBack(context.device, context.queue, scatter_input.size(), scatterResultBuffer);
-    for (float s : scatter) cout << fixed << setprecision(8) << s << " ";
-    cout << endl;
+    scatter_factor(context, scatterResultBuffer, inputMatrix);
+    vector<float> scatterOutput = readBack(context.device, context.queue, inputMatrix.size(), scatterResultBuffer);
+    printSummary("SCATTER_FACTOR", scatterOutput);
+    scatterResultBuffer.release();
 
-    // Test c_gamma
-    vector<int> c_gamma_shape = {3, 3};
-    vector<float> c_gamma_res = {0.1f, 0.4f, 0.1f};
-    size_t c_gamma_len = c_gamma_shape[0] * c_gamma_shape[1];
+    // ------------------------- Test: c_gamma -------------------------
+    cout << "Phase: Running c_gamma test in C++" << endl;
+    size_t c_gamma_len = matrix_shape[0] * matrix_shape[1];
     wgpu::Buffer cGammaResultBuffer = createBuffer(
         context.device, 
         nullptr, 
         sizeof(float) * c_gamma_len, 
         WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc)
     );
-    c_gamma(context, cGammaResultBuffer, c_gamma_res, c_gamma_shape);
-    cout << "c_gamma output:" << endl;
-    vector<float> cgamma = readBack(context.device, context.queue, c_gamma_len, cGammaResultBuffer);
-    for (float c : cgamma) cout << fixed << setprecision(4) << c << " ";
-    cout << endl;
+    c_gamma(context, cGammaResultBuffer, res, matrix_shape);
+    vector<float> cGammaOutput = readBack(context.device, context.queue, c_gamma_len, cGammaResultBuffer);
+    printSummary("C_GAMMA", cGammaOutput);
+    cGammaResultBuffer.release();
 
-    // Test diffract
-    vector<complex<float>> diffract_uf = {
-        {1.0f, 9.0f}, {2.0f, 8.0f}, {3.0f, 7.0f},
-        {4.0f, 6.0f}, {5.0f, 5.0f}, {6.0f, 4.0f},
-        {7.0f, 3.0f}, {8.0f, 2.0f}, {9.0f, 1.0f}
-    };
-    vector<complex<float>> diffract_ub = {
-        {9.0f, 1.0f}, {8.0f, 2.0f}, {7.0f, 3.0f},
-        {6.0f, 4.0f}, {5.0f, 5.0f}, {4.0f, 6.0f},
-        {3.0f, 7.0f}, {2.0f, 8.0f}, {1.0f, 9.0f}
-    };
-    size_t diffract_size = diffract_uf.size();
-    vector<int> diffract_shape = {3,3}; // we need to note original shape of matrix before flattening
+    // ------------------------- Test: diffract -------------------------
+    cout << "Phase: Running diffract test in C++" << endl;
+    size_t numComplex = complexInput.size();
     wgpu::Buffer diffractUFBuffer = createBuffer(
         context.device, 
         nullptr, 
-        sizeof(float) * 2 * diffract_size, 
+        sizeof(float) * 2 * numComplex, 
         WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc)
     );
     wgpu::Buffer diffractUBBuffer = createBuffer(
         context.device, 
         nullptr, 
-        sizeof(float) * 2 * diffract_size, 
+        sizeof(float) * 2 * numComplex, 
         WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc)
     );
-    diffract(context, diffractUFBuffer, diffractUBBuffer, diffract_uf, diffract_ub, diffract_shape);
-    cout << "diffract output (new uf):" << endl;
-    vector<float> diffractUF = readBack(context.device, context.queue, 2 * diffract_size, diffractUFBuffer);
-    for (float uf : diffractUF) cout << fixed << setprecision(4) << uf << " ";
-    cout << endl;
-    cout << "diffract output (new ub):" << endl;
-    vector<float> diffractUB = readBack(context.device, context.queue, 2 * diffract_size, diffractUBBuffer);
-    for (float ub : diffractUB) cout << fixed << setprecision(4) << ub << " ";
-    cout << endl;
+    diffract(context, diffractUFBuffer, diffractUBBuffer, complexInput, complexInput, matrix_shape);
+    vector<float> diffractUF = readBack(context.device, context.queue, 2 * numComplex, diffractUFBuffer);
+    vector<float> diffractUB = readBack(context.device, context.queue, 2 * numComplex, diffractUBBuffer);
+    printComplexSummary("DIFRACT_UF", diffractUF);
+    printComplexSummary("DIFRACT_UB", diffractUB);
+    diffractUFBuffer.release();
+    diffractUBBuffer.release();
 
-    // Test binary_pupil
-    vector<int> binary_pupil_shape = {3, 3};
-    float binary_pupil_na = 0.9f;
-    vector<float> binary_pupil_res = {0.1f, 0.4f, 0.1f};
-    size_t binary_pupil_len = c_gamma_shape[0] * c_gamma_shape[1];
+    // ------------------------- Test: binary_pupil -------------------------
+    cout << "Phase: Running binary_pupil test in C++" << endl;
+    size_t binaryLen = matrix_shape[0] * matrix_shape[1];
     wgpu::Buffer binaryPupilResultBuffer = createBuffer(
         context.device, 
         nullptr, 
-        sizeof(uint32_t) * binary_pupil_len, 
+        sizeof(uint32_t) * binaryLen, 
         WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc)
     );
-    binary_pupil(context, binaryPupilResultBuffer, binary_pupil_shape, binary_pupil_na, binary_pupil_res);
-    cout << "binary_pupil output:" << endl;
-    vector<uint32_t> binarypupil = readBackInt(context.device, context.queue, binary_pupil_len, binaryPupilResultBuffer);
-    for (uint32_t b : binarypupil) cout << b << " ";
-    cout << endl;
+    binary_pupil(context, binaryPupilResultBuffer, matrix_shape, 0.9f, res);
+    vector<uint32_t> binaryPupilOutput = readBackInt(context.device, context.queue, binaryLen, binaryPupilResultBuffer);
+    printIntSummary("BINARY_PUPIL", binaryPupilOutput);
+    binaryPupilResultBuffer.release();
 
-    // Test tilt
-    vector<int> tilt_shape = {2, 2};
-    vector<float> tilt_angles = {2*M_PI, M_PI/2, M_PI/6};
+    // ------------------------- Test: tilt -------------------------
+    cout << "Phase: Running tilt test in C++" << endl;
+    vector<float> tilt_angles = {0.1f, 0.5f, 1.0f};
     float tilt_NA = 0.5f;
-    vector<float> tilt_res = {0.69f, 0.2f, 0.1f};
-    bool trunc = false;
-    size_t tilt_output_size = tilt_angles.size() * tilt_shape[0] * tilt_shape[1];  
+    vector<float> tilt_res = res;
+    size_t tilt_output_size = tilt_angles.size() * matrix_shape[0] * matrix_shape[1];
     size_t tilt_buffer_size = tilt_output_size * 2;
     wgpu::Buffer tiltResultBuffer = createBuffer(
-        context.device, nullptr, 
+        context.device, 
+        nullptr, 
         sizeof(float) * tilt_buffer_size, 
         WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc)
     );
-    tilt(context, tiltResultBuffer, tilt_angles, tilt_shape, tilt_NA, tilt_res, trunc);
-    cout << "tilt output:" << endl;
-    vector<float> tilt = readBack(context.device, context.queue, tilt_buffer_size, tiltResultBuffer);
-    for (float t : tilt) cout << fixed << scientific << setprecision(4) << t << " ";
-    cout << endl;
+    bool trunc = false;
+    tilt(context, tiltResultBuffer, tilt_angles, matrix_shape, tilt_NA, tilt_res, trunc);
+    vector<float> tiltOutput = readBack(context.device, context.queue, tilt_buffer_size, tiltResultBuffer);
+    printComplexSummary("TILT", tiltOutput);
+    tiltResultBuffer.release();
 
-    // Test merge_prop
-    vector<float> merge_res = {0.1f, 0.1f, 0.1f};
-    vector<complex<float>> uf_merge = {
-        {1.0f, 9.0f}, {2.0f, 8.0f}, {3.0f, 7.0f},
-        {4.0f, 6.0f}, {5.0f, 5.0f}, {6.0f, 4.0f},
-        {7.0f, 3.0f}, {8.0f, 2.0f}, {9.0f, 1.0f}
-    };
-    vector<complex<float>> ub_merge = {
-        {9.0f, 1.0f}, {8.0f, 2.0f}, {7.0f, 3.0f},
-        {6.0f, 4.0f}, {5.0f, 5.0f}, {4.0f, 6.0f},
-        {3.0f, 7.0f}, {2.0f, 8.0f}, {1.0f, 9.0f}
-    };
-    vector<int> merge_shape = {3,3};
+    // ------------------------- Test: merge_prop -------------------------
+    cout << "Phase: Running merge_prop test in C++" << endl;
     wgpu::Buffer mergeUFBuffer = createBuffer(
         context.device, 
         nullptr, 
-        sizeof(float) * 2 * uf_merge.size(), // ×2 for complex
+        sizeof(float) * 2 * numComplex, 
         WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc)
     );
     wgpu::Buffer mergeUBBuffer = createBuffer(
         context.device, 
         nullptr, 
-        sizeof(float) * 2 * ub_merge.size(),
+        sizeof(float) * 2 * numComplex, 
         WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc)
     );
-    merge_prop(context, mergeUFBuffer, mergeUBBuffer, uf_merge, ub_merge, merge_shape, merge_res);
-    cout << "merge_prop output (new uf):" << endl;
-    vector<float> mergeUF = readBack(context.device, context.queue, 2 * uf_merge.size(), mergeUFBuffer);
-    for (float uf : mergeUF) cout << fixed << setprecision(4) << uf << " ";
-    cout << endl;
-    cout << "merge_prop output (new ub):" << endl;
-    vector<float> mergeUB = readBack(context.device, context.queue, 2 * ub_merge.size(), mergeUBBuffer);
-    for (float ub : mergeUB) cout << fixed << setprecision(4) << ub << " ";
-    cout << endl;
+    merge_prop(context, mergeUFBuffer, mergeUBBuffer, complexInput, complexInput, matrix_shape, res);
+    vector<float> mergeUF = readBack(context.device, context.queue, 2 * numComplex, mergeUFBuffer);
+    vector<float> mergeUB = readBack(context.device, context.queue, 2 * numComplex, mergeUBBuffer);
+    printComplexSummary("MERGE_PROP_UF", mergeUF);
+    printComplexSummary("MERGE_PROP_UB", mergeUB);
+    mergeUFBuffer.release();
+    mergeUBBuffer.release();
 
-    // Test split_prop
-    vector<float> split_res = {0.1f, 0.1f, 0.1f};
-    vector<complex<float>> uf_split = {
-        {1.0f, 9.0f}, {2.0f, 8.0f}, {3.0f, 7.0f},
-        {4.0f, 6.0f}, {5.0f, 5.0f}, {6.0f, 4.0f},
-        {7.0f, 3.0f}, {8.0f, 2.0f}, {9.0f, 1.0f}
-    };
-    vector<complex<float>> ub_split = {
-        {9.0f, 1.0f}, {8.0f, 2.0f}, {7.0f, 3.0f},
-        {6.0f, 4.0f}, {5.0f, 5.0f}, {4.0f, 6.0f},
-        {3.0f, 7.0f}, {2.0f, 8.0f}, {1.0f, 9.0f}
-    };
-    vector<int> split_shape = {3,3};
+    // ------------------------- Test: split_prop -------------------------
+    cout << "Phase: Running split_prop test in C++" << endl;
     wgpu::Buffer splitUFBuffer = createBuffer(
         context.device, 
         nullptr, 
-        sizeof(float) * 2 * uf_merge.size(),
+        sizeof(float) * 2 * numComplex, 
         WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc)
     );
     wgpu::Buffer splitUBBuffer = createBuffer(
         context.device, 
         nullptr, 
-        sizeof(float) * 2 * ub_merge.size(),
+        sizeof(float) * 2 * numComplex, 
         WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc)
     );
-    split_prop(context, splitUFBuffer, splitUBBuffer, uf_split, ub_split, split_shape, split_res);
-    cout << "split_prop output (new uf):" << endl;
-    vector<float> splitUF = readBack(context.device, context.queue, 2 * uf_merge.size(), splitUFBuffer);
-    for (float uf : splitUF) cout << fixed << scientific << setprecision(4) << uf << " ";
-    cout << endl;
-    cout << "split_prop output (new ub):" << endl;
-    vector<float> splitUB = readBack(context.device, context.queue, 2 * ub_merge.size(), splitUBBuffer);
-    for (float ub : splitUB) cout << fixed << scientific <<  setprecision(4) << ub << " ";
-    cout << endl;
+    split_prop(context, splitUFBuffer, splitUBBuffer, complexInput, complexInput, matrix_shape, res);
+    vector<float> splitUF = readBack(context.device, context.queue, 2 * numComplex, splitUFBuffer);
+    vector<float> splitUB = readBack(context.device, context.queue, 2 * numComplex, splitUBBuffer);
+    printComplexSummary("SPLIT_PROP_UF", splitUF);
+    printComplexSummary("SPLIT_PROP_UB", splitUB);
+    splitUFBuffer.release();
+    splitUBBuffer.release();
 
-    // Release WebGPU resources
+    // Clean up WebGPU resources.
     wgpuQueueRelease(context.queue);
     wgpuDeviceRelease(context.device);
     wgpuAdapterRelease(context.adapter);
     wgpuInstanceRelease(context.instance);
-    scatterResultBuffer.release();
-    cGammaResultBuffer.release();
-    diffractUFBuffer.release();
-    diffractUBBuffer.release();
-    binaryPupilResultBuffer.release();
-    tiltResultBuffer.release();
-    mergeUFBuffer.release();
-    mergeUBBuffer.release();
-    splitUFBuffer.release();
-    splitUBBuffer.release();
-
+    
     return 0;
 }
