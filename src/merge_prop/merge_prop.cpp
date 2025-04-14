@@ -171,7 +171,7 @@ void merge_prop(
     wgpu::ComputePipeline computePipeline = createComputePipeline(device, shaderModule, bindGroupLayout);
 
     // ENCODING AND DISPATCHING COMPUTE COMMANDS
-    uint32_t workgroupsX = std::ceil(double(buffer_len)/256.0);
+    uint32_t workgroupsX = std::ceil(double(buffer_len*2)/256.0);
     wgpu::CommandBuffer commandBuffer = createComputeCommandBuffer(device, computePipeline, bindGroup, workgroupsX);
     queue.submit(1, &commandBuffer);
 

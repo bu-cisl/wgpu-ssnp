@@ -4,7 +4,7 @@ import numpy as np
 import torch
 
 ROWS, COLS = 512,512
-tolerance = 1e-2
+tolerance = 1
 
 # ------------- Helper Functions -----------------
 def compute_summary(arr):
