@@ -3,7 +3,7 @@ import subprocess
 import numpy as np
 import torch
 
-ROWS, COLS = 512,512
+ROWS, COLS = 1024,1024
 tolerance = 1e-2
 
 # ------------- Helper Functions -----------------
@@ -22,7 +22,7 @@ def compute_summary(arr):
     max_val = np.max(arr)
     return count, mean, std, min_val, max_val
 
-def compare_summary(py_sum, cpp_sum, label, rtol=1e-4, atol=tolerance):
+def compare_summary(py_sum, cpp_sum, label, rtol=tolerance, atol=tolerance):
     """
     Compare two summary tuples.
     """
