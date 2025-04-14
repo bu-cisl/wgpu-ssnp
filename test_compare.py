@@ -1,8 +1,9 @@
-#!/usr/bin/env python3
 from py.ssnp_model import scatter_factor, diffract, c_gamma, binary_pupil, merge_prop, split_prop #, tilt
 import subprocess
 import numpy as np
 import torch
+
+ROWS, COLS = 512, 512
 
 # ------------- Helper Functions -----------------
 def compute_summary(arr):
@@ -65,7 +66,7 @@ def parse_cpp_summaries(output_lines):
 
 # ------------------- Set Up Test Inputs -------------------
 print("Phase: Creating test inputs in PyTorch")
-rows, cols = 512, 512
+rows, cols = ROWS, COLS
 # Create a 1D vector and reshape to a matrix (all tests use this same input)
 n_scatter = torch.rand((rows*cols,)) * 10.0
 matrix = n_scatter.reshape(rows, cols)
@@ -87,7 +88,7 @@ diffract_ub_summary = compute_summary(diffract_ub_py.cpu().numpy())
 
 # Binary pupil test (only shape matters).
 bp_py = binary_pupil((rows, cols), na=0.9, res=(0.1,0.1,0.1), device='cpu').cpu().numpy().astype(np.int32)
-binary_summary = (bp_py.size, bp_py.sum(), bp_py.mean(), bp_py.min(), bp_py.max())
+binary_summary = (bp_py.size, bp_py.mean(), bp_py.sum(), bp_py.min(), bp_py.max()) # intentionally std->sum
 
 # Tilt test.
 # angles = torch.tensor([0.1, 0.5, 1.0], dtype=torch.float32)

@@ -105,10 +105,10 @@ void printIntSummary(const string& label, const vector<uint32_t>& data) {
     }
     double mean = double(sum) / data.size();
     cout << label << ": count=" << data.size() 
-         << " sum=" << sum 
          << " mean=" << fixed << setprecision(8) << mean 
-         << " min=" << min_val 
-         << " max=" << max_val << endl;
+         << " std=" << fixed << setprecision(8) << sum // intentionally wrong
+         << " min=" << fixed << min_val 
+         << " max=" << fixed << max_val << endl;
 }
 
 int main(int argc, char** argv) {
