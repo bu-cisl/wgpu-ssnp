@@ -1,11 +1,11 @@
-from py.ssnp_model import scatter_factor, diffract, c_gamma, binary_pupil, merge_prop, split_prop
+from py.ssnp_model import scatter_factor, diffract, c_gamma, binary_pupil, tilt, merge_prop, split_prop
 import subprocess
 import numpy as np
 import torch
 
 # Settings
-ROWS, COLS = 2048, 2048
-tolerance = 1e-1
+ROWS, COLS = 512, 512
+tolerance = 1e-4
 
 # ------------------------------------------------------------------------------
 # Helper: Compare two numpy arrays element-wise.
@@ -89,12 +89,13 @@ def to_interleaved(arr):
 # ------------------------------------------------------------------------------
 # Create test inputs in PyTorch and compute function outputs.
 # ------------------------------------------------------------------------------
-print("Phase: Creating test inputs in PyTorch")
+print(f"Phase: Creating test inputs in PyTorch ({ROWS} x {COLS})")
 rows, cols = ROWS, COLS
 
 # Create a 1D random vector and reshape to matrix.
 n_scatter = torch.rand((rows * cols,)) * 10.0
 matrix = n_scatter.reshape(rows, cols)
+angles = torch.tensor([0.1, 0.5, 1.0], dtype=torch.float32)
 
 # Compute outputs.
 scatter_py = scatter_factor(n_scatter).cpu().numpy().ravel()
@@ -106,6 +107,8 @@ diffract_uf_py, diffract_ub_py = diffract(complex_matrix, complex_matrix, res=(0
 bp_py = binary_pupil((rows, cols), na=0.9, res=(0.1, 0.1, 0.1), device='cpu').cpu().numpy().astype(np.int32).ravel()
 merge_uf_py, merge_ub_py = merge_prop(complex_matrix, complex_matrix, res=(0.1, 0.1, 0.1))
 split_uf_py, split_ub_py = split_prop(complex_matrix, complex_matrix, res=(0.1, 0.1, 0.1))
+tilt_py = tilt((rows, cols), angles, NA=0.5, res=(0.1, 0.1, 0.1), trunc=False, device='cpu')
+tilt_result = to_interleaved(tilt_py.cpu().numpy())
 
 # Prepare a dictionary mapping labels to Python results.
 # For those intended to be complex, convert to interleaved float arrays.
@@ -118,7 +121,8 @@ py_results = {
     "MERGE_PROP_UF": to_interleaved(merge_uf_py.cpu().numpy()),
     "MERGE_PROP_UB": to_interleaved(merge_ub_py.cpu().numpy()),
     "SPLIT_PROP_UF": to_interleaved(split_uf_py.cpu().numpy()),
-    "SPLIT_PROP_UB": to_interleaved(split_ub_py.cpu().numpy())
+    "SPLIT_PROP_UB": to_interleaved(split_ub_py.cpu().numpy()),
+    "TILT": to_interleaved(tilt_py.cpu().numpy())
 }
 
 # ------------------------------------------------------------------------------

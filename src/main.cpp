@@ -189,6 +189,28 @@ int main(int argc, char** argv) {
     printArray("SPLIT_PROP_UB", splitUB);
     splitUFBuffer.release();
     splitUBBuffer.release();
+
+    // ------------------------- Test: tilt -------------------------
+    std::cout << "Phase: Running tilt test in C++\n";
+    // Define a tilt angles vector (in radians) and the numerical aperture (NA) for tilt.
+    std::vector<float> tilt_angles = {0.1f, 0.5f, 1.0f};
+    float tilt_NA = 0.5f;
+    // Calculate the expected output buffer size. Here we assume the output is complex: 
+    // there will be tilt_angles.size() * matrix_shape[0] * matrix_shape[1] complex numbers,
+    // so the total number of floats is 2 * (tilt_angles.size() * matrix_shape[0] * matrix_shape[1]).
+    size_t tilt_num_complex = tilt_angles.size() * matrix_shape[0] * matrix_shape[1];
+    size_t tilt_buffer_size = tilt_num_complex * 2;
+    wgpu::Buffer tiltResultBuffer = createBuffer(
+        context.device, nullptr,
+        sizeof(float) * tilt_buffer_size,
+        WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc)
+    );
+    bool trunc = false;
+    tilt(context, tiltResultBuffer, tilt_angles, matrix_shape, tilt_NA, res, trunc);
+    std::vector<float> tiltOutput = readBack(context.device, context.queue, tilt_buffer_size, tiltResultBuffer);
+    printArray("TILT", tiltOutput);
+    tiltResultBuffer.release();
+
     
     // Release WebGPU resources.
     wgpuQueueRelease(context.queue);
