@@ -27,10 +27,18 @@ jobs:
         run: |
           apt-get install -y mesa-utils vulkan-tools
 
-      - name: 🏗 Build Project
-        run: |
-          cmake -B build -S .
-          cmake --build build
+      # - name: 🏗 Build Project
+      #   run: |
+      #     cmake -B build -S .
+      #     cmake --build build
 
-      - name: 🚀 Run Executable
-        run: ./build/ssnp_cpp
+      # - name: 🚀 Run Executable
+      #   run: ./build/ssnp_cpp
+      - name: 🏗 Python Setup
+        run: |
+          virtualenv .venv
+          source .venv/bin/activate
+
+      - name: 🚀 Run Large Input Python Script 
+        run: |
+          python test_compare.py
