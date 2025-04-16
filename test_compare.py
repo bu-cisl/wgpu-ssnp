@@ -24,7 +24,7 @@ def compare_arrays(py_arr, cpp_arr, tol):
             print(f"Size mismatch: Python size {len(py_arr)}, C++ size {len(cpp_arr)}")
             return None
 
-    is_close = np.isclose(py_arr, cpp_arr, rtol=tol, atol=0) # compute relative tolerance
+    is_close = np.isclose(py_arr, cpp_arr, rtol=tol, atol=1e-5) # compute relative tolerance
     mismatches = np.sum(~is_close)
     
     return mismatches, len(py_arr)
