@@ -17,7 +17,7 @@
 
 using namespace std;
 
-// Helper to print an array of floats in a parseable format.
+// Helper to print an array of floats in a parseable format
 void printArray(const std::string &label, const std::vector<float>& data) {
     std::cout << label << ":\n" << data.size() << "\n";
     for (size_t i = 0; i < data.size(); i++) {
@@ -26,7 +26,7 @@ void printArray(const std::string &label, const std::vector<float>& data) {
     std::cout << "\n";
 }
 
-// Helper to print an array of uint32_t in a parseable format.
+// Helper to print an array of int in a parseable format
 void printIntArray(const std::string &label, const std::vector<uint32_t>& data) {
     std::cout << label << ":\n" << data.size() << "\n";
     for (size_t i = 0; i < data.size(); i++) {
@@ -35,9 +35,7 @@ void printIntArray(const std::string &label, const std::vector<uint32_t>& data) 
     std::cout << "\n";
 }
 
-// Reads a float matrix from a file.
-// Format: First line: <rows> <cols>
-// Then one line per row of space-separated floats.
+// Read matrix from input matrix txt file
 bool readMatrixFromFile(const std::string &filename, std::vector<float>& data, std::vector<int>& shape) {
     std::ifstream infile(filename);
     if (!infile.is_open()) {
@@ -59,11 +57,11 @@ bool readMatrixFromFile(const std::string &filename, std::vector<float>& data, s
 }
 
 int main(int argc, char** argv) {
-    // Initialize WebGPU.
+    // Initialize WebGPU
     WebGPUContext context;
     initWebGPU(context);
     
-    // Read input matrix.
+    // Read input matrix
     std::vector<int> matrix_shape;
     std::vector<float> inputMatrix;
     if(argc > 1) {
@@ -77,7 +75,7 @@ int main(int argc, char** argv) {
         inputMatrix = {5.0f, 21.0f, 65.0f, 5.0f, 21.0f, 65.0f, 5.0f, 21.0f, 65.0f};
     }
     
-    // For functions expecting complex input, convert the real input to complex numbers with zero imaginary parts.
+    // For functions expecting complex input, convert the real input to complex numbers with zero imaginary parts
     std::vector<std::complex<float>> complexInput;
     for (float val : inputMatrix) {
         complexInput.push_back({val, 0.0f});
@@ -192,12 +190,8 @@ int main(int argc, char** argv) {
 
     // ------------------------- Test: tilt -------------------------
     std::cout << "Phase: Running tilt test in C++\n";
-    // Define a tilt angles vector (in radians) and the numerical aperture (NA) for tilt.
     std::vector<float> tilt_angles = {0.1f, 0.5f, 1.0f};
     float tilt_NA = 0.5f;
-    // Calculate the expected output buffer size. Here we assume the output is complex: 
-    // there will be tilt_angles.size() * matrix_shape[0] * matrix_shape[1] complex numbers,
-    // so the total number of floats is 2 * (tilt_angles.size() * matrix_shape[0] * matrix_shape[1]).
     size_t tilt_num_complex = tilt_angles.size() * matrix_shape[0] * matrix_shape[1];
     size_t tilt_buffer_size = tilt_num_complex * 2;
     wgpu::Buffer tiltResultBuffer = createBuffer(
