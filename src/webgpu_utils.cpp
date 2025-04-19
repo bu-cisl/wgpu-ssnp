@@ -62,7 +62,7 @@ WorkgroupLimits getWorkgroupLimits(wgpu::Device& device) {
 }
 
 // LOADING AND COMPILING SHADER CODE
-std::string readShaderFile(const std::string& filename) {
+std::string readShaderFile(const std::string& filename, int workgroupsX, int workgroupsY, int workgroupsZ) {
     std::ifstream file(filename);
     if (!file.is_open()) {
         std::cerr << "Failed to open shader file: " << filename << std::endl;
@@ -70,7 +70,18 @@ std::string readShaderFile(const std::string& filename) {
     }
     std::stringstream buffer;
     buffer << file.rdbuf();
-    return buffer.str();
+    std::string shaderCode = buffer.str();
+
+    // Write the new workgroup sizes
+    std::string workgroups = std::to_string(workgroupsX) + ", " + std::to_string(workgroupsY) + ", " + std::to_string(workgroupsZ);
+    std::string token = "{{WORKGROUP_SIZE}}";
+    auto pos = shaderCode.find(token);
+    if (pos == std::string::npos) {
+        throw std::runtime_error("WGSL template missing WORKGROUP_SIZE token");
+    }
+    shaderCode.replace(pos, token.size(), workgroups);
+
+    return shaderCode;
 }
 
 wgpu::ShaderModule createShaderModule(wgpu::Device& device, const std::string& shaderCode) {

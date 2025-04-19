@@ -5,7 +5,7 @@
 @group(0) @binding(4) var<storage, read_write> uf_new : array<vec2<f32>>;
 @group(0) @binding(5) var<storage, read_write> ub_new : array<vec2<f32>>;
 
-@compute @workgroup_size(256)
+@compute @workgroup_size({{WORKGROUP_SIZE}})
 fn main(@builtin(global_invocation_id) global_id : vec3<u32>) {
     let idx = global_id.x;
     if (idx >= arrayLength(&uf)) {

@@ -12,7 +12,7 @@ fn near_0(index: i32, size: i32) -> f32 {
     return modulus(f32(index) / f32(size) + 0.5, 1.0) - 0.5;
 }
 
-@compute @workgroup_size(256)
+@compute @workgroup_size({{WORKGROUP_SIZE}})
 fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
     let index: i32 = i32(global_id.x); // Use only the x-dimension for indexing
 

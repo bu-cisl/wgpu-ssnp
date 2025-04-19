@@ -27,7 +27,7 @@ void initWebGPU(WebGPUContext& context);
 WorkgroupLimits getWorkgroupLimits(wgpu::Device& device);
 
 // Reads shader source code from a file
-std::string readShaderFile(const std::string& filename);
+std::string readShaderFile(const std::string& filename, int workgroupsX = 256, int workgroupsY = 1, int workgroupsZ = 1);
 
 // Creates a WebGPU shader module from WGSL source code
 wgpu::ShaderModule createShaderModule(wgpu::Device& device, const std::string& shaderCode);
