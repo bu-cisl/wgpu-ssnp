@@ -137,7 +137,8 @@ void diffract(
     wgpu::Queue queue = context.queue;
     
     // LOADING AND COMPILING SHADER CODE
-    std::string shaderCode = readShaderFile("src/diffract/diffract.wgsl");
+    WorkgroupLimits limits = getWorkgroupLimits(device);
+    std::string shaderCode = readShaderFile("src/diffract/diffract.wgsl", limits.maxWorkgroupSizeX);
     wgpu::ShaderModule shaderModule = createShaderModule(device, shaderCode);
 
     // CREATING BUFFERS
@@ -167,7 +168,7 @@ void diffract(
     wgpu::ComputePipeline computePipeline = createComputePipeline(device, shaderModule, bindGroupLayout);
 
     // ENCODING AND DISPATCHING COMPUTE COMMANDS
-    uint32_t workgroupsX = std::ceil(double(buffer_len)/256.0);
+    uint32_t workgroupsX = std::ceil(double(buffer_len)/limits.maxWorkgroupSizeX);
     wgpu::CommandBuffer commandBuffer = createComputeCommandBuffer(device, computePipeline, bindGroup, workgroupsX);
     queue.submit(1, &commandBuffer);
 

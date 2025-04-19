@@ -82,7 +82,8 @@ void c_gamma(WebGPUContext& context, wgpu::Buffer& outputBuffer, std::vector<flo
     wgpu::Queue queue = context.queue;
     
     // LOADING AND COMPILING SHADER CODE
-    std::string shaderCode = readShaderFile("src/c_gamma/c_gamma.wgsl");
+    WorkgroupLimits limits = getWorkgroupLimits(device);
+    std::string shaderCode = readShaderFile("src/c_gamma/c_gamma.wgsl", limits.maxWorkgroupSizeX);
     wgpu::ShaderModule shaderModule = createShaderModule(device, shaderCode);
 
     // CREATING BUFFERS
@@ -97,7 +98,7 @@ void c_gamma(WebGPUContext& context, wgpu::Buffer& outputBuffer, std::vector<flo
     wgpu::ComputePipeline computePipeline = createComputePipeline(device, shaderModule, bindGroupLayout);
 
     // ENCODING AND DISPATCHING COMPUTE COMMANDS
-    uint32_t workgroupsX = std::ceil(double(output_buffer_len)/256.0);
+    uint32_t workgroupsX = std::ceil(double(output_buffer_len)/limits.maxWorkgroupSizeX);
     wgpu::CommandBuffer commandBuffer = createComputeCommandBuffer(device, computePipeline, bindGroup, workgroupsX);
     queue.submit(1, &commandBuffer);
 

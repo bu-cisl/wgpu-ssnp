@@ -146,7 +146,8 @@ void tilt(
     wgpu::Queue queue = context.queue;
 
     // LOADING AND COMPILING SHADER CODE
-    std::string shaderCode = readShaderFile("src/tilt/tilt.wgsl");
+    WorkgroupLimits limits = getWorkgroupLimits(device);
+    std::string shaderCode = readShaderFile("src/tilt/tilt.wgsl", limits.maxWorkgroupSizeX);
     wgpu::ShaderModule shaderModule = createShaderModule(device, shaderCode);
     
     // CREATING BUFFERS FOR TILT
@@ -173,7 +174,7 @@ void tilt(
     wgpu::ComputePipeline computePipeline = createComputePipeline(device, shaderModule, bindGroupLayout);
 
     // ENCODING AND DISPATCHING COMPUTE COMMANDS
-    uint32_t workgroupsX = std::ceil(double(out_buffer_len)/256.0);
+    uint32_t workgroupsX = std::ceil(double(out_buffer_len)/limits.maxWorkgroupSizeX);
     wgpu::CommandBuffer commandBuffer = createComputeCommandBuffer(device, computePipeline, bindGroup, workgroupsX);
     queue.submit(1, &commandBuffer);
     
