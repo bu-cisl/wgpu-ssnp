@@ -14,52 +14,69 @@ fn cexp(theta: f32) -> vec2<f32> {
 }
 
 @compute @workgroup_size({{WORKGROUP_SIZE}})
-fn main(@builtin(global_invocation_id) global_id : vec3<u32>) {
+fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
     let idx = global_id.x;
     let num_angles = arrayLength(&angles);
     let shape_x = u32(shape[1]);
     let shape_y = u32(shape[0]);
     let total_pixels = shape_x * shape_y;
     let total_out = num_angles * total_pixels;
-    let pi = radians(180.0);
-    if (idx >= total_out) {
-        return;
-    }
+    if (idx >= total_out) { return; }
 
-    // decode (angle, y, x) from idx
+    // decode (angle, y, x)
     let angle_idx = idx / total_pixels;
     let pixel_idx = idx % total_pixels;
     let x = pixel_idx % shape_x;
     let y = pixel_idx / shape_x;
 
-    // compute factors
-    let angle = angles[angle_idx];
-    let c_sin = NA * sin(angle);
-    let c_cos = NA * cos(angle);
-    let norm_sin = f32(shape[0]) * res[1];
-    let norm_cos = f32(shape[1]) * res[2];
-    var f_sin = c_sin * norm_sin;
-    var f_cos = c_cos * norm_cos;
-    if (trunc_flag == 1u) {
-        f_sin = trunc(f_sin);
-        f_cos = trunc(f_cos);
-    }
-
+    // constants
+    let pi     = radians(180.0);
     let two_pi = 2.0 * pi;
-    // compute 
-    let xr = cexp(two_pi * f_cos * f32(x) / f32(shape_x));
-    let yr = cexp(two_pi * f_sin * f32(y) / f32(shape_y));
+    let shape_x_f = f32(shape_x);
+    let shape_y_f = f32(shape_y);
+
+    // 1) WRAP the raw angle into [0, 2π) to improve sin/cos precision
+    let raw_angle    = angles[angle_idx];
+    let angle_wrapped = fract(raw_angle / two_pi) * two_pi;
+
+    // 2) compute base sin/cos on the reduced angle
+    let c_sin = NA * sin(angle_wrapped);
+    let c_cos = NA * cos(angle_wrapped);
+
+    // 3) form your “spatial frequency” and immediately normalize/divide
+    //    (this keeps the numbers small), THEN optionally truncate,
+    //    THEN take fract() so everything is in [0,1).
+    var f_sin_norm = c_sin * res[1];
+    var f_cos_norm = c_cos * res[2];
+    if (trunc_flag == 1u) {
+        f_sin_norm = trunc(f_sin_norm * shape_y_f) / shape_y_f;
+        f_cos_norm = trunc(f_cos_norm * shape_x_f) / shape_x_f;
+    }
+    f_sin_norm = fract(f_sin_norm);
+    f_cos_norm = fract(f_cos_norm);
+
+    // 4) build the per‐pixel phase entirely inside [0, 2π)
+    let xf = f32(x);
+    let yf = f32(y);
+    let phase_x = two_pi * fract(f_cos_norm * xf);
+    let phase_y = two_pi * fract(f_sin_norm * yf);
+
+    let xr = cexp(phase_x);
+    let yr = cexp(phase_y);
     let val = cmul(xr, yr);
 
-    // normalization: divide by center‑point value
+    // 5) do the same for the center‐point
     let cx = shape_x / 2u;
     let cy = shape_y / 2u;
-    let center_x = cexp(two_pi * f_cos * f32(cx) / f32(shape_x));
-    let center_y = cexp(two_pi * f_sin * f32(cy) / f32(shape_y));
-    let center = cmul(center_x, center_y);
+    let cf_x = f32(cx);
+    let cf_y = f32(cy);
+    let center_phase_x = two_pi * fract(f_cos_norm * cf_x);
+    let center_phase_y = two_pi * fract(f_sin_norm * cf_y);
+    let center_x = cexp(center_phase_x);
+    let center_y = cexp(center_phase_y);
+    let center  = cmul(center_x, center_y);
 
+    // apply normalization
     let inv_center = vec2<f32>(center.x, -center.y);
-    let norm = cmul(val, inv_center);
-
-    out[idx] = norm;
+    out[idx] = cmul(val, inv_center);
 }
