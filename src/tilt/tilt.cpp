@@ -151,7 +151,7 @@ void tilt(
     wgpu::ShaderModule shaderModule = createShaderModule(device, shaderCode);
     
     // CREATING BUFFERS FOR TILT
-    wgpu::Buffer anglesBuffer = createBuffer(device, angles.data(), sizeof(float) * out_buffer_len, wgpu::BufferUsage::Storage);
+    wgpu::Buffer anglesBuffer = createBuffer(device, angles.data(), sizeof(float) * angles_buffer_len, wgpu::BufferUsage::Storage);
     wgpu::Buffer shapeBuffer = createBuffer(device, shape.data(), sizeof(int) * 2, wgpu::BufferUsage::Storage);
     wgpu::Buffer resBuffer = createBuffer(device, res.value().data(), sizeof(float) * 3, wgpu::BufferUsage::Storage);
     wgpu::Buffer uniformNABuffer = createBuffer(device, &params.NA, sizeof(float), wgpu::BufferUsage::Uniform);
