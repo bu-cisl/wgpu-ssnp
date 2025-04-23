@@ -33,8 +33,10 @@ def c_gamma(res: tuple[float], shape: tuple[int], device: str = 'cpu') -> Tensor
 	def _near_0(size):
 		return torch.fmod(torch.arange(size, device=device) / size + 0.5, 1) - 0.5
 
-	eps = torch.tensor(1E-8, device=device)
+	eps = torch.tensor(1E-8, device=device) # og: eps = 1E-8
 	c_beta, c_alpha = [_near_0(size).to(torch.complex64) / resolution for size, resolution in zip(shape, res[-2:])]
+
+	# og: return torch.sqrt(1 - (torch.square(c_alpha) + torch.square(c_beta[:, None])), min=eps).unsqueeze(0)
 	alpha_square = torch.abs(c_alpha) ** 2
 	beta_square = torch.abs(c_beta) ** 2
 
@@ -74,7 +76,7 @@ def tilt(shape: tuple[int], angles: Tensor, NA: float= 0.65, res: tuple[float] =
 	out = xr * yr
 
 	# normalize by center point value
-	out /= out[:, *(i // 2 for i in shape)].clone().view(-1, 1, 1)
+	out /= out[:, *(i // 2 for i in shape)].clone().view(-1, 1, 1) # og: out /= out[:, *(i // 2 for i in shape)].clone()
 	return out
 
 def merge_prop(uf: Tensor, ub: Tensor, res: tuple[float] = (0.1, 0.1, 0.1)) -> Tensor:
@@ -115,7 +117,7 @@ class SNNPBeam:
 		
 		# configure input feild
 		# FOR WGPU: for angle in angles:
-		Forward = torch.fft.fft2(tilt(shape, angles, na=self.na, res=self.res, device=n.device))
+		Forward = torch.fft.fft2(tilt(shape, angles, NA=self.na, res=self.res, device=n.device))
 		Backward = torch.zeros_like(Forward)
 		U, UD = merge_prop(Forward, Backward, res=self.res)
 	
