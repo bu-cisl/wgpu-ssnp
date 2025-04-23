@@ -18,7 +18,7 @@ struct WorkgroupLimits {
     double maxWorkgroupSizeX;
     double maxWorkgroupSizeY;
     double maxWorkgroupSizeZ;
-    double maxWorkgroupsPerDimension;
+    double maxInvocationsPerWorkgroup;
 };
 
 // Initializes WebGPU

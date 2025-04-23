@@ -52,7 +52,7 @@ WorkgroupLimits getWorkgroupLimits(wgpu::Device& device) {
         result.maxWorkgroupSizeX = double(limits.limits.maxComputeWorkgroupSizeX);
         result.maxWorkgroupSizeY = double(limits.limits.maxComputeWorkgroupSizeY);
         result.maxWorkgroupSizeZ = double(limits.limits.maxComputeWorkgroupSizeZ);
-        result.maxWorkgroupsPerDimension = double(limits.limits.maxComputeWorkgroupsPerDimension);
+        result.maxInvocationsPerWorkgroup = double(limits.limits.maxComputeInvocationsPerWorkgroup);
     } else {
         std::cerr << "Error fetching workgroup limits." << std::endl;
         result = { -1.0, -1.0, -1.0, -1.0 }; // Return default error values
