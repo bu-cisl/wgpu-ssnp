@@ -14,7 +14,7 @@ void scatter_factor(
     std::vector<float> n, 
     std::optional<float> res_z = 0.1, 
     std::optional<float> dz = 1, 
-    std::optional<float> n0 = 1
+    std::optional<float> n0 = 1.33
 );
 
 #endif 

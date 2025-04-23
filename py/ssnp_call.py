@@ -1,18 +1,15 @@
 import torch
-from ssnp_model import SNNPBeam
+from ssnp_model import SSNPBeam
 
 if __name__ == "__main__":
     # Create a dummy RI volume (depth=3, 16x16 pixels)
     n = torch.ones((3, 16, 16), dtype=torch.float32)
-    
-    # Create dummy tilt angles
-    angles = torch.tensor([0.1, 0.5, 1.0], dtype=torch.float32)
 
     # Initialize the model
-    model = SNNPBeam()
+    model = SSNPBeam()
 
     # Run the model
-    output = model(n, angles)
+    output = model(n)
 
     # Print the output shape and a small patch of values
     print("Output shape:", output.shape)
