@@ -114,6 +114,7 @@ class SNNPBeam:
 		shape = n.shape[-2:]
 		
 		# configure input feild
+		# FOR WGPU: for angle in angles:
 		Forward = torch.fft.fft2(tilt(shape, angles, na=self.na, res=self.res, device=n.device))
 		Backward = torch.zeros_like(Forward)
 		U, UD = merge_prop(Forward, Backward, res=self.res)
@@ -145,5 +146,11 @@ class SNNPBeam:
 		pupil = binary_pupil(shape, self.na, res=self.res, device=n.device)
 		Forward *= pupil
 
+		# FOR WGPU: temp_out = torch.abs(torch.fft.ifft2(Forward))**2
+		# FOR WGPU: read back temp_out buffer from device
+		# FOR WGPU: out.append(temp_out)
+
+		# FOR WGPU: return out
+		
 		# return the intensity
 		return torch.abs(torch.fft.ifft2(Forward))**2
