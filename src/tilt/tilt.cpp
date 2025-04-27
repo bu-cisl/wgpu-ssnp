@@ -2,19 +2,17 @@
 
 // INPUT PARAMS
 struct Params {
-    float NA;
     uint32_t trunc_flag;
 };
 
-static size_t angles_buffer_len;
 static size_t out_buffer_len;
 
 // CREATING BIND GROUP AND LAYOUT
 static wgpu::BindGroupLayout createBindGroupLayout(wgpu::Device& device) {
-    wgpu::BindGroupLayoutEntry anglesBufferLayout = {};
-    anglesBufferLayout.binding = 0;
-    anglesBufferLayout.visibility = wgpu::ShaderStage::Compute;
-    anglesBufferLayout.buffer.type = wgpu::BufferBindingType::ReadOnlyStorage;
+    wgpu::BindGroupLayoutEntry cbaBufferLayout = {};
+    cbaBufferLayout.binding = 0;
+    cbaBufferLayout.visibility = wgpu::ShaderStage::Compute;
+    cbaBufferLayout.buffer.type = wgpu::BufferBindingType::ReadOnlyStorage;
 
     wgpu::BindGroupLayoutEntry shapeBufferLayout = {};
     shapeBufferLayout.binding = 1;
@@ -31,27 +29,21 @@ static wgpu::BindGroupLayout createBindGroupLayout(wgpu::Device& device) {
     outBufferLayout.visibility = wgpu::ShaderStage::Compute;
     outBufferLayout.buffer.type = wgpu::BufferBindingType::Storage;
 
-    wgpu::BindGroupLayoutEntry uniformNALayout = {};
-    uniformNALayout.binding = 4;
-    uniformNALayout.visibility = wgpu::ShaderStage::Compute;
-    uniformNALayout.buffer.type = wgpu::BufferBindingType::Uniform;
-
     wgpu::BindGroupLayoutEntry uniformTruncLayout = {};
-    uniformTruncLayout.binding = 5;
+    uniformTruncLayout.binding = 4;
     uniformTruncLayout.visibility = wgpu::ShaderStage::Compute;
     uniformTruncLayout.buffer.type = wgpu::BufferBindingType::Uniform;
 
     wgpu::BindGroupLayoutEntry entries[] = {
-        anglesBufferLayout,
+        cbaBufferLayout,
         shapeBufferLayout,
         resBufferLayout,
         outBufferLayout,
-        uniformNALayout,
         uniformTruncLayout
     };
 
     wgpu::BindGroupLayoutDescriptor layoutDesc = {};
-    layoutDesc.entryCount = 6;
+    layoutDesc.entryCount = 5;
     layoutDesc.entries = entries;
 
     return device.createBindGroupLayout(layoutDesc);
@@ -64,14 +56,13 @@ static wgpu::BindGroup createBindGroup(
     wgpu::Buffer shapeBuffer,
     wgpu::Buffer resBuffer,
     wgpu::Buffer outBuffer, 
-    wgpu::Buffer uniformNABuffer,
     wgpu::Buffer uniformTruncBuffer
 ) {
-    wgpu::BindGroupEntry anglesEntry = {};
-    anglesEntry.binding = 0;
-    anglesEntry.buffer = anglesBuffer;
-    anglesEntry.offset = 0;
-    anglesEntry.size = sizeof(float) * angles_buffer_len;
+    wgpu::BindGroupEntry cbaEntry = {};
+    cbaEntry.binding = 0;
+    cbaEntry.buffer = anglesBuffer;
+    cbaEntry.offset = 0;
+    cbaEntry.size = sizeof(float) * 2;
 
     wgpu::BindGroupEntry shapeEntry = {};
     shapeEntry.binding = 1;
@@ -91,30 +82,23 @@ static wgpu::BindGroup createBindGroup(
     outEntry.offset = 0;
     outEntry.size = sizeof(float) * 2 * out_buffer_len;
 
-    wgpu::BindGroupEntry uniformNAEntry = {};
-    uniformNAEntry.binding = 4;
-    uniformNAEntry.buffer = uniformNABuffer;
-    uniformNAEntry.offset = 0;
-    uniformNAEntry.size = sizeof(float);
-
     wgpu::BindGroupEntry uniformTruncEntry = {};
-    uniformTruncEntry.binding = 5;
+    uniformTruncEntry.binding = 4;
     uniformTruncEntry.buffer = uniformTruncBuffer;
     uniformTruncEntry.offset = 0;
     uniformTruncEntry.size = sizeof(uint32_t);
 
     wgpu::BindGroupEntry entries[] = {
-        anglesEntry,
+        cbaEntry,
         shapeEntry,
         resEntry,
         outEntry,
-        uniformNAEntry,
         uniformTruncEntry
     };
 
     wgpu::BindGroupDescriptor bindGroupDesc = {};
     bindGroupDesc.layout = bindGroupLayout;
-    bindGroupDesc.entryCount = 6;
+    bindGroupDesc.entryCount = 5;
     bindGroupDesc.entries = entries;
 
     return device.createBindGroup(bindGroupDesc);
@@ -123,21 +107,19 @@ static wgpu::BindGroup createBindGroup(
 void tilt(
     WebGPUContext& context,
     wgpu::Buffer& outBuffer,
-    std::vector<float> angles,
+    std::vector<float> c_ba,
     std::vector<int> shape,
-    std::optional<float> NA,
     std::optional<std::vector<float>> res,
     std::optional<bool> trunc
 ) {
     // Validate inputs
     assert(shape.size() == 2 && "Shape must be 2D (height, width)");
     assert(res.value().size() == 3 && "Resolution must have 3 components");
-    
-    angles_buffer_len = angles.size();
-    out_buffer_len = angles.size() * shape[0] * shape[1];  
+    assert(c_ba.size() == 2 && "This tilt function only support's one angle's c_ba tuple at a time");
+
+    out_buffer_len =  shape[0] * shape[1];  
     
     Params params = {
-        NA.value(),
         trunc.value() ? 1u : 0u
     };
 
@@ -151,10 +133,9 @@ void tilt(
     wgpu::ShaderModule shaderModule = createShaderModule(device, shaderCode);
     
     // CREATING BUFFERS FOR TILT
-    wgpu::Buffer anglesBuffer = createBuffer(device, angles.data(), sizeof(float) * angles_buffer_len, wgpu::BufferUsage::Storage);
+    wgpu::Buffer anglesBuffer = createBuffer(device, c_ba.data(), sizeof(float) * 2, wgpu::BufferUsage::Storage);
     wgpu::Buffer shapeBuffer = createBuffer(device, shape.data(), sizeof(int) * 2, wgpu::BufferUsage::Storage);
     wgpu::Buffer resBuffer = createBuffer(device, res.value().data(), sizeof(float) * 3, wgpu::BufferUsage::Storage);
-    wgpu::Buffer uniformNABuffer = createBuffer(device, &params.NA, sizeof(float), wgpu::BufferUsage::Uniform);
     wgpu::Buffer uniformTruncBuffer = createBuffer(device, &params.trunc_flag, sizeof(uint32_t), wgpu::BufferUsage::Uniform);
 
     // CREATING BIND GROUP AND LAYOUT
@@ -165,8 +146,7 @@ void tilt(
         anglesBuffer, 
         shapeBuffer, 
         resBuffer,
-        outBuffer, 
-        uniformNABuffer, 
+        outBuffer,  
         uniformTruncBuffer
     );
 
@@ -187,6 +167,5 @@ void tilt(
     anglesBuffer.release();
     shapeBuffer.release();
     resBuffer.release();
-    uniformNABuffer.release();
     uniformTruncBuffer.release();
 }

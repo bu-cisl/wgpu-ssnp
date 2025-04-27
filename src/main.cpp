@@ -22,17 +22,20 @@ int main() {
     vector<float> res = {0.1,0.1,0.1};
     float na = 0.65;
     int angles_size = 32;
-    vector<vector<double>> angles(angles_size, vector<double>(2, 0.0));
     bool intensity = true;
 
+    // angles_size vectors of c_ba values
+    vector<vector<double>> angles(angles_size, vector<double>(2, 0.0));
+
     // input matrix
-    // Define a 3D vector filled with ones (similar to torch.ones)
     vector<vector<vector<float>>> n(3, vector<vector<float>>(16, vector<float>(16, 1.0f)));
 
     // ssnp forward function
     vector<int> shape = {int(n[0].size()), int(n[0][0].size())};
-    for(auto angle : angles) {
+    
+    for(vector<double> c_ba : angles) {
         continue;
     }
-    cout << na << intensity << endl;
+
+    cout << na << " " << intensity << endl;
 }

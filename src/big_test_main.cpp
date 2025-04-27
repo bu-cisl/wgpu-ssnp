@@ -190,9 +190,8 @@ int main(int argc, char** argv) {
 
     // ------------------------- Test: tilt -------------------------
     std::cout << "Phase: Running tilt test in C++\n";
-    std::vector<float> tilt_angles = {0.1f, 0.5f, 1.0f};
-    float tilt_NA = 0.5f;
-    size_t tilt_num_complex = tilt_angles.size() * matrix_shape[0] * matrix_shape[1];
+    std::vector<float> c_ba = {0.1f, 0.1f};
+    size_t tilt_num_complex = matrix_shape[0] * matrix_shape[1];
     size_t tilt_buffer_size = tilt_num_complex * 2;
     wgpu::Buffer tiltResultBuffer = createBuffer(
         context.device, nullptr,
@@ -200,7 +199,7 @@ int main(int argc, char** argv) {
         WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc)
     );
     bool trunc = false;
-    tilt(context, tiltResultBuffer, tilt_angles, matrix_shape, tilt_NA, res, trunc);
+    tilt(context, tiltResultBuffer, c_ba, matrix_shape, res, trunc);
     std::vector<float> tiltOutput = readBack(context.device, context.queue, tilt_buffer_size, tiltResultBuffer);
     printArray("TILT", tiltOutput);
     tiltResultBuffer.release();

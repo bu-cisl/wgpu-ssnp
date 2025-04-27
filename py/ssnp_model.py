@@ -44,38 +44,30 @@ def binary_pupil(shape: tuple[int, ...], na: float, res: tuple[float, ...] = (0.
 	mask = torch.greater(cgamma, (1 - na ** 2)**0.5)
 	return mask
 
-def tilt(shape: tuple[int, ...], angles: Tensor, NA: float= 0.65, res: tuple[float, ...] = (0.1, 0.1, 0.1), trunc: bool = True, device: str = 'cpu') -> Tensor:
+def tilt(shape: tuple[int, ...], c_ba, res, trunc: bool = True, device: str | Device = 'cpu') -> Tensor:
 
-	c_ba = NA*torch.stack(
-		(
-			torch.sin(angles),
-			torch.cos(angles)
-		),
-		dim=1
-	)
+		norm = torch.tensor(shape) * torch.tensor(res[1:])
+		norm = norm.view(1, 2)
+		norm = norm.to(device=device)
 
-	norm = torch.tensor(shape) * torch.tensor(res[1:])
-	norm = norm.view(1, 2)
-	norm = norm.to(device=device)
+		if trunc:
+			factor = torch.trunc(c_ba * norm).T
+		else:
+			factor = (c_ba * norm).T
 
-	if trunc:
-		factor = torch.trunc(c_ba * norm).T
-	else:
-		factor = (c_ba * norm).T
+		xr = torch.arange(shape[1], device=device).view(1,1,-1).to(dtype=torch.complex128)
+		xr = (2j * torch.pi / shape[1]) * factor[1].reshape(-1,1,1) * xr
+		xr.exp_()
 
-	xr = torch.arange(shape[1], device=device).view(1,1,-1).to(dtype=torch.complex128)
-	xr = (2j * torch.pi / shape[1]) * factor[1].reshape(-1,1,1) * xr
-	xr.exp_()
+		yr = torch.arange(shape[0], device=device).view(1,-1,1).to(dtype=torch.complex128)
+		yr = (2j * torch.pi / shape[0]) * factor[0].reshape(-1,1,1) * yr
+		yr.exp_()
 
-	yr = torch.arange(shape[0], device=device).view(1,-1,1).to(dtype=torch.complex128)
-	yr = (2j * torch.pi / shape[0]) * factor[0].reshape(-1,1,1) * yr
-	yr.exp_()
+		out = xr * yr
 
-	out = xr * yr
-
-	# normalize by center point value
-	out /= out[:, *(i // 2 for i in shape)].clone().view(-1, 1, 1)
-	return out
+		# normalize by center point value
+		out /= out[:, *(i // 2 for i in shape)].clone().view(-1, 1, 1)
+		return out
 
 def merge_prop(uf: Tensor, ub: Tensor, res: tuple[float, ...] = (0.1, 0.1, 0.1)) -> tuple[Tensor, Tensor]:
 
@@ -119,7 +111,7 @@ class SSNPBeam(Module):
 		shape = n.shape[-2:]
 		
 		# configure input feild
-		Forward = torch.fft.fft2(self.tilt(shape, device=n.device))
+		Forward = torch.fft.fft2(tilt(shape, c_ba=self.angles, res=self.res, device=n.device))
 		Backward = torch.zeros_like(Forward)
 		U, UD = merge_prop(Forward, Backward, res=self.res)
 
@@ -146,30 +138,3 @@ class SSNPBeam(Module):
 		# return the intensity
 		result = torch.abs(torch.fft.ifft2(Forward))
 		return result**2 if self.intensity else result
-
-
-	def tilt(self, shape: tuple[int, ...], trunc: bool = True, device: str | Device = 'cpu', angles = None) -> Tensor:
-
-		norm = torch.tensor(shape) * torch.tensor(self.res[1:])
-		norm = norm.view(1, 2)
-		norm = norm.to(device=device)
-
-		if trunc:
-			# factor = DiffTrunc.apply(self.angles * norm).T
-			factor = torch.trunc(self.angles * norm).T
-		else:
-			factor = (self.angles * norm).T
-
-		xr = torch.arange(shape[1], device=device).view(1,1,-1).to(dtype=torch.complex128)
-		xr = (2j * torch.pi / shape[1]) * factor[1].reshape(-1,1,1) * xr
-		xr.exp_()
-
-		yr = torch.arange(shape[0], device=device).view(1,-1,1).to(dtype=torch.complex128)
-		yr = (2j * torch.pi / shape[0]) * factor[0].reshape(-1,1,1) * yr
-		yr.exp_()
-
-		out = xr * yr
-
-		# normalize by center point value
-		out /= out[:, *(i // 2 for i in shape)].clone().view(-1, 1, 1)
-		return out.to(dtype=torch.complex64)

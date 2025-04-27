@@ -87,8 +87,8 @@ merge_uf_py, merge_ub_py = merge_prop(complex_matrix, complex_matrix, res=(0.1, 
 split_uf_py, split_ub_py = split_prop(complex_matrix, complex_matrix, res=(0.1, 0.1, 0.1))
 
 # Angle tensor for tilt testing
-angles = torch.tensor([0.1, 0.5, 1.0], dtype=torch.float32)
-tilt_py = tilt((rows, cols), angles, NA=0.5, res=(0.1, 0.1, 0.1), trunc=False, device='cpu')
+angles = torch.tensor([0.1, 0.1], dtype=torch.float32)
+tilt_py = tilt((rows, cols), c_ba=angles, res=(0.1, 0.1, 0.1), trunc=False, device='cpu')
 tilt_result = to_interleaved(tilt_py.cpu().numpy())
 
 # Map labels -> python results
