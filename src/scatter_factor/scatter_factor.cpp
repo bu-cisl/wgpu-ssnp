@@ -73,12 +73,13 @@ static wgpu::BindGroup createBindGroup(
 void scatter_factor(
     WebGPUContext& context, 
     wgpu::Buffer& outputBuffer, 
-    std::vector<float> n, 
+    wgpu::Buffer& inputBuffer, 
+    size_t bufferlen,
     std::optional<float> res_z, 
     std::optional<float> dz, 
     std::optional<float> n0
 ) {
-    buffer_len = n.size();
+    buffer_len = bufferlen;
     Params params = {res_z.value(), dz.value(), n0.value()};
 
     // INITIALIZING WEBGPU
@@ -91,7 +92,6 @@ void scatter_factor(
     wgpu::ShaderModule shaderModule = createShaderModule(device, shaderCode);
 
     // CREATING BUFFERS
-    wgpu::Buffer inputBuffer = createBuffer(device, n.data(), sizeof(float) * buffer_len, wgpu::BufferUsage::Storage);
     wgpu::Buffer uniformBuffer = createBuffer(device, &params, sizeof(Params), wgpu::BufferUsage::Uniform);
 
     // CREATING BIND GROUP AND LAYOUT
