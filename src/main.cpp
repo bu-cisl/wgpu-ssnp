@@ -87,11 +87,19 @@ int main(int argc, char** argv) {
         complexInput.push_back({val, 0.0f});
     }
 
-    // wgpu::Buffer complexInputBuffer = createBuffer(
-    //     context.device, complexInput.data(),
-    //     sizeof(float) * complexInput.size()*2,
-    //     WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc)
-    // );
+    std::vector<float> complexInputFlat(complexInput.size()*2);
+    for (size_t i = 0; i < complexInput.size(); ++i) {
+        complexInputFlat[2*i] = complexInput[i].real();
+        complexInputFlat[2*i + 1] = complexInput[i].imag();
+        complexInputFlat[2*i] = complexInput[i].real();
+        complexInputFlat[2*i + 1] = complexInput[i].imag();
+    }
+
+    wgpu::Buffer complexInputBuffer = createBuffer(
+        context.device, complexInputFlat.data(),
+        sizeof(float) * complexInputFlat.size(),
+        WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc)
+    );
     
     // Fixed resolution vector.
     std::vector<float> res = {0.1f, 0.1f, 0.1f};
@@ -134,7 +142,7 @@ int main(int argc, char** argv) {
         sizeof(float) * 2 * numComplex,
         WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc)
     );
-    diffract(context, diffractUFBuffer, diffractUBBuffer, complexInput, complexInput, matrix_shape);
+    diffract(context, diffractUFBuffer, diffractUBBuffer, complexInputBuffer, complexInputBuffer, numComplex, matrix_shape);
     std::vector<float> diffractUF = readBack(context.device, context.queue, 2 * numComplex, diffractUFBuffer);
     std::vector<float> diffractUB = readBack(context.device, context.queue, 2 * numComplex, diffractUBBuffer);
     printArray("DIFRACT_UF", diffractUF);
