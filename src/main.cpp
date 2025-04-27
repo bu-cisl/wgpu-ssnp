@@ -4,16 +4,11 @@
 #include "binary_pupil/binary_pupil.h"
 #include "tilt/tilt.h"
 #include "merge_prop/merge_prop.h"
-#include "split_prop/split_prop.h"
-#include "c_gamma/c_gamma.h"  
+#include "split_prop/split_prop.h" 
+#include "dft/dft.h"
 #include "webgpu_utils.h"
 #include <vector>
-#include <complex>
 #include <iostream>
-#include <iomanip>
-#include <fstream>
-#include <sstream>
-#include <cmath>
 
 using namespace std;
 
@@ -45,7 +40,7 @@ int main() {
         wgpu::Buffer tiltResultBuffer = createBuffer(context.device, nullptr, sizeof(float) * buffer_len * 2, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
         tilt(context, tiltResultBuffer, c_ba, shape, res);
         wgpu::Buffer forwardBuffer = createBuffer(context.device, nullptr, sizeof(float) * buffer_len * 2, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
-        // NEED TO forward = fft(tiltResult)
+        dft(context, forwardBuffer, tiltResultBuffer, buffer_len, shape[0], shape[1], 0); // dft
         vector<float> backward(shape[0]*shape[1]*2, 0.0);
         wgpu::Buffer backwardBuffer = createBuffer(context.device, backward.data(), sizeof(float) * buffer_len * 2, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
         tiltResultBuffer.release();
@@ -67,7 +62,8 @@ int main() {
             UD.release();
 
             // Field to spatial domain
-            // NEED TO u = ifft(U)
+            wgpu::Buffer u = createBuffer(context.device, nullptr, sizeof(float) * buffer_len * 2, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
+            dft(context, u, U2, buffer_len, shape[0], shape[1], 1); // idft
 
             // Scattering effects
             // NEED TO COMPUTE SCATTERING EFFECTS
@@ -88,7 +84,7 @@ int main() {
         forwardBuffer = createBuffer(context.device, backward.data(), sizeof(float) * buffer_len * 2, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
         wgpu::Buffer _ = createBuffer(context.device, nullptr, sizeof(float) * buffer_len * 2, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
         split_prop(context, forwardBuffer, _, U2, UD2, buffer_len, shape, res);
-        // NEED TO FORWARD * BINARY PUPIL
+        // NEED TO FORWARD *= BINARY PUPIL
 
         // NEED TO temp_result = torch.fft.ifft2(Forward)
         // read back temp_result
