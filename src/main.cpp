@@ -200,7 +200,7 @@ int main(int argc, char** argv) {
         sizeof(float) * 2 * numComplex,
         WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc)
     );
-    split_prop(context, splitUFBuffer, splitUBBuffer, complexInput, complexInput, matrix_shape, res);
+    split_prop(context, splitUFBuffer, splitUBBuffer, complexInputBuffer, complexInputBuffer, numComplex, matrix_shape, res);
     std::vector<float> splitUF = readBack(context.device, context.queue, 2 * numComplex, splitUFBuffer);
     std::vector<float> splitUB = readBack(context.device, context.queue, 2 * numComplex, splitUBBuffer);
     printArray("SPLIT_PROP_UF", splitUF);

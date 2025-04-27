@@ -119,13 +119,13 @@ void split_prop(
     WebGPUContext& context,
     wgpu::Buffer& ufNewBuffer,
     wgpu::Buffer& ubNewBuffer,
-    std::vector<std::complex<float>> uf,
-    std::vector<std::complex<float>> ub,
+    wgpu::Buffer& ufBuffer,
+    wgpu::Buffer& ubBuffer,
+    size_t bufferlen,
     std::vector<int> shape,
     std::optional<std::vector<float>> res
 ) {
-    assert(uf.size() == ub.size() && "uf and ub must have the same shape");
-    buffer_len = uf.size();
+    buffer_len = bufferlen;
     res_buffer_len = res.value().size();
 
     // INITIALIZING WEBGPU
@@ -140,19 +140,6 @@ void split_prop(
     // CREATING BUFFERS
     wgpu::Buffer cgammaBuffer = createBuffer(context.device, nullptr, sizeof(float) * buffer_len, wgpu::BufferUsage::Storage);
     c_gamma(context, cgammaBuffer, res.value(), shape);
-
-    // Flatten uf and ub
-    std::vector<float> ufFlat(buffer_len * 2);
-    std::vector<float> ubFlat(buffer_len * 2);
-    for (size_t i = 0; i < buffer_len; ++i) {
-        ufFlat[2*i] = uf[i].real();
-        ufFlat[2*i + 1] = uf[i].imag();
-        ubFlat[2*i] = ub[i].real();
-        ubFlat[2*i + 1] = ub[i].imag();
-    }
-
-    wgpu::Buffer ufBuffer = createBuffer(device, ufFlat.data(), sizeof(float) * ufFlat.size(), wgpu::BufferUsage::Storage);
-    wgpu::Buffer ubBuffer = createBuffer(device, ubFlat.data(), sizeof(float) * ubFlat.size(), wgpu::BufferUsage::Storage);
     wgpu::Buffer resBuffer = createBuffer(device, res.value().data(), sizeof(float)*res_buffer_len, wgpu::BufferUsage::Storage);
 
     // CREATING BIND GROUP AND LAYOUT
@@ -183,7 +170,5 @@ void split_prop(
     bindGroupLayout.release();
     shaderModule.release();
     cgammaBuffer.release();
-    ufBuffer.release();
-    ubBuffer.release();
     resBuffer.release();
 }
