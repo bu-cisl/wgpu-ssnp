@@ -180,7 +180,7 @@ int main(int argc, char** argv) {
         sizeof(float) * 2 * numComplex,
         WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc)
     );
-    merge_prop(context, mergeUFBuffer, mergeUBBuffer, complexInput, complexInput, matrix_shape, res);
+    merge_prop(context, mergeUFBuffer, mergeUBBuffer, complexInputBuffer, complexInputBuffer, numComplex, matrix_shape, res);
     std::vector<float> mergeUF = readBack(context.device, context.queue, 2 * numComplex, mergeUFBuffer);
     std::vector<float> mergeUB = readBack(context.device, context.queue, 2 * numComplex, mergeUBBuffer);
     printArray("MERGE_PROP_UF", mergeUF);
