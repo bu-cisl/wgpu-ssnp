@@ -84,7 +84,7 @@ int main(int argc, char** argv) {
     // For functions expecting complex input, convert the real input to complex numbers with zero imaginary parts
     std::vector<std::complex<float>> complexInput;
     for (float val : inputMatrix) {
-        complexInput.push_back({val, 0.0f});
+        complexInput.push_back({val, 10.0f});
     }
 
     std::vector<float> complexInputFlat(complexInput.size()*2);

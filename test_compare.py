@@ -81,6 +81,7 @@ c_gamma_py = c_gamma((0.1, 0.1, 0.1), (rows, cols), device='cpu').squeeze(0).cpu
 
 # For complex tests, convert the matrix to a complex tensor
 complex_matrix = matrix.to(torch.complex64)
+complex_matrix.imag = torch.full_like(complex_matrix.imag, 10)
 diffract_uf_py, diffract_ub_py = diffract(complex_matrix, complex_matrix, res=(0.1, 0.1, 0.1), dz=1.0)
 bp_py = binary_pupil((rows, cols), na=0.9, res=(0.1, 0.1, 0.1), device='cpu').cpu().numpy().astype(np.int32).ravel()
 merge_uf_py, merge_ub_py = merge_prop(complex_matrix, complex_matrix, res=(0.1, 0.1, 0.1))
