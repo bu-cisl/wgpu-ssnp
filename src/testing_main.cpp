@@ -109,11 +109,11 @@ int main(int argc, char** argv) {
     std::cout << "Phase: Running scatter_factor test in C++\n";
     wgpu::Buffer scatterResultBuffer = createBuffer(
         context.device, nullptr,
-        sizeof(float) * inputMatrix.size(),
+        sizeof(float) * complexInput.size() * 2,
         WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc)
     );
-    scatter_factor(context, scatterResultBuffer, inputBuffer, inputMatrix.size());
-    std::vector<float> scatterOutput = readBack(context.device, context.queue, inputMatrix.size(), scatterResultBuffer);
+    scatter_factor(context, scatterResultBuffer, complexInputBuffer, complexInput.size());
+    std::vector<float> scatterOutput = readBack(context.device, context.queue, complexInput.size()*2, scatterResultBuffer);
     printArray("SCATTER_FACTOR", scatterOutput);
     scatterResultBuffer.release();
     

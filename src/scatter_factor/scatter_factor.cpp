@@ -46,13 +46,13 @@ static wgpu::BindGroup createBindGroup(
     inputEntry.binding = 0;
     inputEntry.buffer = inputBuffer;
     inputEntry.offset = 0;
-    inputEntry.size = sizeof(float) * buffer_len;
+    inputEntry.size = sizeof(float) * buffer_len * 2;
 
     wgpu::BindGroupEntry outputEntry = {};
     outputEntry.binding = 1;
     outputEntry.buffer = outputBuffer;
     outputEntry.offset = 0;
-    outputEntry.size = sizeof(float) * buffer_len;
+    outputEntry.size = sizeof(float) * buffer_len * 2;
 
     wgpu::BindGroupEntry uniformEntry = {};
     uniformEntry.binding = 2;
