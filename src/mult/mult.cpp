@@ -1,4 +1,4 @@
-#include "arithmetic.h"
+#include "mult.h"
 
 static size_t buffer_len;
 
@@ -63,7 +63,7 @@ static wgpu::BindGroup createBindGroup(
     return device.createBindGroup(bindGroupDesc);
 }
 
-void arithmetic(
+void mult(
     WebGPUContext& context, 
     wgpu::Buffer& outputBuffer, 
     wgpu::Buffer& inputBuffer1, 
@@ -78,7 +78,7 @@ void arithmetic(
 
     // LOADING AND COMPILING SHADER CODE
     WorkgroupLimits limits = getWorkgroupLimits(device);
-    std::string shaderCode = readShaderFile("src/arithmetic/multiply.wgsl", limits.maxWorkgroupSizeX);
+    std::string shaderCode = readShaderFile("src/mult/mult.wgsl", limits.maxWorkgroupSizeX);
     wgpu::ShaderModule shaderModule = createShaderModule(device, shaderCode);
 
     // CREATING BIND GROUP AND LAYOUT

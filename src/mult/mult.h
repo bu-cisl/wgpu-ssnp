@@ -1,5 +1,5 @@
-#ifndef ARITHMETIC_H
-#define ARITHMETIC_H
+#ifndef MULT_H
+#define MULT_H
 #include <fstream>
 #include <sstream>
 #include <cmath>
@@ -7,7 +7,7 @@
 #include <webgpu/webgpu.hpp>
 #include "../webgpu_utils.h"
 
-void arithmetic(
+void mult(
     WebGPUContext& context, 
     wgpu::Buffer& outputBuffer, 
     wgpu::Buffer& inputBuffer1, 
