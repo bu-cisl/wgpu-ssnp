@@ -15,6 +15,13 @@
 
 using namespace std;
 
+void printArray(const vector<float>& data) {
+    for (size_t i = 0; i < data.size(); i++) {
+        cout << data[i] << " ";
+    }
+    cout << "\n";
+}
+
 int main() {
     // Initialize WebGPU
     WebGPUContext context;
@@ -23,7 +30,7 @@ int main() {
     // default init params for ssnp model
     vector<float> res = {0.1,0.1,0.1};
     float na = 0.65;
-    int angles_size = 1;
+    int angles_size = 3;
     bool intensity = true;
 
     // angles_size vectors of c_ba values
@@ -81,7 +88,7 @@ int main() {
         // Propagate the wave back to the focal plane
         wgpu::Buffer U2 = createBuffer(context.device, nullptr, sizeof(float) * buffer_len * 2, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
         wgpu::Buffer UD2 = createBuffer(context.device, nullptr, sizeof(float) * buffer_len * 2, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));  
-        diffract(context, U2, UD2, U, UD, buffer_len, shape, res, -1*n.size()/2);
+        diffract(context, U2, UD2, U, UD, buffer_len, shape, res, -1*float(n.size())/2);
         U.release();
         UD.release();
 
@@ -92,7 +99,7 @@ int main() {
         _.release();
         U2.release();
         UD2.release();
-        wgpu::Buffer pupilBuffer = createBuffer(context.device, nullptr, sizeof(float) * buffer_len, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
+        wgpu::Buffer pupilBuffer = createBuffer(context.device, nullptr, sizeof(int) * buffer_len, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
         binary_pupil(context, pupilBuffer, shape, na, res);
         wgpu::Buffer finalForwardBuffer = createBuffer(context.device, nullptr, sizeof(float) * buffer_len * 2, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
         mult(context, finalForwardBuffer, forwardBuffer, pupilBuffer, buffer_len);
@@ -123,12 +130,18 @@ int main() {
                 reshapedSlice[i][j] = slice[i * shape[1] + j];
             }
         }
-        for (size_t i = 0; i < reshapedSlice.size(); i++) {
-            for (size_t j = 0; j < reshapedSlice[i].size(); j++) {
-                cout << reshapedSlice[i][j] << " ";
+        result.push_back(reshapedSlice);
+    }
+
+    cout << "Final Result:" << endl;
+    for (size_t i = 0; i < result.size(); i++) {
+        for (size_t j = 0; j < result[i].size(); j++) {
+            for (size_t k = 0; k < result[i][j].size(); k++) {
+                cout << result[i][j][k] << " ";
             }
             cout << endl;
         }
-        result.push_back(reshapedSlice);
+        cout << endl;
     }
+
 }
