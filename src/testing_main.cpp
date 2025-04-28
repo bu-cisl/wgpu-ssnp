@@ -6,6 +6,7 @@
 #include "merge_prop/merge_prop.h"
 #include "split_prop/split_prop.h"
 #include "c_gamma/c_gamma.h"  
+#include "mult/mult.h"
 #include "webgpu_utils.h"
 #include <vector>
 #include <complex>
@@ -224,12 +225,29 @@ int main(int argc, char** argv) {
     printArray("TILT", tiltOutput);
     tiltResultBuffer.release();
 
-    
+    // test mult
+    // wgpu::Buffer multBuffer = createBuffer(
+    //     context.device, nullptr,
+    //     sizeof(float) * matrix_shape[0]*matrix_shape[1]*2,
+    //     WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc)
+    // );
+    // std::cout << "\ntesting mult" << std::endl;
+    // mult(context, multBuffer, complexInputBuffer, inputBuffer, matrix_shape[0]*matrix_shape[1]);
+    // std::vector<float> multOutput = readBack(context.device, context.queue, matrix_shape[0]*matrix_shape[1]*2, multBuffer);
+    // std::vector<float> in1 = readBack(context.device, context.queue, matrix_shape[0]*matrix_shape[1]*2, complexInputBuffer);
+    // std::vector<float> in2 = readBack(context.device, context.queue, matrix_shape[0]*matrix_shape[1], inputBuffer);
+    // printArray("frwrd", in1);
+    // printArray("pupil", in2);
+    // printArray("MULT",multOutput);
+    // multBuffer.release();
+
     // Release WebGPU resources.
     wgpuQueueRelease(context.queue);
     wgpuDeviceRelease(context.device);
     wgpuAdapterRelease(context.adapter);
     wgpuInstanceRelease(context.instance);
+    inputBuffer.release();
+    complexInputBuffer.release();
     
     return 0;
 }

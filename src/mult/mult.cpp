@@ -39,7 +39,7 @@ static wgpu::BindGroup createBindGroup(
     inputEntry1.binding = 0;
     inputEntry1.buffer = inputBuffer1;
     inputEntry1.offset = 0;
-    inputEntry1.size = sizeof(float) * buffer_len;
+    inputEntry1.size = sizeof(float) * buffer_len * 2;
 
     wgpu::BindGroupEntry inputEntry2 = {};
     inputEntry2.binding = 1;
@@ -51,7 +51,7 @@ static wgpu::BindGroup createBindGroup(
     outputEntry.binding = 2;
     outputEntry.buffer = outputBuffer;
     outputEntry.offset = 0;
-    outputEntry.size = sizeof(float) * buffer_len;;
+    outputEntry.size = sizeof(float) * buffer_len * 2;
 
     wgpu::BindGroupEntry entries[] = {inputEntry1, inputEntry2, outputEntry};
 
@@ -66,8 +66,8 @@ static wgpu::BindGroup createBindGroup(
 void mult(
     WebGPUContext& context, 
     wgpu::Buffer& outputBuffer, 
-    wgpu::Buffer& inputBuffer1, 
-    wgpu::Buffer& inputBuffer2,
+    wgpu::Buffer& inputBuffer1, // forward
+    wgpu::Buffer& inputBuffer2, // pupil
     size_t bufferlen
 ) {
     buffer_len = bufferlen;
