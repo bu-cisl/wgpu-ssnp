@@ -17,6 +17,7 @@ add_executable(
     src/merge_prop/merge_prop.cpp
     src/split_prop/split_prop.cpp
     src/dft/dft.cpp
+    src/arithmetic/arithmetic.cpp
 )
 
 set_target_properties(ssnp_cpp PROPERTIES

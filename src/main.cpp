@@ -86,9 +86,10 @@ int main() {
         split_prop(context, forwardBuffer, _, U2, UD2, buffer_len, shape, res);
         // NEED TO FORWARD *= BINARY PUPIL
 
-        // NEED TO temp_result = torch.fft.ifft2(Forward)
-        // read back temp_result
-        // temp_result = abs(temp_result)
+        wgpu::Buffer slice_result = createBuffer(context.device, backward.data(), sizeof(float) * buffer_len * 2, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
+        dft(context, slice_result, forwardBuffer, buffer_len, shape[0], shape[1], 1); // idft
+        // read back slice_result
+        // slice_result = abs(slice_result)
         // append to result 3d Matrix
     }
     // return result**2 if self.intensity else result
