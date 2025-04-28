@@ -7,6 +7,7 @@
 #include "split_prop/split_prop.h" 
 #include "dft/dft.h"
 #include "mult/mult.h"
+#include "scatter_effects/scatter_effects.h"
 #include "webgpu_utils.h"
 #include <vector>
 #include <iostream>
@@ -80,9 +81,24 @@ int main() {
             dft(context, u, U2, buffer_len, shape[0], shape[1], 1); // idft
 
             // Scattering effects
-            // NEED TO COMPUTE SCATTERING EFFECTS
-            UD = UD2;
+            UD = createBuffer(context.device, nullptr, sizeof(float) * buffer_len * 2, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
+            wgpu::Buffer scatterBuffer = createBuffer(context.device, nullptr, sizeof(float) * buffer_len * 2, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
+            vector<float> flatSlice;
+            for (const auto& inner : slice) {
+                flatSlice.insert(flatSlice.end(), inner.begin(), inner.end());
+            }
+            vector<float> complexSlice;
+            for (float value : flatSlice) {
+                complexSlice.push_back(value); // real part
+                complexSlice.push_back(0); // 0 for imag part
+            }        
+            wgpu::Buffer sliceBuffer = createBuffer(context.device, complexSlice.data(), sizeof(float) * buffer_len * 2, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
+            scatter_factor(context, scatterBuffer, sliceBuffer, buffer_len, res[0], 1, 1.33); // compute scatter factor output
+            scatter_effects(context, UD, scatterBuffer, u, UD2, buffer_len, shape); // compute ud - fft(scatter*u)
             u.release();
+            scatterBuffer.release();
+            sliceBuffer.release();
+            UD2.release();
         }
 
         // Propagate the wave back to the focal plane
@@ -106,7 +122,7 @@ int main() {
         forwardBuffer.release();
         pupilBuffer.release();
 
-        wgpu::Buffer slice_result = createBuffer(context.device, backward.data(), sizeof(float) * buffer_len * 2, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
+        wgpu::Buffer slice_result = createBuffer(context.device, nullptr, sizeof(float) * buffer_len * 2, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
         dft(context, slice_result, finalForwardBuffer, buffer_len, shape[0], shape[1], 1); // idft
         finalForwardBuffer.release();
         vector<float> flatSlice = readBack(context.device, context.queue, buffer_len * 2, slice_result);

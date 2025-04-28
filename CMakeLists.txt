@@ -18,6 +18,7 @@ add_executable(
     src/split_prop/split_prop.cpp
     src/dft/dft.cpp
     src/mult/mult.cpp
+    src/scatter_effects/scatter_effects.cpp
 )
 
 set_target_properties(ssnp_cpp PROPERTIES
