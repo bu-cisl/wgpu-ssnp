@@ -23,20 +23,20 @@ int main() {
     // default init params for ssnp model
     vector<float> res = {0.1,0.1,0.1};
     float na = 0.65;
-    int angles_size = 32;
+    int angles_size = 1;
     bool intensity = true;
 
     // angles_size vectors of c_ba values
     vector<vector<float>> angles(angles_size, vector<float>(2, 0.0));
 
     // input matrix
-    vector<vector<vector<float>>> n(3, vector<vector<float>>(16, vector<float>(16, 1.0f)));
+    vector<vector<vector<float>>> n(3, vector<vector<float>>(4, vector<float>(4, 1.0f)));
 
     // ssnp forward function
     vector<int> shape = {int(n[0].size()), int(n[0][0].size())};
 
     // initialize the final result output
-    vector<vector<vector<complex<float>>>> result;
+    vector<vector<vector<float>>> result; // angle_size x shape[0] x shape[1]
     
     for(vector<float> c_ba : angles) {
         // CONFIGURING INPUT FIELD
@@ -108,17 +108,27 @@ int main() {
         for (size_t i = 0; i < flatSlice.size(); i += 2) {
             complexSlice.push_back(complex<float>(flatSlice[i], flatSlice[i + 1]));
         }
-        transform(complexSlice.begin(), complexSlice.end(), complexSlice.begin(), [](complex<float> x) { return abs(x); });
-        // reshape for final result
-        vector<vector<complex<float>>> reshapedSlice;
-        // for (int i = 0; i < shape[0]; i++) {
-        //     for (int j = 0; j < shape[1]; j++) {
-        //         reshapedSlice[i][j] = complexSlice[i * shape[1] + j];
-        //     }
-        // }
-        // result.push_back(reshapedSlice);
-    }
-    // return result**2 if self.intensity else result
+        vector<float> slice;
+        for (auto element : complexSlice) {
+            slice.push_back(abs(element));
+        }
 
-    cout << na << " " << intensity << endl;
+        // Apply intensity
+        if(intensity) transform(slice.begin(), slice.end(), slice.begin(), [](float x) { return x * x; });
+
+        // reshape for final result
+        vector<vector<float>> reshapedSlice(shape[0], vector<float>(shape[1], 0.0f));
+        for (int i = 0; i < shape[0]; i++) {
+            for (int j = 0; j < shape[1]; j++) {
+                reshapedSlice[i][j] = slice[i * shape[1] + j];
+            }
+        }
+        for (size_t i = 0; i < reshapedSlice.size(); i++) {
+            for (size_t j = 0; j < reshapedSlice[i].size(); j++) {
+                cout << reshapedSlice[i][j] << " ";
+            }
+            cout << endl;
+        }
+        result.push_back(reshapedSlice);
+    }
 }

@@ -3,14 +3,14 @@ from ssnp_model import SSNPBeam
 
 if __name__ == "__main__":
     # Create a dummy RI volume (depth=3, 16x16 pixels)
-    n = torch.ones((3, 16, 16), dtype=torch.float32)
+    n = torch.ones((1, 4, 4), dtype=torch.float32)
 
     # Initialize the model
-    model = SSNPBeam()
+    model = SSNPBeam(angles=1)
 
     # Run the model
     output = model(n)
 
     # Print the output shape and a small patch of values
     print("Output shape:", output.shape)
-    print("Output sample:", output[0:3, 0:3])
+    print("Output:", output)
