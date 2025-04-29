@@ -1,27 +1,5 @@
 #define WEBGPU_CPP_IMPLEMENTATION
-#include "scatter_factor/scatter_factor.h"
-#include "diffract/diffract.h"
-#include "binary_pupil/binary_pupil.h"
-#include "tilt/tilt.h"
-#include "merge_prop/merge_prop.h"
-#include "split_prop/split_prop.h" 
-#include "dft/dft.h"
-#include "mult/mult.h"
-#include "scatter_effects/scatter_effects.h"
-#include "webgpu_utils.h"
-#include <vector>
-#include <iostream>
-#include <algorithm>
-#include <cmath>
-
-using namespace std;
-
-void printArray(const vector<float>& data) {
-    for (size_t i = 0; i < data.size(); i++) {
-        cout << data[i] << " ";
-    }
-    cout << "\n";
-}
+#include "forward.h"
 
 int main() {
     // Initialize WebGPU
@@ -33,121 +11,13 @@ int main() {
     float na = 0.65;
     int angles_size = 3;
     bool intensity = true;
-
-    // angles_size vectors of c_ba values
-    vector<vector<float>> angles(angles_size, vector<float>(2, 0.0));
+    vector<vector<float>> angles(angles_size, vector<float>(2, 0.0)); // angles_size vectors of c_ba values, default [0,0]
 
     // input matrix
     vector<vector<vector<float>>> n(3, vector<vector<float>>(4, vector<float>(4, 1.0f)));
 
-    // ssnp forward function
-    vector<int> shape = {int(n[0].size()), int(n[0][0].size())};
-
-    // initialize the final result output
-    vector<vector<vector<float>>> result; // angle_size x shape[0] x shape[1]
-    
-    for(vector<float> c_ba : angles) {
-        // CONFIGURING INPUT FIELD
-
-        // Generate Forward/Backward
-        size_t buffer_len = shape[0] * shape[1];
-        wgpu::Buffer tiltResultBuffer = createBuffer(context.device, nullptr, sizeof(float) * buffer_len * 2, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
-        tilt(context, tiltResultBuffer, c_ba, shape, res);
-        wgpu::Buffer forwardBuffer = createBuffer(context.device, nullptr, sizeof(float) * buffer_len * 2, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
-        dft(context, forwardBuffer, tiltResultBuffer, buffer_len, shape[0], shape[1], 0); // dft
-        vector<float> backward(shape[0]*shape[1]*2, 0.0);
-        wgpu::Buffer backwardBuffer = createBuffer(context.device, backward.data(), sizeof(float) * buffer_len * 2, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
-        tiltResultBuffer.release();
-        
-        // Get U/UD
-        wgpu::Buffer U = createBuffer(context.device, nullptr, sizeof(float) * buffer_len * 2, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
-        wgpu::Buffer UD = createBuffer(context.device, nullptr, sizeof(float) * buffer_len * 2, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
-        merge_prop(context, U, UD, forwardBuffer, backwardBuffer, buffer_len, shape, res);
-        forwardBuffer.release();
-        backwardBuffer.release();
-
-        // Traverse slices
-        for(vector<vector<float>> slice : n) {
-            // Propogate the wave
-            wgpu::Buffer U2 = createBuffer(context.device, nullptr, sizeof(float) * buffer_len * 2, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
-            wgpu::Buffer UD2 = createBuffer(context.device, nullptr, sizeof(float) * buffer_len * 2, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
-            diffract(context, U2, UD2, U, UD, buffer_len, shape, res, 1.0);
-            U.release();
-            UD.release();
-            U = U2; // reassign U value for next iter
-
-            // Field to spatial domain
-            wgpu::Buffer u = createBuffer(context.device, nullptr, sizeof(float) * buffer_len * 2, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
-            dft(context, u, U2, buffer_len, shape[0], shape[1], 1); // idft
-
-            // Scattering effects
-            UD = createBuffer(context.device, nullptr, sizeof(float) * buffer_len * 2, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
-            wgpu::Buffer scatterBuffer = createBuffer(context.device, nullptr, sizeof(float) * buffer_len * 2, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
-            vector<float> flatSlice;
-            for (const auto& inner : slice) {
-                flatSlice.insert(flatSlice.end(), inner.begin(), inner.end());
-            }
-            vector<float> complexSlice;
-            for (float value : flatSlice) {
-                complexSlice.push_back(value); // real part
-                complexSlice.push_back(0); // 0 for imag part
-            }        
-            wgpu::Buffer sliceBuffer = createBuffer(context.device, complexSlice.data(), sizeof(float) * buffer_len * 2, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
-            scatter_factor(context, scatterBuffer, sliceBuffer, buffer_len, res[0], 1, 1.33); // compute scatter factor output
-            scatter_effects(context, UD, scatterBuffer, u, UD2, buffer_len, shape); // compute ud - fft(scatter*u)
-            u.release();
-            scatterBuffer.release();
-            sliceBuffer.release();
-            UD2.release();
-        }
-
-        // Propagate the wave back to the focal plane
-        wgpu::Buffer U2 = createBuffer(context.device, nullptr, sizeof(float) * buffer_len * 2, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
-        wgpu::Buffer UD2 = createBuffer(context.device, nullptr, sizeof(float) * buffer_len * 2, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));  
-        diffract(context, U2, UD2, U, UD, buffer_len, shape, res, -1*float(n.size())/2);
-        U.release();
-        UD.release();
-
-        // Merge the forward and backward fields from u and ∂u
-        forwardBuffer = createBuffer(context.device, nullptr, sizeof(float) * buffer_len * 2, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
-        wgpu::Buffer _ = createBuffer(context.device, nullptr, sizeof(float) * buffer_len * 2, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
-        split_prop(context, forwardBuffer, _, U2, UD2, buffer_len, shape, res);
-        _.release();
-        U2.release();
-        UD2.release();
-        wgpu::Buffer pupilBuffer = createBuffer(context.device, nullptr, sizeof(int) * buffer_len, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
-        binary_pupil(context, pupilBuffer, shape, na, res);
-        wgpu::Buffer finalForwardBuffer = createBuffer(context.device, nullptr, sizeof(float) * buffer_len * 2, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
-        mult(context, finalForwardBuffer, forwardBuffer, pupilBuffer, buffer_len);
-        forwardBuffer.release();
-        pupilBuffer.release();
-
-        wgpu::Buffer slice_result = createBuffer(context.device, nullptr, sizeof(float) * buffer_len * 2, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
-        dft(context, slice_result, finalForwardBuffer, buffer_len, shape[0], shape[1], 1); // idft
-        finalForwardBuffer.release();
-        vector<float> flatSlice = readBack(context.device, context.queue, buffer_len * 2, slice_result);
-        slice_result.release();
-        vector<complex<float>> complexSlice; // convert real,imag floats to complex pairs
-        for (size_t i = 0; i < flatSlice.size(); i += 2) {
-            complexSlice.push_back(complex<float>(flatSlice[i], flatSlice[i + 1]));
-        }
-        vector<float> slice;
-        for (auto element : complexSlice) {
-            slice.push_back(abs(element));
-        }
-
-        // Apply intensity
-        if(intensity) transform(slice.begin(), slice.end(), slice.begin(), [](float x) { return x * x; });
-
-        // reshape for final result
-        vector<vector<float>> reshapedSlice(shape[0], vector<float>(shape[1], 0.0f));
-        for (int i = 0; i < shape[0]; i++) {
-            for (int j = 0; j < shape[1]; j++) {
-                reshapedSlice[i][j] = slice[i * shape[1] + j];
-            }
-        }
-        result.push_back(reshapedSlice);
-    }
+    // compute result with forward function
+    vector<vector<vector<float>>> result = forward(context, n, res, na, angles, intensity);
 
     cout << "Final Result:" << endl;
     for (size_t i = 0; i < result.size(); i++) {
