@@ -19,6 +19,7 @@ add_executable(
     src/dft/dft.cpp
     src/mult/mult.cpp
     src/scatter_effects/scatter_effects.cpp
+    src/intensity/intensity.cpp
     src/forward.cpp
 )
 

@@ -1,3 +1,5 @@
+#ifndef FORWARD_H
+#define FORWARD_H
 #include "scatter_factor/scatter_factor.h"
 #include "diffract/diffract.h"
 #include "binary_pupil/binary_pupil.h"
@@ -7,6 +9,7 @@
 #include "dft/dft.h"
 #include "mult/mult.h"
 #include "scatter_effects/scatter_effects.h"
+#include "intensity/intensity.h"
 #include "webgpu_utils.h"
 #include <vector>
 #include <iostream>
@@ -22,3 +25,5 @@ vector<vector<vector<float>>> forward(
     vector<vector<float>> angles, 
     bool intensity
 );
+
+#endif

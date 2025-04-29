@@ -90,22 +90,14 @@ vector<vector<vector<float>>> forward(
         forwardBuffer.release();
         pupilBuffer.release();
 
-        wgpu::Buffer slice_result = createBuffer(context.device, nullptr, sizeof(float) * buffer_len * 2, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
-        dft(context, slice_result, finalForwardBuffer, buffer_len, shape[0], shape[1], 1); // idft
+        wgpu::Buffer complexSlice = createBuffer(context.device, nullptr, sizeof(float) * buffer_len * 2, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
+        dft(context, complexSlice, finalForwardBuffer, buffer_len, shape[0], shape[1], 1); // idft
         finalForwardBuffer.release();
-        vector<float> flatSlice = readBack(context.device, context.queue, buffer_len * 2, slice_result);
-        slice_result.release();
-        vector<complex<float>> complexSlice; // convert real,imag floats to complex pairs
-        for (size_t i = 0; i < flatSlice.size(); i += 2) {
-            complexSlice.push_back(complex<float>(flatSlice[i], flatSlice[i + 1]));
-        }
-        vector<float> slice;
-        for (auto element : complexSlice) {
-            slice.push_back(abs(element));
-        }
-
-        // Apply intensity
-        if(intensity) transform(slice.begin(), slice.end(), slice.begin(), [](float x) { return x * x; });
+        wgpu::Buffer sliceBuffer = createBuffer(context.device, nullptr, sizeof(float) * buffer_len, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
+        intense(context, sliceBuffer, complexSlice, buffer_len, intensity);
+        vector<float> slice = readBack(context.device, context.queue, buffer_len, sliceBuffer);
+        complexSlice.release();
+        sliceBuffer.release();
 
         // reshape for final result
         vector<vector<float>> reshapedSlice(shape[0], vector<float>(shape[1], 0.0f));
