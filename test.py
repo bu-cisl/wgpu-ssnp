@@ -23,7 +23,7 @@ def load_tensor_bin(filename) -> np.ndarray:
         data = np.frombuffer(f.read(), dtype=np.float32)
         return data.reshape((D, H, W))
 
-def create_sphere(shape, radius_fraction=0.25, value_inside=0.1, value_outside=0.0):
+def create_sphere(shape, radius_fraction=0.25, value_inside=0.01, value_outside=0.0):
     z, y, x = np.indices(shape)
     center = [s // 2 for s in shape]
     radius = int(min(shape) * radius_fraction)
