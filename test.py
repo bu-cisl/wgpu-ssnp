@@ -2,13 +2,14 @@ import numpy as np
 import subprocess
 import struct
 import torch
+import matplotlib.pyplot as plt
 from py.ssnp_model import SSNPBeam
 
-SLICES = 100
-ROWS = 512
-COLS = 512
-ANGLE_COUNT = 1 # note - need to manually change on src/main.cpp line 81 for now
+SLICES = 200
+ROWS = 1024
+COLS = 1024
 TOL = 1e-4 # rtol
+SAVE_IMAGES = False
 
 def save_tensor_bin(filename, tensor: np.ndarray):
     assert tensor.ndim == 3
@@ -55,9 +56,16 @@ def run_cpp_model(input_tensor, input_path="input.bin", output_path="output.bin"
 
 def run_python_model(input_tensor):
     tensor_input = torch.tensor(input_tensor, dtype=torch.float32)
-    model = SSNPBeam(angles=ANGLE_COUNT)
+    model = SSNPBeam(angles=1)
     with torch.no_grad():
         return model(tensor_input).numpy()
+
+def save_output_as_png(output, filename):
+    output = np.squeeze(output, axis=0)
+    array = np.array(output)
+    plt.imshow(array)
+    plt.savefig(filename)
+    plt.close()
 
 def compare_outputs(py_output, cpp_output, rtol=TOL, atol=1e-4):
     abs_diff = np.abs(py_output - cpp_output)
@@ -95,6 +103,13 @@ if __name__ == "__main__":
 
     print("Running Python model...")
     py_output = run_python_model(input_tensor)
+
+    if SAVE_IMAGES:
+        image_folder = f"{ROWS}x{COLS}x{SLICES}"
+        output_dir = f"images/{image_folder}/"
+        save_output_as_png(cpp_output, f"{output_dir}/cpp.png")
+        save_output_as_png(py_output, f"{output_dir}/py.png")
+        print(f"Saved images to {output_dir}")
 
     print("Comparing outputs...")
     compare_outputs(py_output, cpp_output)
