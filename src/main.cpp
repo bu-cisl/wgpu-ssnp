@@ -78,7 +78,7 @@ int main(int argc, char* argv[]) {
     vector<float> res = {0.1f, 0.1f, 0.1f};
     float na = 0.65f;
     bool intensity = true;
-    vector<vector<float>> angles(10, vector<float>(2, 0.0f)); // default [0, 0]
+    vector<vector<float>> angles(1, vector<float>(2, 0.0f)); // default [0, 0]
 
     auto result = forward(context, input_tensor, res, na, angles, intensity);
 
