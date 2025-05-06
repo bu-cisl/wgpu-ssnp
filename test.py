@@ -23,8 +23,27 @@ def load_tensor_bin(filename) -> np.ndarray:
         data = np.frombuffer(f.read(), dtype=np.float32)
         return data.reshape((D, H, W))
 
+def create_sphere(shape, radius_fraction=0.25, value_inside=0.1, value_outside=0.0):
+    z, y, x = np.indices(shape)
+    center = [s // 2 for s in shape]
+    radius = int(min(shape) * radius_fraction)
+    
+    # Compute squared distance from center
+    distance_squared = ((x - center[2])**2 + 
+                        (y - center[1])**2 + 
+                        (z - center[0])**2)
+    
+    # Mask for points inside the sphere
+    mask = distance_squared <= radius**2
+
+    # Create volume
+    volume = np.full(shape, value_outside, dtype=np.float32)
+    volume[mask] = value_inside
+    
+    return volume
+
 def generate_input(shape=(3, 128, 128)) -> np.ndarray:
-    return np.ones(shape, dtype=np.float32)
+    return create_sphere(shape)
 
 def run_cpp_model(input_tensor, input_path="input.bin", output_path="output.bin"):
     save_tensor_bin(input_path, input_tensor)
