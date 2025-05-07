@@ -15,11 +15,11 @@
 /Makefile
 
 # Ignore Python virtual environments
-/py/venv/
-/py/.venv/
-/py/__pycache__/
-/py/*.pyc
-/py/.pytest_cache/
+*venv
+*.venv
+*__pycache__/
+*.pyc
+*.pytest_cache/
 
 # Ignore sandbox and testing files
 /test
