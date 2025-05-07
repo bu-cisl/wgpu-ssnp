@@ -9,7 +9,7 @@ SLICES = 200
 ROWS = 1024
 COLS = 1024
 TOL = 1e-4 # rtol
-SAVE_IMAGES = False
+IMAGE_NAME = None # None if no save
 
 def save_tensor_bin(filename, tensor: np.ndarray):
     assert tensor.ndim == 3
@@ -64,6 +64,7 @@ def save_output_as_png(output, filename):
     output = np.squeeze(output, axis=0)
     array = np.array(output)
     plt.imshow(array)
+    plt.colorbar()
     plt.savefig(filename)
     plt.close()
 
@@ -104,11 +105,11 @@ if __name__ == "__main__":
     print("Running Python model...")
     py_output = run_python_model(input_tensor)
 
-    if SAVE_IMAGES:
+    if IMAGE_NAME is not None:
         image_folder = f"{ROWS}x{COLS}x{SLICES}"
         output_dir = f"images/{image_folder}/"
-        save_output_as_png(cpp_output, f"{output_dir}/cpp.png")
-        save_output_as_png(py_output, f"{output_dir}/py.png")
+        save_output_as_png(cpp_output, f"{output_dir}/cpp_{IMAGE_NAME}.png")
+        save_output_as_png(py_output, f"{output_dir}/py_{IMAGE_NAME}.png")
         print(f"Saved images to {output_dir}")
 
     print("Comparing outputs...")
