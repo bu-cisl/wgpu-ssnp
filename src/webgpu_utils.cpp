@@ -209,7 +209,11 @@ std::vector<float> readBack(wgpu::Device& device, wgpu::Queue& queue, size_t buf
 
     // Wait for the mapping to complete
     while (!mappingComplete) {
-        wgpuDevicePoll(device, false, nullptr); 
+        #ifndef __EMSCRIPTEN__
+            wgpuDevicePoll(device, true, nullptr);
+        #else
+            emscripten_sleep(10); // Yield to browser event loop
+        #endif
     }
 
     readbackBuffer.release();
@@ -253,7 +257,11 @@ std::vector<uint32_t> readBackInt(wgpu::Device& device, wgpu::Queue& queue, size
 
     // Wait for the mapping to complete
     while (!mappingComplete) {
-        wgpuDevicePoll(device, false, nullptr); 
+        #ifndef __EMSCRIPTEN__
+            wgpuDevicePoll(device, true, nullptr);
+        #else
+            emscripten_sleep(10); // Yield to browser event loop
+        #endif
     }
 
     readbackBuffer.release();
