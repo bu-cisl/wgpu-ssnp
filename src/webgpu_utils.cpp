@@ -3,8 +3,12 @@
 // INITIALIZING WEBGPU
 void initWebGPU(WebGPUContext& context) {
     // Create an instance
-    wgpu::InstanceDescriptor instanceDescriptor = {};
-    context.instance = wgpu::createInstance(instanceDescriptor);
+#ifdef __EMSCRIPTEN__
+    context.instance = wgpuCreateInstance(nullptr);
+#else
+    WGPUInstanceDescriptor desc = {};
+    context.instance = wgpuCreateInstance(&desc);
+#endif
     if (!context.instance) {
         std::cerr << "Failed to create WebGPU instance." << std::endl;
     }
@@ -17,20 +21,25 @@ void initWebGPU(WebGPUContext& context) {
         std::cerr << "Failed to request a WebGPU adapter." << std::endl;
     }
 
-    // Get adapter's limits
+#ifdef __EMSCRIPTEN__
+    // On web: just do the default device request, no requiredLimits
+    wgpu::DeviceDescriptor devDesc = {};
+    context.device = context.adapter.requestDevice(devDesc);
+#else
+    // Native: you can mirror adapter limits if you really need to tweak them
     WGPUSupportedLimits supportedLimits = {};
     wgpuAdapterGetLimits(context.adapter, &supportedLimits);
 
-    // Request device
-    wgpu::DeviceDescriptor deviceDescriptor = {};
-    deviceDescriptor.label = "Default Device";
-
-    // Align device limits to that of adapter
     WGPURequiredLimits requiredLimits = {};
     requiredLimits.limits = supportedLimits.limits;
-    requiredLimits.limits.maxBufferSize = requiredLimits.limits.maxBufferSize-1; // for some reason defaulted to 256 MB before
-    deviceDescriptor.requiredLimits = &requiredLimits;
-    context.device = context.adapter.requestDevice(deviceDescriptor);
+    // tweak one limit if you need
+    requiredLimits.limits.maxBufferSize -= 1;
+
+    wgpu::DeviceDescriptor devDesc = {};
+    devDesc.label = "Default Device";
+    devDesc.requiredLimits = &requiredLimits;
+    context.device = context.adapter.requestDevice(devDesc);
+#endif
     if (!context.device) {
         std::cerr << "Failed to request a WebGPU device." << std::endl;
     }
@@ -194,7 +203,8 @@ std::vector<float> readBack(wgpu::Device& device, wgpu::Queue& queue, size_t buf
     bool mappingComplete = false;
     auto handle = readbackBuffer.mapAsync(wgpu::MapMode::Read, 0, buffer_len * sizeof(float), [&](wgpu::BufferMapAsyncStatus status) {
         if (status == wgpu::BufferMapAsyncStatus::Success) {
-            void* mappedData = readbackBuffer.getMappedRange(0, buffer_len * sizeof(float));
+            // void* mappedData = readbackBuffer.getMappedRange(0, buffer_len * sizeof(float));
+            const void* mappedData = readbackBuffer.getConstMappedRange(0, buffer_len * sizeof(float));
             if (mappedData) {
                 memcpy(output.data(), mappedData, buffer_len * sizeof(float));
                 readbackBuffer.unmap();
@@ -209,11 +219,11 @@ std::vector<float> readBack(wgpu::Device& device, wgpu::Queue& queue, size_t buf
 
     // Wait for the mapping to complete
     while (!mappingComplete) {
-        #ifndef __EMSCRIPTEN__
-            wgpuDevicePoll(device, true, nullptr);
-        #else
-            emscripten_sleep(10); // Yield to browser event loop
-        #endif
+    #ifndef __EMSCRIPTEN__
+        wgpuDevicePoll(device, true, nullptr);
+    #else
+        emscripten_sleep(100); // Yield to browser event loop
+    #endif
     }
 
     readbackBuffer.release();
@@ -242,7 +252,8 @@ std::vector<uint32_t> readBackInt(wgpu::Device& device, wgpu::Queue& queue, size
     bool mappingComplete = false;
     auto handle = readbackBuffer.mapAsync(wgpu::MapMode::Read, 0, buffer_len * sizeof(uint32_t), [&](wgpu::BufferMapAsyncStatus status) {
         if (status == wgpu::BufferMapAsyncStatus::Success) {
-            void* mappedData = readbackBuffer.getMappedRange(0, buffer_len * sizeof(uint32_t));
+            // void* mappedData = readbackBuffer.getMappedRange(0, buffer_len * sizeof(uint32_t));
+            const void* mappedData = readbackBuffer.getConstMappedRange(0, buffer_len * sizeof(uint32_t));
             if (mappedData) {
                 memcpy(output.data(), mappedData, buffer_len * sizeof(uint32_t));
                 readbackBuffer.unmap();
@@ -257,11 +268,11 @@ std::vector<uint32_t> readBackInt(wgpu::Device& device, wgpu::Queue& queue, size
 
     // Wait for the mapping to complete
     while (!mappingComplete) {
-        #ifndef __EMSCRIPTEN__
-            wgpuDevicePoll(device, true, nullptr);
-        #else
-            emscripten_sleep(10); // Yield to browser event loop
-        #endif
+    #ifndef __EMSCRIPTEN__
+        wgpuDevicePoll(device, true, nullptr);
+    #else
+        emscripten_sleep(100); // Yield to browser event loop
+    #endif
     }
 
     readbackBuffer.release();
