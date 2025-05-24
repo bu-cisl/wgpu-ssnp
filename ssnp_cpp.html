@@ -38,7 +38,7 @@
     }
   </style>
   <script>
-    // Prevent main() auto-run; we'll call our own functions
+    // Prevent main() auto-run
     var Module = {
       noInitialRun: true,
       canvas: document.getElementById('canvas'),
@@ -71,7 +71,7 @@
           [],
           { async: true }
         ).then(() => {
-          document.getElementById('output').textContent += "▶️ forward() completed\n";
+          document.getElementById('output').textContent += "forward() completed\n";
         }).catch(err => {
           console.error("Error running forward:", err);
         });
