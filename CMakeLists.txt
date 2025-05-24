@@ -44,3 +44,20 @@ target_link_libraries(ssnp_cpp PRIVATE webgpu)
 
 # Copy necessary runtime binaries
 target_copy_webgpu_binaries(ssnp_cpp)
+
+if (EMSCRIPTEN)
+    # apply Emscripten flags
+    target_link_options(ssnp_cpp PRIVATE
+        "-sUSE_WEBGPU"   # hook WebGPU calls into JS API
+        "-sASYNCIFY"     # allow sync requestAdapter/Device
+        "--preload-file=${CMAKE_CURRENT_SOURCE_DIR}/src@/src"  
+        "-sALLOW_MEMORY_GROWTH"  # let the browser grow the Wasm heap
+        "-sEXPORTED_FUNCTIONS=['_runForwardOnce', '_main']"
+        "-sEXPORTED_RUNTIME_METHODS=['ccall','cwrap']"
+    )
+
+    # emit an HTML shell instead of just .wasm
+    set_target_properties(ssnp_cpp PROPERTIES
+        SUFFIX ".html"
+    )
+endif()
