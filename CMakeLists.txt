@@ -55,9 +55,4 @@ if (EMSCRIPTEN)
         "-sEXPORTED_FUNCTIONS=['_runForwardOnce', '_main']"
         "-sEXPORTED_RUNTIME_METHODS=['ccall','cwrap']"
     )
-
-    # emit an HTML shell instead of just .wasm
-    set_target_properties(ssnp_cpp PROPERTIES
-        SUFFIX ".html"
-    )
 endif()

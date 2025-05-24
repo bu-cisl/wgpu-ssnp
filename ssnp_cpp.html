@@ -71,8 +71,7 @@
           [],
           { async: true }
         ).then(() => {
-          document.getElementById('log').textContent +=
-            "▶️ forward() completed\n";
+          document.getElementById('output').textContent += "▶️ forward() completed\n";
         }).catch(err => {
           console.error("Error running forward:", err);
         });

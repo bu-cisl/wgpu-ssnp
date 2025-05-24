@@ -5,10 +5,6 @@
 #include <vector>
 #include <string>
 
-#ifdef __EMSCRIPTEN__
-#include <emscripten/emscripten.h>
-#endif
-
 using namespace std;
 
 bool read_input_tensor(const string& filename, vector<vector<vector<float>>>& tensor, int& D, int& H, int& W) {
@@ -62,6 +58,7 @@ bool write_output_tensor(const string& filename, const vector<vector<vector<floa
     return true;
 }
 
+/*
 int main(int argc, char* argv[]) {
     if (argc < 3) {
         cerr << "Usage: " << argv[0] << " <input.bin> <output.bin>" << endl;
@@ -90,33 +87,82 @@ int main(int argc, char* argv[]) {
 
     return 0;
 }
+*/
+
+int main() {
+    vector<vector<vector<float>>> test_input = {
+        {{1, 2, 3},
+         {4, 3, 6},
+         {7, 8, 9}}
+    };
+
+    cout << "Input tensor:" << endl;
+    for (auto& slice : test_input) {
+        for (auto& row : slice) {
+            for (auto val : row) {
+                cout << val << " ";
+            }
+            cout << endl;
+        }
+    }
+
+    WebGPUContext context;
+    initWebGPU(context);
+
+    // Parameters
+    vector<float> res = {0.1f, 0.1f, 0.1f};
+    float na = 0.65f;
+    bool intensity = false;
+    vector<vector<float>> angles = {{8.2f, 0.2f}};
+    
+    auto result = forward(context, test_input, res, na, angles, intensity);
+    
+    cout << "Result tensor:" << endl;
+    for (auto& slice : result) {
+        for (auto& row : slice) {
+            for (auto val : row) {
+                cout << val << " ";
+            }
+            cout << endl;
+        }
+    }
+    
+    return 0;
+}
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 extern "C" {
+    // exported into `Module` as `_runForwardOnce`
+    EMSCRIPTEN_KEEPALIVE
+    void runForwardOnce() {
+        // hard-coded inputs for now
+        vector<vector<vector<float>>> input_tensor = {{{1,2,3},{4,3,6},{7,8,9}}};
+        float na = 0.65f;
+        bool intensity = false;
+        vector<float> res = {0.1f,0.1f,0.1f};
+        vector<vector<float>> angles = {{8.0f,0.2}};
 
-// this will be exported into `Module` as `_runForwardOnce`
-EMSCRIPTEN_KEEPALIVE
-void runForwardOnce() {
-    // 1) hard-coded inputs for now
-    vector<vector<vector<float>>> input_tensor = {{{1,2,3},{4,5,6},{7,8,9}}};
-    float na = 0.65f;
-    bool intensity = true;
-    vector<float> res = {0.1f,0.1f,0.1f};
-    vector<vector<float>> angles = {{0.0f,0.0f}};
+        WebGPUContext context;
+        initWebGPU(context);
+        auto output = forward(context, input_tensor, res, na, angles, intensity);
 
-    // 2) init WebGPU
-    WebGPUContext context;
-    initWebGPU(context);
+        // Print the entire tensor
+        printf("Output tensor dimensions: %zux%zux%zu\n",
+            output.size(),
+            output.empty() ? 0 : output[0].size(),
+            output.empty() ? 0 : (output[0].empty() ? 0 : output[0][0].size()));
 
-    // 3) run your compute
-    auto output = forward(context, input_tensor, res, na, angles, intensity);
-
-    // 4) for demo, print the first element to the browser console
-    if (!output.empty() && !output[0][0].empty()) {
-      printf("forward[0][0][0] = %f\n", output[0][0][0]);
+        for (size_t i = 0; i < output.size(); ++i) {
+            printf("Slice %zu:\n", i);
+            for (size_t j = 0; j < output[i].size(); ++j) {
+                for (size_t k = 0; k < output[i][j].size(); ++k) {
+                    printf("%8.4f ", output[i][j][k]);
+                }
+                printf("\n");
+            }
+            printf("\n");
+        }
     }
 }
-
-} // extern "C"
 #endif
