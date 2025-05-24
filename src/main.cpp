@@ -91,9 +91,21 @@ int main(int argc, char* argv[]) {
 
 int main() {
     vector<vector<vector<float>>> test_input = {
-        {{1, 2, 3},
-         {4, 3, 6},
-         {7, 8, 9}}
+        {
+            {1.23f, 4.56f, 7.89f},
+            {2.34f, 5.67f, 8.90f},
+            {3.45f, 6.78f, 9.01f}
+        },
+        {
+            {0.12f, 3.45f, 6.78f},
+            {9.87f, 6.54f, 3.21f},
+            {1.11f, 2.22f, 3.33f}
+        },
+        {
+            {7.77f, 8.88f, 9.99f},
+            {4.44f, 5.55f, 6.66f},
+            {0.01f, 1.02f, 2.03f}
+        }
     };
 
     cout << "Input tensor:" << endl;
@@ -110,10 +122,10 @@ int main() {
     initWebGPU(context);
 
     // Parameters
-    vector<float> res = {0.1f, 0.1f, 0.1f};
-    float na = 0.65f;
-    bool intensity = false;
-    vector<vector<float>> angles = {{8.2f, 0.2f}};
+    vector<float> res = {0.1f, 0.2f, 0.1f};
+    float na = 0.69f;
+    bool intensity = true;
+    vector<vector<float>> angles = {{2.0f, 8.2f}, {1.2f, 5.0f}};
     
     auto result = forward(context, test_input, res, na, angles, intensity);
     
@@ -133,35 +145,52 @@ int main() {
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 extern "C" {
-    // exported into `Module` as `_runForwardOnce`
+    // Reads `input.bin`, runs forward(), prints every element:
     EMSCRIPTEN_KEEPALIVE
-    void runForwardOnce() {
-        // hard-coded inputs for now
-        vector<vector<vector<float>>> input_tensor = {{{1,2,3},{4,3,6},{7,8,9}}};
-        float na = 0.65f;
-        bool intensity = false;
-        vector<float> res = {0.1f,0.1f,0.1f};
-        vector<vector<float>> angles = {{8.0f,0.2}};
+    void runForwardFromFile() {
+        try {
+            // load the bin file into a tensor
+            std::vector<std::vector<std::vector<float>>> tensor;
+            int D, H, W;
+            if (!read_input_tensor("input.bin", tensor, D, H, W)) {
+                printf("Failed to read input.bin\n");
+                return;
+            }
 
-        WebGPUContext context;
-        initWebGPU(context);
-        auto output = forward(context, input_tensor, res, na, angles, intensity);
+            WebGPUContext context;
+            initWebGPU(context);
+            auto result = forward(
+                context,
+                tensor,
+                /*res*/ {0.1f,0.2f,0.1f},
+                /*na*/ 0.69f,
+                /*angles*/ {{2.0f, 8.2f}, {1.2f, 5.0f}},
+                /*intensity*/ true
+            );
 
-        // Print the entire tensor
-        printf("Output tensor dimensions: %zux%zux%zu\n",
-            output.size(),
-            output.empty() ? 0 : output[0].size(),
-            output.empty() ? 0 : (output[0].empty() ? 0 : output[0][0].size()));
+            printf("Output dims: %d×%d×%d\n", 
+                (int)result.size(),
+                result.empty() ? 0 : (int)result[0].size(),
+                (result.empty() || result[0].empty()) ? 0 : (int)result[0][0].size()
+            );
 
-        for (size_t i = 0; i < output.size(); ++i) {
-            printf("Slice %zu:\n", i);
-            for (size_t j = 0; j < output[i].size(); ++j) {
-                for (size_t k = 0; k < output[i][j].size(); ++k) {
-                    printf("%8.4f ", output[i][j][k]);
+            // 4) print every element
+            for (size_t d = 0; d < result.size(); ++d) {
+                printf("Slice %zu:\n", d);
+                for (size_t i = 0; i < result[d].size(); ++i) {
+                    for (size_t j = 0; j < result[d][i].size(); ++j) {
+                        printf("%8.4f ", result[d][i][j]);
+                    }
+                    printf("\n");
                 }
                 printf("\n");
             }
-            printf("\n");
+        }
+        catch (const std::exception &e) {
+            printf("C++ exception: %s\n", e.what());
+        }
+        catch (...) {
+            printf("Unknown C++ exception\n");
         }
     }
 }

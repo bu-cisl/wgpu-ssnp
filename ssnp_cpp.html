@@ -1,84 +1,118 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SSNP WebGPU Demo</title>
-  <style>
-    body {
-      margin: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      background-color: #202020;
-      color: #eee;
-      font-family: Arial, sans-serif;
-    }
-    canvas {
-      border: 1px solid #555;
-      width: 640px;
-      height: 480px;
-      margin-top: 16px;
-    }
-    #output {
-      width: 640px;
-      height: 150px;
-      margin-top: 12px;
-      background-color: #000;
-      color: #0f0;
-      font-family: 'Courier New', monospace;
-      padding: 8px;
-      overflow-y: auto;
-    }
-    #runBtn {
-      margin-top: 12px;
-      padding: 8px 16px;
-      font-size: 1rem;
-      cursor: pointer;
-    }
-  </style>
-  <script>
-    // Prevent main() auto-run
-    var Module = {
-      noInitialRun: true,
-      canvas: document.getElementById('canvas'),
-      print: function(text) {
-        console.log(text);
-        var out = document.getElementById('output');
-        if (out) {
-          out.textContent += text + '\n';
-          out.scrollTop = out.scrollHeight;
-        }
-      }
-    };
-  </script>
-</head>
-<body>
-  <h1>SSNP Forward WebGPU Demo</h1>
-  <canvas id="canvas"></canvas>
-  <button id="runBtn" disabled>Run forward()</button>
-  <pre id="output"></pre>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>SSNP WebGPU Demo</title>
+        <style>
+            body {
+                margin: 0;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                background-color: #202020;
+                color: #eee;
+                font-family: Arial, sans-serif;
+            }
+            canvas {
+                border: 1px solid #555;
+                width: 640px;
+                height: 480px;
+                margin-top: 16px;
+            }
+            #output {
+                width: 640px;
+                height: 150px;
+                margin-top: 12px;
+                background-color: #000;
+                color: #0f0;
+                font-family: "Courier New", monospace;
+                padding: 8px;
+                overflow-y: auto;
+            }
+            #runBtn {
+                margin-top: 12px;
+                padding: 8px 16px;
+                font-size: 1rem;
+                cursor: pointer;
+            }
+        </style>
+        <script>
+            // Prevent main() auto-run
+            var Module = {
+                noInitialRun: true,
+                canvas: document.getElementById("canvas"),
+                print: function (text) {
+                    console.log(text);
+                    var out = document.getElementById("output");
+                    if (out) {
+                        out.textContent += text + "\n";
+                        out.scrollTop = out.scrollHeight;
+                    }
+                },
+            };
+        </script>
+    </head>
+    <body>
+        <h1>SSNP Forward WebGPU Demo</h1>
+        <canvas id="canvas"></canvas>
+        <div id="controls">
+            <input type="file" id="fileInput" accept=".bin" />
+            <button id="runBtn" disabled>Run forward on input.bin</button>
+        </div>
+        <pre id="output"></pre>
 
-  <script>
-    Module.onRuntimeInitialized = function() {
-      const btn = document.getElementById('runBtn');
-      btn.disabled = false;
-      btn.addEventListener('click', () => {
-        Module.ccall(
-          'runForwardOnce',
-          null,
-          [],
-          [],
-          { async: true }
-        ).then(() => {
-          document.getElementById('output').textContent += "forward() completed\n";
-        }).catch(err => {
-          console.error("Error running forward:", err);
-        });
-      });
-    };
-  </script>
+        <script>
+            Module.onRuntimeInitialized = () => {
+                const fileInput = document.getElementById("fileInput");
+                const runBtn = document.getElementById("runBtn");
+                const output = document.getElementById("output");
 
-  <script async src="ssnp_cpp.js"></script>
-</body>
+                // when user picks a file, load it into the virtual FS
+                fileInput.addEventListener("change", (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    const r = new FileReader();
+                    r.onload = () => {
+                        const data = new Uint8Array(r.result);
+                        FS.writeFile("input.bin", data);
+                        output.textContent = `Loaded ${file.name} (${data.length} bytes)\n`;
+
+                        // --- DEBUG: print the three int32s from the start of the file
+                        if (data.length >= 12) {
+                            const dv = new DataView(r.result);
+                            const D = dv.getInt32(0, true);
+                            const H = dv.getInt32(4, true);
+                            const W = dv.getInt32(8, true);
+                            output.textContent += `HEADER → D=${D}, H=${H}, W=${W}\n`;
+                        } else {
+                            output.textContent += "️File too short to contain a valid header\n";
+                        }
+                        // -------------------------------------------------------------
+
+                        runBtn.disabled = false;
+                    };
+                    r.readAsArrayBuffer(file);
+                });
+
+                runBtn.addEventListener("click", () => {
+                    output.textContent += "️Running forward on input.bin ...\n";
+                    Module.ccall(
+                        "runForwardFromFile", // C function
+                        null, // return type
+                        [], // arg types
+                        [], // args
+                        { async: true }
+                    )
+                        .then(() => {
+                            output.textContent += "Done!\n";
+                        })
+                        .catch((err) => {
+                            output.textContent += "Error: " + err + "\n";
+                        });
+                });
+            };
+        </script>
+        <script async src="ssnp_cpp.js"></script>
+    </body>
 </html>

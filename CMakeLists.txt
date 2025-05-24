@@ -52,7 +52,8 @@ if (EMSCRIPTEN)
         "-sASYNCIFY"     # allow sync requestAdapter/Device
         "--preload-file=${CMAKE_CURRENT_SOURCE_DIR}/src@/src"  
         "-sALLOW_MEMORY_GROWTH"  # let the browser grow the Wasm heap
-        "-sEXPORTED_FUNCTIONS=['_runForwardOnce', '_main']"
-        "-sEXPORTED_RUNTIME_METHODS=['ccall','cwrap']"
+        "-sEXPORTED_FUNCTIONS=['_runForwardFromFile', '_main']"
+        "-sEXPORTED_RUNTIME_METHODS=['ccall']"
+        "-sNO_DISABLE_EXCEPTION_CATCHING"  
     )
 endif()
