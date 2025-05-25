@@ -1,16 +1,15 @@
-# NOTE: MAKE SURE THAT src/test-main.cpp IS src/main.cpp INSTEAD BEFORE RUNNING THIS
-
 import os
 import numpy as np
 import subprocess
 import struct
 import torch
 import matplotlib.pyplot as plt
+import pyvista as pv
 from py.ssnp_model import SSNPBeam
 
-SLICES = 200
-ROWS = 1024
-COLS = 1024
+SLICES = 100
+ROWS = 512
+COLS = 512
 TOL = 1e-4 # rtol
 IMAGE_NAME = None # None if no save
 
@@ -70,6 +69,21 @@ def save_output_as_png(output, filename):
     plt.savefig(filename)
     plt.close()
 
+def save_input_as_png(input, filename):
+    image = input.transpose(1, 2, 0)
+
+    # Generate grid
+    grid = pv.ImageData()
+    grid.dimensions = np.array(image.shape) + 1
+    grid.spacing = (1, 1, 1)
+    grid.origin = (0, 0, 0)  
+    grid.cell_data["values"] = image.flatten(order="F") 
+
+    # Plot the volume
+    plotter = pv.Plotter()
+    plotter.add_volume(grid, scalars="values", cmap="viridis")
+    plotter.show(screenshot=f"{filename}.png")
+
 def compare_outputs(py_output, cpp_output, rtol=TOL, atol=1e-4):
     abs_diff = np.abs(py_output - cpp_output)
     denom = np.maximum(np.abs(py_output), np.abs(cpp_output))
@@ -116,10 +130,11 @@ if __name__ == "__main__":
     if IMAGE_NAME is not None:
         image_folder = f"{ROWS}x{COLS}x{SLICES}"
         output_dir = f"images/{image_folder}/"
+        print(f"Saving images to {output_dir}...")
         os.makedirs(output_dir, exist_ok=True)
+        save_input_as_png(input_tensor, f"{output_dir}/input")
         save_output_as_png(cpp_output, f"{output_dir}/cpp_{IMAGE_NAME}.png")
         save_output_as_png(py_output, f"{output_dir}/py_{IMAGE_NAME}.png")
-        print(f"Saved images to {output_dir}")
 
     print("Comparing outputs...")
     compare_outputs(py_output, cpp_output)

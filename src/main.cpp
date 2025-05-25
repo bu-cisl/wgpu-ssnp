@@ -58,6 +58,36 @@ bool write_output_tensor(const string& filename, const vector<vector<vector<floa
     return true;
 }
 
+// Main for testing script
+int main(int argc, char* argv[]) {
+    if (argc < 3) {
+        cerr << "Usage: " << argv[0] << " <input.bin> <output.bin>" << endl;
+        return 1;
+    }
+
+    string input_filename = argv[1];
+    string output_filename = argv[2];
+
+    vector<vector<vector<float>>> input_tensor;
+    int D, H, W;
+
+    if (!read_input_tensor(input_filename, input_tensor, D, H, W)) return 1;
+
+    WebGPUContext context;
+    initWebGPU(context);
+
+    vector<float> res = {0.1f, 0.1f, 0.1f};
+    float na = 0.65f;
+    bool intensity = true;
+    vector<vector<float>> angles(1, vector<float>(2, 0.0f)); // default [0, 0]
+
+    auto result = forward(context, input_tensor, res, na, angles, intensity);
+
+    if (!write_output_tensor(output_filename, result)) return 1;
+
+    return 0;
+}
+
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #include <sstream>
