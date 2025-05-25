@@ -79,48 +79,47 @@ extern "C" {
 
             WebGPUContext context;
             initWebGPU(context);
-            auto result = forward(
-                context,
-                tensor,
-                {0.1f, 0.1f, 0.1f}, // default res
-                0.65f, // default na
-                {
-                    {0.0f, 0.0f}, 
-                    {0.0f, 0.0f}
-                }, // default angle twice
-                true // default intensity
-            );
 
-            // Flatten the tensor into a string for JS
-            std::ostringstream oss;
-            oss << "[";
-            for (size_t d = 0; d < result.size(); ++d)
-                for (size_t i = 0; i < result[d].size(); ++i)
-                    for (size_t j = 0; j < result[d][i].size(); ++j)
-                        oss << result[d][i][j] << (d == result.size()-1 && i == result[d].size()-1 && j == result[d][i].size()-1 ? "" : ",");
-
-            oss << "]";
-
-            int outD = result.size();
-            int outH = result[0].size();
-            int outW = result[0][0].size();
-
-            float globalMin = result[0][0][0];
-            float globalMax = result[0][0][0];
-
-            for (const auto& slice : result) {
-                for (const auto& row : slice) {
-                    for (float val : row) {
-                        if (val < globalMin) globalMin = val;
-                        if (val > globalMax) globalMax = val;
+            // Default values
+            std::vector<float> res = {0.1f, 0.1f, 0.1f};
+            float na = 0.65f;
+            std::vector<std::vector<float>> angles = {
+                {0.0f, 0.0f},
+                {0.25f, 0.25f},
+                {0.5f, 0.5f}
+            };
+            bool intensity = true;
+            
+            auto result = forward(context, tensor, res, na, angles, intensity);
+            
+            // Flatten tensor + compute min/max for each output image for colorbar
+            std::ostringstream dataStream, minStream, maxStream;
+            dataStream << "[";
+            minStream << "[";
+            maxStream << "[";
+            for (size_t d = 0; d < result.size(); ++d) {
+                float localMin = result[d][0][0];
+                float localMax = result[d][0][0];
+                for (size_t i = 0; i < result[d].size(); ++i) {
+                    for (size_t j = 0; j < result[d][i].size(); ++j) {
+                        float val = result[d][i][j];
+                        dataStream << val << ",";
+                        if (val < localMin) localMin = val;
+                        if (val > localMax) localMax = val;
                     }
                 }
+                minStream << localMin << (d < result.size()-1 ? "," : "");
+                maxStream << localMax << (d < result.size()-1 ? "," : "");
             }
+            dataStream.seekp(-1, dataStream.cur); dataStream << "]";
+            minStream << "]";
+            maxStream << "]";
 
-            // Flatten and send to JS as before...
+            // Plot via JS
             std::ostringstream jsCall;
-            jsCall << "plotSlices(" << oss.str() << "," << outD << "," << outH << "," << outW
-                << "," << globalMin << "," << globalMax << ");";
+            jsCall << "plotSlices(" << dataStream.str() << "," << D << "," << H << "," << W
+                   << "," << minStream.str() << "," << maxStream.str() << ");";
+
             emscripten_run_script(jsCall.str().c_str());
 
         } catch (const std::exception &e) {
