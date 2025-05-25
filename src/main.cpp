@@ -58,17 +58,13 @@ bool write_output_tensor(const string& filename, const vector<vector<vector<floa
     return true;
 }
 
-int main() {
-    return 0;
-}
-
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #include <sstream>
 
 extern "C" {
     EMSCRIPTEN_KEEPALIVE
-    void runForwardFromFile() {
+    void callSSNP(const char* angleStr) {
         try {
             std::vector<std::vector<std::vector<float>>> tensor;
             int D, H, W;
@@ -83,12 +79,19 @@ extern "C" {
             // Default values
             std::vector<float> res = {0.1f, 0.1f, 0.1f};
             float na = 0.65f;
-            std::vector<std::vector<float>> angles = {
-                {0.0f, 0.0f},
-                {0.25f, 0.25f},
-                {0.5f, 0.5f}
-            };
             bool intensity = true;
+
+            // Read in angles
+            std::vector<std::vector<float>> angles;
+            std::istringstream ss(angleStr);
+            std::string token;
+            while (std::getline(ss, token, ';')) {
+                std::istringstream pairStream(token);
+                std::string xStr, yStr;
+                std::getline(pairStream, xStr, ',');
+                std::getline(pairStream, yStr, ',');
+                angles.push_back({std::stof(xStr), std::stof(yStr)});
+            }
             
             auto result = forward(context, tensor, res, na, angles, intensity);
             
