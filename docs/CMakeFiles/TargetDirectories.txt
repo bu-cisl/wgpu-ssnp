@@ -1,0 +1,5 @@
+/projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs/CMakeFiles/ssnp_cpp.dir
+/projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs/CMakeFiles/edit_cache.dir
+/projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs/CMakeFiles/rebuild_cache.dir
+/projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs/webgpu/CMakeFiles/edit_cache.dir
+/projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs/webgpu/CMakeFiles/rebuild_cache.dir

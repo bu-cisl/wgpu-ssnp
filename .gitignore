@@ -1,6 +1,5 @@
 # Ignore build artifacts
 /build/
-/build-web/
 *.o
 *.out
 *.exe
