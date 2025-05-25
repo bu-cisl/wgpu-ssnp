@@ -58,37 +58,38 @@ bool write_output_tensor(const string& filename, const vector<vector<vector<floa
     return true;
 }
 
-/*
-int main(int argc, char* argv[]) {
-    if (argc < 3) {
-        cerr << "Usage: " << argv[0] << " <input.bin> <output.bin>" << endl;
-        return 1;
-    }
+// rayan test script main
+// int main(int argc, char* argv[]) {
+//     if (argc < 3) {
+//         cerr << "Usage: " << argv[0] << " <input.bin> <output.bin>" << endl;
+//         return 1;
+//     }
 
-    string input_filename = argv[1];
-    string output_filename = argv[2];
+//     string input_filename = argv[1];
+//     string output_filename = argv[2];
 
-    vector<vector<vector<float>>> input_tensor;
-    int D, H, W;
+//     vector<vector<vector<float>>> input_tensor;
+//     int D, H, W;
 
-    if (!read_input_tensor(input_filename, input_tensor, D, H, W)) return 1;
+//     if (!read_input_tensor(input_filename, input_tensor, D, H, W)) return 1;
 
-    WebGPUContext context;
-    initWebGPU(context);
+//     WebGPUContext context;
+//     initWebGPU(context);
 
-    vector<float> res = {0.1f, 0.1f, 0.1f};
-    float na = 0.65f;
-    bool intensity = true;
-    vector<vector<float>> angles(1, vector<float>(2, 0.0f)); // default [0, 0]
+//     vector<float> res = {0.1f, 0.1f, 0.1f};
+//     float na = 0.65f;
+//     bool intensity = true;
+//     vector<vector<float>> angles(1, vector<float>(2, 0.0f)); // default [0, 0]
 
-    auto result = forward(context, input_tensor, res, na, angles, intensity);
+//     auto result = forward(context, input_tensor, res, na, angles, intensity);
 
-    if (!write_output_tensor(output_filename, result)) return 1;
+//     if (!write_output_tensor(output_filename, result)) return 1;
 
-    return 0;
-}
-*/
+//     return 0;
+// }
 
+
+// andrew testing main
 int main() {
     vector<vector<vector<float>>> test_input = {
         {
@@ -144,12 +145,12 @@ int main() {
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
+#include <sstream>
+
 extern "C" {
-    // Reads `input.bin`, runs forward(), prints every element:
     EMSCRIPTEN_KEEPALIVE
     void runForwardFromFile() {
         try {
-            // load the bin file into a tensor
             std::vector<std::vector<std::vector<float>>> tensor;
             int D, H, W;
             if (!read_input_tensor("input.bin", tensor, D, H, W)) {
@@ -162,34 +163,53 @@ extern "C" {
             auto result = forward(
                 context,
                 tensor,
-                /*res*/ {0.1f,0.2f,0.1f},
-                /*na*/ 0.69f,
-                /*angles*/ {{2.0f, 8.2f}, {1.2f, 5.0f}},
-                /*intensity*/ true
+                {0.1f, 0.1f, 0.1f}, // default res
+                0.65f, // default na
+                {
+                    {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},
+                    {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},
+                    {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}
+                }, // deafult angle (9 times just cuz)
+                true // default intensity
             );
 
-            printf("Output dims: %d×%d×%d\n", 
-                (int)result.size(),
-                result.empty() ? 0 : (int)result[0].size(),
-                (result.empty() || result[0].empty()) ? 0 : (int)result[0][0].size()
-            );
+            // Flatten the tensor into a string for JS
+            std::ostringstream oss;
+            oss << "[";
+            for (size_t d = 0; d < result.size(); ++d)
+                for (size_t i = 0; i < result[d].size(); ++i)
+                    for (size_t j = 0; j < result[d][i].size(); ++j)
+                        oss << result[d][i][j] << (d == result.size()-1 && i == result[d].size()-1 && j == result[d][i].size()-1 ? "" : ",");
 
-            // 4) print every element
-            for (size_t d = 0; d < result.size(); ++d) {
-                printf("Slice %zu:\n", d);
-                for (size_t i = 0; i < result[d].size(); ++i) {
-                    for (size_t j = 0; j < result[d][i].size(); ++j) {
-                        printf("%8.4f ", result[d][i][j]);
+            oss << "]";
+
+            int outD = result.size();
+            int outH = result[0].size();
+            int outW = result[0][0].size();
+
+            float globalMin = result[0][0][0];
+            float globalMax = result[0][0][0];
+
+            for (const auto& slice : result) {
+                for (const auto& row : slice) {
+                    for (float val : row) {
+                        if (val < globalMin) globalMin = val;
+                        if (val > globalMax) globalMax = val;
                     }
-                    printf("\n");
                 }
-                printf("\n");
             }
-        }
-        catch (const std::exception &e) {
+
+            std::cout << globalMin << " " << globalMax << endl;
+
+            // Flatten and send to JS as before...
+            std::ostringstream jsCall;
+            jsCall << "plotSlices(" << oss.str() << "," << outD << "," << outH << "," << outW
+                << "," << globalMin << "," << globalMax << ");";
+            emscripten_run_script(jsCall.str().c_str());
+
+        } catch (const std::exception &e) {
             printf("C++ exception: %s\n", e.what());
-        }
-        catch (...) {
+        } catch (...) {
             printf("Unknown C++ exception\n");
         }
     }
