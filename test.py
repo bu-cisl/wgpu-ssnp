@@ -1,3 +1,6 @@
+# NOTE: MAKE SURE THAT src/test-main.cpp IS src/main.cpp INSTEAD BEFORE RUNNING THIS
+
+import os
 import numpy as np
 import subprocess
 import struct
@@ -46,8 +49,7 @@ def create_sphere(shape, radius_fraction=0.25, value_inside=0.01, value_outside=
 def generate_input(shape=(3, 128, 128)) -> np.ndarray:
     return create_sphere(shape)
 
-def run_cpp_model(input_tensor, input_path="input.bin", output_path="output.bin"):
-    save_tensor_bin(input_path, input_tensor)
+def run_cpp_model(input_path="input.bin", output_path="output.bin"):
     result = subprocess.run(["./build/ssnp_cpp", input_path, output_path], capture_output=True, text=True)
     if result.returncode != 0:
         print("C++ Error:", result.stderr, result.stdout)
@@ -97,10 +99,16 @@ def compare_outputs(py_output, cpp_output, rtol=TOL, atol=1e-4):
         print("✅ All outputs match within specified tolerances.")
 
 if __name__ == "__main__":
-    input_tensor = generate_input((SLICES, ROWS, COLS)) 
+    print("Building C++ model...")
+    subprocess.run(["cmake", "-B", "build", "-S", "."])
+    subprocess.run(["cmake", "--build", "build"])
+
+    print("Generating input...")
+    input_tensor = generate_input((SLICES, ROWS, COLS))
+    save_tensor_bin("input.bin", input_tensor)
 
     print("Running C++ model...")
-    cpp_output = run_cpp_model(input_tensor)
+    cpp_output = run_cpp_model()
 
     print("Running Python model...")
     py_output = run_python_model(input_tensor)
@@ -108,6 +116,7 @@ if __name__ == "__main__":
     if IMAGE_NAME is not None:
         image_folder = f"{ROWS}x{COLS}x{SLICES}"
         output_dir = f"images/{image_folder}/"
+        os.makedirs(output_dir, exist_ok=True)
         save_output_as_png(cpp_output, f"{output_dir}/cpp_{IMAGE_NAME}.png")
         save_output_as_png(py_output, f"{output_dir}/py_{IMAGE_NAME}.png")
         print(f"Saved images to {output_dir}")

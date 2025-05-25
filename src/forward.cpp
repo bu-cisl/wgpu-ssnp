@@ -14,7 +14,13 @@ vector<vector<vector<float>>> forward(
     // initialize the final result output
     vector<vector<vector<float>>> result; // angle_size x shape[0] x shape[1]
     
+    int count = 1;
+
     for(vector<float> c_ba : angles) {
+        // Console updates
+        cout << "Starting compute for angle " << count << " ..." << endl;
+        count++;
+
         // CONFIGURING INPUT FIELD
 
         // Generate Forward/Backward

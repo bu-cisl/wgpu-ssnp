@@ -58,88 +58,7 @@ bool write_output_tensor(const string& filename, const vector<vector<vector<floa
     return true;
 }
 
-// rayan test script main
-// int main(int argc, char* argv[]) {
-//     if (argc < 3) {
-//         cerr << "Usage: " << argv[0] << " <input.bin> <output.bin>" << endl;
-//         return 1;
-//     }
-
-//     string input_filename = argv[1];
-//     string output_filename = argv[2];
-
-//     vector<vector<vector<float>>> input_tensor;
-//     int D, H, W;
-
-//     if (!read_input_tensor(input_filename, input_tensor, D, H, W)) return 1;
-
-//     WebGPUContext context;
-//     initWebGPU(context);
-
-//     vector<float> res = {0.1f, 0.1f, 0.1f};
-//     float na = 0.65f;
-//     bool intensity = true;
-//     vector<vector<float>> angles(1, vector<float>(2, 0.0f)); // default [0, 0]
-
-//     auto result = forward(context, input_tensor, res, na, angles, intensity);
-
-//     if (!write_output_tensor(output_filename, result)) return 1;
-
-//     return 0;
-// }
-
-
-// andrew testing main
 int main() {
-    vector<vector<vector<float>>> test_input = {
-        {
-            {1.23f, 4.56f, 7.89f},
-            {2.34f, 5.67f, 8.90f},
-            {3.45f, 6.78f, 9.01f}
-        },
-        {
-            {0.12f, 3.45f, 6.78f},
-            {9.87f, 6.54f, 3.21f},
-            {1.11f, 2.22f, 3.33f}
-        },
-        {
-            {7.77f, 8.88f, 9.99f},
-            {4.44f, 5.55f, 6.66f},
-            {0.01f, 1.02f, 2.03f}
-        }
-    };
-
-    cout << "Input tensor:" << endl;
-    for (auto& slice : test_input) {
-        for (auto& row : slice) {
-            for (auto val : row) {
-                cout << val << " ";
-            }
-            cout << endl;
-        }
-    }
-
-    WebGPUContext context;
-    initWebGPU(context);
-
-    // Parameters
-    vector<float> res = {0.1f, 0.2f, 0.1f};
-    float na = 0.69f;
-    bool intensity = true;
-    vector<vector<float>> angles = {{2.0f, 8.2f}, {1.2f, 5.0f}};
-    
-    auto result = forward(context, test_input, res, na, angles, intensity);
-    
-    cout << "Result tensor:" << endl;
-    for (auto& slice : result) {
-        for (auto& row : slice) {
-            for (auto val : row) {
-                cout << val << " ";
-            }
-            cout << endl;
-        }
-    }
-    
     return 0;
 }
 
@@ -166,10 +85,9 @@ extern "C" {
                 {0.1f, 0.1f, 0.1f}, // default res
                 0.65f, // default na
                 {
-                    {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},
-                    {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},
-                    {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}
-                }, // deafult angle (9 times just cuz)
+                    {0.0f, 0.0f}, 
+                    {0.0f, 0.0f}
+                }, // default angle twice
                 true // default intensity
             );
 
@@ -198,8 +116,6 @@ extern "C" {
                     }
                 }
             }
-
-            std::cout << globalMin << " " << globalMax << endl;
 
             // Flatten and send to JS as before...
             std::ostringstream jsCall;

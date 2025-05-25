@@ -22,18 +22,17 @@ void initWebGPU(WebGPUContext& context) {
     }
 
 #ifdef __EMSCRIPTEN__
-    // On web: just do the default device request, no requiredLimits
+    // On web: default device request
     wgpu::DeviceDescriptor devDesc = {};
     context.device = context.adapter.requestDevice(devDesc);
 #else
-    // Native: you can mirror adapter limits if you really need to tweak them
+    // Native: mirror adapter limits 
     WGPUSupportedLimits supportedLimits = {};
     wgpuAdapterGetLimits(context.adapter, &supportedLimits);
 
     WGPURequiredLimits requiredLimits = {};
     requiredLimits.limits = supportedLimits.limits;
-    // tweak one limit if you need
-    requiredLimits.limits.maxBufferSize -= 1;
+    requiredLimits.limits.maxBufferSize -= 1; // default bugged
 
     wgpu::DeviceDescriptor devDesc = {};
     devDesc.label = "Default Device";
@@ -203,7 +202,6 @@ std::vector<float> readBack(wgpu::Device& device, wgpu::Queue& queue, size_t buf
     bool mappingComplete = false;
     auto handle = readbackBuffer.mapAsync(wgpu::MapMode::Read, 0, buffer_len * sizeof(float), [&](wgpu::BufferMapAsyncStatus status) {
         if (status == wgpu::BufferMapAsyncStatus::Success) {
-            // void* mappedData = readbackBuffer.getMappedRange(0, buffer_len * sizeof(float));
             const void* mappedData = readbackBuffer.getConstMappedRange(0, buffer_len * sizeof(float));
             if (mappedData) {
                 memcpy(output.data(), mappedData, buffer_len * sizeof(float));
@@ -252,7 +250,6 @@ std::vector<uint32_t> readBackInt(wgpu::Device& device, wgpu::Queue& queue, size
     bool mappingComplete = false;
     auto handle = readbackBuffer.mapAsync(wgpu::MapMode::Read, 0, buffer_len * sizeof(uint32_t), [&](wgpu::BufferMapAsyncStatus status) {
         if (status == wgpu::BufferMapAsyncStatus::Success) {
-            // void* mappedData = readbackBuffer.getMappedRange(0, buffer_len * sizeof(uint32_t));
             const void* mappedData = readbackBuffer.getConstMappedRange(0, buffer_len * sizeof(uint32_t));
             if (mappedData) {
                 memcpy(output.data(), mappedData, buffer_len * sizeof(uint32_t));
