@@ -1,10 +1,9 @@
 #!/bin/bash
 
 # Create docs/ dir for build
-if [ ! -d "docs" ]; then
-    source ./emsdk/emsdk_env.sh
-    emcmake cmake -B docs
-fi
+module load python3
+source ./emsdk/emsdk_env.sh
+emcmake cmake -B docs
 
 # Build + save html as index for git
 cmake --build docs
