@@ -54,10 +54,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /projectnb/cislbu/rsyed/wgpu_ssnp-idt
+CMAKE_SOURCE_DIR = /projectnb/cislbu/andrewx/ssnp_cpp
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs
+CMAKE_BINARY_DIR = /projectnb/cislbu/andrewx/ssnp_cpp/docs
 
 #=============================================================================
 # Directory level rules for the build root directory
@@ -98,14 +98,14 @@ webgpu/clean:
 CMakeFiles/ssnp_cpp.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ssnp_cpp.dir/build.make CMakeFiles/ssnp_cpp.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ssnp_cpp.dir/build.make CMakeFiles/ssnp_cpp.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs/CMakeFiles --progress-num=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 "Built target ssnp_cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/projectnb/cislbu/andrewx/ssnp_cpp/docs/CMakeFiles --progress-num=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 "Built target ssnp_cpp"
 .PHONY : CMakeFiles/ssnp_cpp.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/ssnp_cpp.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs/CMakeFiles 15
+	$(CMAKE_COMMAND) -E cmake_progress_start /projectnb/cislbu/andrewx/ssnp_cpp/docs/CMakeFiles 15
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/ssnp_cpp.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /projectnb/cislbu/andrewx/ssnp_cpp/docs/CMakeFiles 0
 .PHONY : CMakeFiles/ssnp_cpp.dir/rule
 
 # Convenience name for target.

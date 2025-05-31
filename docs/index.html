@@ -81,6 +81,13 @@
             <button id="clearAnglesBtn">Clear Angles</button> 
         </div>
         <div id="anglesList"></div>
+        <div>
+            <input type="text" id="resInput" placeholder="Resolution (e.g. 0.1,0.2,0.1)" />
+            <input type="text" id="naInput" placeholder="NA (e.g. 0.65)" />
+            <label>
+                <input type="checkbox" id="intensityInput" checked /> Intensity
+            </label>
+        </div>
         <button id="runBtn" disabled>Run</button>
     </div>
     <div id="viewer"></div>
@@ -225,13 +232,22 @@
 
             runBtn.addEventListener("click", () => {
                 const angleString = angles.length ? angles.join(";") : "0.0,0.0";
+                const resVal = document.getElementById("resInput").value.trim() || "0.1,0.1,0.1";
+                const naVal = document.getElementById("naInput").value.trim() || "0.65";
+                const intensityVal = document.getElementById("intensityInput").checked ? "1" : "0";
+
+                const combinedParams = `${angleString}|${resVal}|${naVal}|${intensityVal}`;
+
                 const viewer = document.getElementById('viewer');
                 viewer.innerHTML = '';
+
+                console.log("Sending to C++:", combinedParams);
+
                 Module.ccall(
                     "callSSNP",
                     null,
                     ["string"],
-                    [angleString],
+                    [combinedParams],
                     { async: true }
                 ).catch(err => console.error("Error:", err));
             });

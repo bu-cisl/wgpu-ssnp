@@ -31,7 +31,7 @@ if (ENVIRONMENT_IS_NODE) {
 
 // --pre-jses are emitted after the Module integration code, so that they can
 // refer to Module (if they choose; they can also define Module)
-// include: /scratch/tmp8j17cpzu.js
+// include: /tmp/tmpg7_ye130.js
 
   Module['expectedDataFileDownloads'] ??= 0;
   Module['expectedDataFileDownloads']++;
@@ -219,25 +219,25 @@ Module['FS_createPath']("/src", "tilt", true, true);
     }
 
     }
-    loadPackage({"files": [{"filename": "/src/binary_pupil/binary_pupil.cpp", "start": 0, "end": 4062}, {"filename": "/src/binary_pupil/binary_pupil.h", "start": 4062, "end": 4502}, {"filename": "/src/binary_pupil/binary_pupil.wgsl", "start": 4502, "end": 4989}, {"filename": "/src/c_gamma/c_gamma.cpp", "start": 4989, "end": 9176}, {"filename": "/src/c_gamma/c_gamma.h", "start": 9176, "end": 9488}, {"filename": "/src/c_gamma/c_gamma.wgsl", "start": 9488, "end": 10701}, {"filename": "/src/dft/dft.cpp", "start": 10701, "end": 16757}, {"filename": "/src/dft/dft.h", "start": 16757, "end": 17123}, {"filename": "/src/dft/dft_col.wgsl", "start": 17123, "end": 18502}, {"filename": "/src/dft/dft_row.wgsl", "start": 18502, "end": 19874}, {"filename": "/src/diffract/diffract.cpp", "start": 19874, "end": 26180}, {"filename": "/src/diffract/diffract.h", "start": 26180, "end": 26779}, {"filename": "/src/diffract/diffract.wgsl", "start": 26779, "end": 28459}, {"filename": "/src/forward.cpp", "start": 28459, "end": 35579}, {"filename": "/src/forward.h", "start": 35579, "end": 36261}, {"filename": "/src/intensity/intensity.cpp", "start": 36261, "end": 40153}, {"filename": "/src/intensity/intensity.h", "start": 40153, "end": 40485}, {"filename": "/src/intensity/intensity.wgsl", "start": 40485, "end": 40972}, {"filename": "/src/main.cpp", "start": 40972, "end": 46373}, {"filename": "/src/merge_prop/merge_prop.cpp", "start": 46373, "end": 52141}, {"filename": "/src/merge_prop/merge_prop.h", "start": 52141, "end": 52706}, {"filename": "/src/merge_prop/merge_prop.wgsl", "start": 52706, "end": 53670}, {"filename": "/src/mult/mult.cpp", "start": 53670, "end": 57358}, {"filename": "/src/mult/mult.h", "start": 57358, "end": 57691}, {"filename": "/src/mult/mult.wgsl", "start": 57691, "end": 58217}, {"filename": "/src/scatter_effects/complex_mult.wgsl", "start": 58217, "end": 58768}, {"filename": "/src/scatter_effects/complex_sub.wgsl", "start": 58768, "end": 59173}, {"filename": "/src/scatter_effects/scatter_effects.cpp", "start": 59173, "end": 64294}, {"filename": "/src/scatter_effects/scatter_effects.h", "start": 64294, "end": 64737}, {"filename": "/src/scatter_factor/scatter_factor.cpp", "start": 64737, "end": 68792}, {"filename": "/src/scatter_factor/scatter_factor.h", "start": 68792, "end": 69250}, {"filename": "/src/scatter_factor/scatter_factor.wgsl", "start": 69250, "end": 70005}, {"filename": "/src/split_prop/split_prop.cpp", "start": 70005, "end": 75772}, {"filename": "/src/split_prop/split_prop.h", "start": 75772, "end": 76338}, {"filename": "/src/split_prop/split_prop.wgsl", "start": 76338, "end": 77266}, {"filename": "/src/test_main.cpp", "start": 77266, "end": 79828}, {"filename": "/src/tilt/tilt.cpp", "start": 79828, "end": 85641}, {"filename": "/src/tilt/tilt.h", "start": 85641, "end": 86094}, {"filename": "/src/tilt/tilt.wgsl", "start": 86094, "end": 88607}, {"filename": "/src/webgpu_utils.cpp", "start": 88607, "end": 98927}, {"filename": "/src/webgpu_utils.h", "start": 98927, "end": 100706}], "remote_package_size": 100706});
+    loadPackage({"files": [{"filename": "/src/binary_pupil/binary_pupil.cpp", "start": 0, "end": 4062}, {"filename": "/src/binary_pupil/binary_pupil.h", "start": 4062, "end": 4502}, {"filename": "/src/binary_pupil/binary_pupil.wgsl", "start": 4502, "end": 4989}, {"filename": "/src/c_gamma/c_gamma.cpp", "start": 4989, "end": 9176}, {"filename": "/src/c_gamma/c_gamma.h", "start": 9176, "end": 9488}, {"filename": "/src/c_gamma/c_gamma.wgsl", "start": 9488, "end": 10701}, {"filename": "/src/dft/dft.cpp", "start": 10701, "end": 16757}, {"filename": "/src/dft/dft.h", "start": 16757, "end": 17123}, {"filename": "/src/dft/dft_col.wgsl", "start": 17123, "end": 18502}, {"filename": "/src/dft/dft_row.wgsl", "start": 18502, "end": 19874}, {"filename": "/src/diffract/diffract.cpp", "start": 19874, "end": 26180}, {"filename": "/src/diffract/diffract.h", "start": 26180, "end": 26779}, {"filename": "/src/diffract/diffract.wgsl", "start": 26779, "end": 28459}, {"filename": "/src/forward.cpp", "start": 28459, "end": 35579}, {"filename": "/src/forward.h", "start": 35579, "end": 36261}, {"filename": "/src/intensity/intensity.cpp", "start": 36261, "end": 40153}, {"filename": "/src/intensity/intensity.h", "start": 40153, "end": 40485}, {"filename": "/src/intensity/intensity.wgsl", "start": 40485, "end": 40972}, {"filename": "/src/main.cpp", "start": 40972, "end": 47105}, {"filename": "/src/merge_prop/merge_prop.cpp", "start": 47105, "end": 52873}, {"filename": "/src/merge_prop/merge_prop.h", "start": 52873, "end": 53438}, {"filename": "/src/merge_prop/merge_prop.wgsl", "start": 53438, "end": 54402}, {"filename": "/src/mult/mult.cpp", "start": 54402, "end": 58090}, {"filename": "/src/mult/mult.h", "start": 58090, "end": 58423}, {"filename": "/src/mult/mult.wgsl", "start": 58423, "end": 58949}, {"filename": "/src/scatter_effects/complex_mult.wgsl", "start": 58949, "end": 59500}, {"filename": "/src/scatter_effects/complex_sub.wgsl", "start": 59500, "end": 59905}, {"filename": "/src/scatter_effects/scatter_effects.cpp", "start": 59905, "end": 65026}, {"filename": "/src/scatter_effects/scatter_effects.h", "start": 65026, "end": 65469}, {"filename": "/src/scatter_factor/scatter_factor.cpp", "start": 65469, "end": 69524}, {"filename": "/src/scatter_factor/scatter_factor.h", "start": 69524, "end": 69982}, {"filename": "/src/scatter_factor/scatter_factor.wgsl", "start": 69982, "end": 70737}, {"filename": "/src/split_prop/split_prop.cpp", "start": 70737, "end": 76504}, {"filename": "/src/split_prop/split_prop.h", "start": 76504, "end": 77070}, {"filename": "/src/split_prop/split_prop.wgsl", "start": 77070, "end": 77998}, {"filename": "/src/tilt/tilt.cpp", "start": 77998, "end": 83811}, {"filename": "/src/tilt/tilt.h", "start": 83811, "end": 84264}, {"filename": "/src/tilt/tilt.wgsl", "start": 84264, "end": 86777}, {"filename": "/src/webgpu_utils.cpp", "start": 86777, "end": 97097}, {"filename": "/src/webgpu_utils.h", "start": 97097, "end": 98876}], "remote_package_size": 98876});
 
   })();
 
-// end include: /scratch/tmp8j17cpzu.js
-// include: /scratch/tmpluw8ry9e.js
+// end include: /tmp/tmpg7_ye130.js
+// include: /tmp/tmpdipc_mld.js
 
     // All the pre-js content up to here must remain later on, we need to run
     // it.
     if ((typeof ENVIRONMENT_IS_WASM_WORKER != 'undefined' && ENVIRONMENT_IS_WASM_WORKER) || (typeof ENVIRONMENT_IS_PTHREAD != 'undefined' && ENVIRONMENT_IS_PTHREAD) || (typeof ENVIRONMENT_IS_AUDIO_WORKLET != 'undefined' && ENVIRONMENT_IS_AUDIO_WORKLET)) Module['preRun'] = [];
     var necessaryPreJSTasks = Module['preRun'].slice();
-  // end include: /scratch/tmpluw8ry9e.js
-// include: /scratch/tmp0kewwcxm.js
+  // end include: /tmp/tmpdipc_mld.js
+// include: /tmp/tmpcvebkcxf.js
 
     if (!Module['preRun']) throw 'Module.preRun should exist because file support used it; did a pre-js delete it?';
     necessaryPreJSTasks.forEach((task) => {
       if (Module['preRun'].indexOf(task) < 0) throw 'All preRun tasks that exist before user pre-js code should remain after; did you replace Module or modify Module.preRun?';
     });
-  // end include: /scratch/tmp0kewwcxm.js
+  // end include: /tmp/tmpcvebkcxf.js
 
 
 var arguments_ = [];

@@ -53,10 +53,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /projectnb/cislbu/rsyed/wgpu_ssnp-idt
+CMAKE_SOURCE_DIR = /projectnb/cislbu/andrewx/ssnp_cpp
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs
+CMAKE_BINARY_DIR = /projectnb/cislbu/andrewx/ssnp_cpp/docs
 
 # Include any dependencies generated for this target.
 include CMakeFiles/ssnp_cpp.dir/depend.make
@@ -71,213 +71,213 @@ include CMakeFiles/ssnp_cpp.dir/flags.make
 
 CMakeFiles/ssnp_cpp.dir/src/main.cpp.o: CMakeFiles/ssnp_cpp.dir/flags.make
 CMakeFiles/ssnp_cpp.dir/src/main.cpp.o: CMakeFiles/ssnp_cpp.dir/includes_CXX.rsp
-CMakeFiles/ssnp_cpp.dir/src/main.cpp.o: /projectnb/cislbu/rsyed/wgpu_ssnp-idt/src/main.cpp
+CMakeFiles/ssnp_cpp.dir/src/main.cpp.o: /projectnb/cislbu/andrewx/ssnp_cpp/src/main.cpp
 CMakeFiles/ssnp_cpp.dir/src/main.cpp.o: CMakeFiles/ssnp_cpp.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/ssnp_cpp.dir/src/main.cpp.o"
-	/projectnb/cislbu/rsyed/wgpu_ssnp-idt/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ssnp_cpp.dir/src/main.cpp.o -MF CMakeFiles/ssnp_cpp.dir/src/main.cpp.o.d -o CMakeFiles/ssnp_cpp.dir/src/main.cpp.o -c /projectnb/cislbu/rsyed/wgpu_ssnp-idt/src/main.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/projectnb/cislbu/andrewx/ssnp_cpp/docs/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/ssnp_cpp.dir/src/main.cpp.o"
+	/projectnb/cislbu/andrewx/ssnp_cpp/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ssnp_cpp.dir/src/main.cpp.o -MF CMakeFiles/ssnp_cpp.dir/src/main.cpp.o.d -o CMakeFiles/ssnp_cpp.dir/src/main.cpp.o -c /projectnb/cislbu/andrewx/ssnp_cpp/src/main.cpp
 
 CMakeFiles/ssnp_cpp.dir/src/main.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ssnp_cpp.dir/src/main.cpp.i"
-	/projectnb/cislbu/rsyed/wgpu_ssnp-idt/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /projectnb/cislbu/rsyed/wgpu_ssnp-idt/src/main.cpp > CMakeFiles/ssnp_cpp.dir/src/main.cpp.i
+	/projectnb/cislbu/andrewx/ssnp_cpp/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /projectnb/cislbu/andrewx/ssnp_cpp/src/main.cpp > CMakeFiles/ssnp_cpp.dir/src/main.cpp.i
 
 CMakeFiles/ssnp_cpp.dir/src/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ssnp_cpp.dir/src/main.cpp.s"
-	/projectnb/cislbu/rsyed/wgpu_ssnp-idt/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /projectnb/cislbu/rsyed/wgpu_ssnp-idt/src/main.cpp -o CMakeFiles/ssnp_cpp.dir/src/main.cpp.s
+	/projectnb/cislbu/andrewx/ssnp_cpp/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /projectnb/cislbu/andrewx/ssnp_cpp/src/main.cpp -o CMakeFiles/ssnp_cpp.dir/src/main.cpp.s
 
 CMakeFiles/ssnp_cpp.dir/src/webgpu_utils.cpp.o: CMakeFiles/ssnp_cpp.dir/flags.make
 CMakeFiles/ssnp_cpp.dir/src/webgpu_utils.cpp.o: CMakeFiles/ssnp_cpp.dir/includes_CXX.rsp
-CMakeFiles/ssnp_cpp.dir/src/webgpu_utils.cpp.o: /projectnb/cislbu/rsyed/wgpu_ssnp-idt/src/webgpu_utils.cpp
+CMakeFiles/ssnp_cpp.dir/src/webgpu_utils.cpp.o: /projectnb/cislbu/andrewx/ssnp_cpp/src/webgpu_utils.cpp
 CMakeFiles/ssnp_cpp.dir/src/webgpu_utils.cpp.o: CMakeFiles/ssnp_cpp.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/ssnp_cpp.dir/src/webgpu_utils.cpp.o"
-	/projectnb/cislbu/rsyed/wgpu_ssnp-idt/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ssnp_cpp.dir/src/webgpu_utils.cpp.o -MF CMakeFiles/ssnp_cpp.dir/src/webgpu_utils.cpp.o.d -o CMakeFiles/ssnp_cpp.dir/src/webgpu_utils.cpp.o -c /projectnb/cislbu/rsyed/wgpu_ssnp-idt/src/webgpu_utils.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/projectnb/cislbu/andrewx/ssnp_cpp/docs/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/ssnp_cpp.dir/src/webgpu_utils.cpp.o"
+	/projectnb/cislbu/andrewx/ssnp_cpp/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ssnp_cpp.dir/src/webgpu_utils.cpp.o -MF CMakeFiles/ssnp_cpp.dir/src/webgpu_utils.cpp.o.d -o CMakeFiles/ssnp_cpp.dir/src/webgpu_utils.cpp.o -c /projectnb/cislbu/andrewx/ssnp_cpp/src/webgpu_utils.cpp
 
 CMakeFiles/ssnp_cpp.dir/src/webgpu_utils.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ssnp_cpp.dir/src/webgpu_utils.cpp.i"
-	/projectnb/cislbu/rsyed/wgpu_ssnp-idt/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /projectnb/cislbu/rsyed/wgpu_ssnp-idt/src/webgpu_utils.cpp > CMakeFiles/ssnp_cpp.dir/src/webgpu_utils.cpp.i
+	/projectnb/cislbu/andrewx/ssnp_cpp/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /projectnb/cislbu/andrewx/ssnp_cpp/src/webgpu_utils.cpp > CMakeFiles/ssnp_cpp.dir/src/webgpu_utils.cpp.i
 
 CMakeFiles/ssnp_cpp.dir/src/webgpu_utils.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ssnp_cpp.dir/src/webgpu_utils.cpp.s"
-	/projectnb/cislbu/rsyed/wgpu_ssnp-idt/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /projectnb/cislbu/rsyed/wgpu_ssnp-idt/src/webgpu_utils.cpp -o CMakeFiles/ssnp_cpp.dir/src/webgpu_utils.cpp.s
+	/projectnb/cislbu/andrewx/ssnp_cpp/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /projectnb/cislbu/andrewx/ssnp_cpp/src/webgpu_utils.cpp -o CMakeFiles/ssnp_cpp.dir/src/webgpu_utils.cpp.s
 
 CMakeFiles/ssnp_cpp.dir/src/scatter_factor/scatter_factor.cpp.o: CMakeFiles/ssnp_cpp.dir/flags.make
 CMakeFiles/ssnp_cpp.dir/src/scatter_factor/scatter_factor.cpp.o: CMakeFiles/ssnp_cpp.dir/includes_CXX.rsp
-CMakeFiles/ssnp_cpp.dir/src/scatter_factor/scatter_factor.cpp.o: /projectnb/cislbu/rsyed/wgpu_ssnp-idt/src/scatter_factor/scatter_factor.cpp
+CMakeFiles/ssnp_cpp.dir/src/scatter_factor/scatter_factor.cpp.o: /projectnb/cislbu/andrewx/ssnp_cpp/src/scatter_factor/scatter_factor.cpp
 CMakeFiles/ssnp_cpp.dir/src/scatter_factor/scatter_factor.cpp.o: CMakeFiles/ssnp_cpp.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/ssnp_cpp.dir/src/scatter_factor/scatter_factor.cpp.o"
-	/projectnb/cislbu/rsyed/wgpu_ssnp-idt/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ssnp_cpp.dir/src/scatter_factor/scatter_factor.cpp.o -MF CMakeFiles/ssnp_cpp.dir/src/scatter_factor/scatter_factor.cpp.o.d -o CMakeFiles/ssnp_cpp.dir/src/scatter_factor/scatter_factor.cpp.o -c /projectnb/cislbu/rsyed/wgpu_ssnp-idt/src/scatter_factor/scatter_factor.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/projectnb/cislbu/andrewx/ssnp_cpp/docs/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/ssnp_cpp.dir/src/scatter_factor/scatter_factor.cpp.o"
+	/projectnb/cislbu/andrewx/ssnp_cpp/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ssnp_cpp.dir/src/scatter_factor/scatter_factor.cpp.o -MF CMakeFiles/ssnp_cpp.dir/src/scatter_factor/scatter_factor.cpp.o.d -o CMakeFiles/ssnp_cpp.dir/src/scatter_factor/scatter_factor.cpp.o -c /projectnb/cislbu/andrewx/ssnp_cpp/src/scatter_factor/scatter_factor.cpp
 
 CMakeFiles/ssnp_cpp.dir/src/scatter_factor/scatter_factor.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ssnp_cpp.dir/src/scatter_factor/scatter_factor.cpp.i"
-	/projectnb/cislbu/rsyed/wgpu_ssnp-idt/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /projectnb/cislbu/rsyed/wgpu_ssnp-idt/src/scatter_factor/scatter_factor.cpp > CMakeFiles/ssnp_cpp.dir/src/scatter_factor/scatter_factor.cpp.i
+	/projectnb/cislbu/andrewx/ssnp_cpp/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /projectnb/cislbu/andrewx/ssnp_cpp/src/scatter_factor/scatter_factor.cpp > CMakeFiles/ssnp_cpp.dir/src/scatter_factor/scatter_factor.cpp.i
 
 CMakeFiles/ssnp_cpp.dir/src/scatter_factor/scatter_factor.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ssnp_cpp.dir/src/scatter_factor/scatter_factor.cpp.s"
-	/projectnb/cislbu/rsyed/wgpu_ssnp-idt/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /projectnb/cislbu/rsyed/wgpu_ssnp-idt/src/scatter_factor/scatter_factor.cpp -o CMakeFiles/ssnp_cpp.dir/src/scatter_factor/scatter_factor.cpp.s
+	/projectnb/cislbu/andrewx/ssnp_cpp/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /projectnb/cislbu/andrewx/ssnp_cpp/src/scatter_factor/scatter_factor.cpp -o CMakeFiles/ssnp_cpp.dir/src/scatter_factor/scatter_factor.cpp.s
 
 CMakeFiles/ssnp_cpp.dir/src/c_gamma/c_gamma.cpp.o: CMakeFiles/ssnp_cpp.dir/flags.make
 CMakeFiles/ssnp_cpp.dir/src/c_gamma/c_gamma.cpp.o: CMakeFiles/ssnp_cpp.dir/includes_CXX.rsp
-CMakeFiles/ssnp_cpp.dir/src/c_gamma/c_gamma.cpp.o: /projectnb/cislbu/rsyed/wgpu_ssnp-idt/src/c_gamma/c_gamma.cpp
+CMakeFiles/ssnp_cpp.dir/src/c_gamma/c_gamma.cpp.o: /projectnb/cislbu/andrewx/ssnp_cpp/src/c_gamma/c_gamma.cpp
 CMakeFiles/ssnp_cpp.dir/src/c_gamma/c_gamma.cpp.o: CMakeFiles/ssnp_cpp.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/ssnp_cpp.dir/src/c_gamma/c_gamma.cpp.o"
-	/projectnb/cislbu/rsyed/wgpu_ssnp-idt/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ssnp_cpp.dir/src/c_gamma/c_gamma.cpp.o -MF CMakeFiles/ssnp_cpp.dir/src/c_gamma/c_gamma.cpp.o.d -o CMakeFiles/ssnp_cpp.dir/src/c_gamma/c_gamma.cpp.o -c /projectnb/cislbu/rsyed/wgpu_ssnp-idt/src/c_gamma/c_gamma.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/projectnb/cislbu/andrewx/ssnp_cpp/docs/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/ssnp_cpp.dir/src/c_gamma/c_gamma.cpp.o"
+	/projectnb/cislbu/andrewx/ssnp_cpp/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ssnp_cpp.dir/src/c_gamma/c_gamma.cpp.o -MF CMakeFiles/ssnp_cpp.dir/src/c_gamma/c_gamma.cpp.o.d -o CMakeFiles/ssnp_cpp.dir/src/c_gamma/c_gamma.cpp.o -c /projectnb/cislbu/andrewx/ssnp_cpp/src/c_gamma/c_gamma.cpp
 
 CMakeFiles/ssnp_cpp.dir/src/c_gamma/c_gamma.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ssnp_cpp.dir/src/c_gamma/c_gamma.cpp.i"
-	/projectnb/cislbu/rsyed/wgpu_ssnp-idt/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /projectnb/cislbu/rsyed/wgpu_ssnp-idt/src/c_gamma/c_gamma.cpp > CMakeFiles/ssnp_cpp.dir/src/c_gamma/c_gamma.cpp.i
+	/projectnb/cislbu/andrewx/ssnp_cpp/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /projectnb/cislbu/andrewx/ssnp_cpp/src/c_gamma/c_gamma.cpp > CMakeFiles/ssnp_cpp.dir/src/c_gamma/c_gamma.cpp.i
 
 CMakeFiles/ssnp_cpp.dir/src/c_gamma/c_gamma.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ssnp_cpp.dir/src/c_gamma/c_gamma.cpp.s"
-	/projectnb/cislbu/rsyed/wgpu_ssnp-idt/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /projectnb/cislbu/rsyed/wgpu_ssnp-idt/src/c_gamma/c_gamma.cpp -o CMakeFiles/ssnp_cpp.dir/src/c_gamma/c_gamma.cpp.s
+	/projectnb/cislbu/andrewx/ssnp_cpp/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /projectnb/cislbu/andrewx/ssnp_cpp/src/c_gamma/c_gamma.cpp -o CMakeFiles/ssnp_cpp.dir/src/c_gamma/c_gamma.cpp.s
 
 CMakeFiles/ssnp_cpp.dir/src/diffract/diffract.cpp.o: CMakeFiles/ssnp_cpp.dir/flags.make
 CMakeFiles/ssnp_cpp.dir/src/diffract/diffract.cpp.o: CMakeFiles/ssnp_cpp.dir/includes_CXX.rsp
-CMakeFiles/ssnp_cpp.dir/src/diffract/diffract.cpp.o: /projectnb/cislbu/rsyed/wgpu_ssnp-idt/src/diffract/diffract.cpp
+CMakeFiles/ssnp_cpp.dir/src/diffract/diffract.cpp.o: /projectnb/cislbu/andrewx/ssnp_cpp/src/diffract/diffract.cpp
 CMakeFiles/ssnp_cpp.dir/src/diffract/diffract.cpp.o: CMakeFiles/ssnp_cpp.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/ssnp_cpp.dir/src/diffract/diffract.cpp.o"
-	/projectnb/cislbu/rsyed/wgpu_ssnp-idt/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ssnp_cpp.dir/src/diffract/diffract.cpp.o -MF CMakeFiles/ssnp_cpp.dir/src/diffract/diffract.cpp.o.d -o CMakeFiles/ssnp_cpp.dir/src/diffract/diffract.cpp.o -c /projectnb/cislbu/rsyed/wgpu_ssnp-idt/src/diffract/diffract.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/projectnb/cislbu/andrewx/ssnp_cpp/docs/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/ssnp_cpp.dir/src/diffract/diffract.cpp.o"
+	/projectnb/cislbu/andrewx/ssnp_cpp/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ssnp_cpp.dir/src/diffract/diffract.cpp.o -MF CMakeFiles/ssnp_cpp.dir/src/diffract/diffract.cpp.o.d -o CMakeFiles/ssnp_cpp.dir/src/diffract/diffract.cpp.o -c /projectnb/cislbu/andrewx/ssnp_cpp/src/diffract/diffract.cpp
 
 CMakeFiles/ssnp_cpp.dir/src/diffract/diffract.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ssnp_cpp.dir/src/diffract/diffract.cpp.i"
-	/projectnb/cislbu/rsyed/wgpu_ssnp-idt/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /projectnb/cislbu/rsyed/wgpu_ssnp-idt/src/diffract/diffract.cpp > CMakeFiles/ssnp_cpp.dir/src/diffract/diffract.cpp.i
+	/projectnb/cislbu/andrewx/ssnp_cpp/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /projectnb/cislbu/andrewx/ssnp_cpp/src/diffract/diffract.cpp > CMakeFiles/ssnp_cpp.dir/src/diffract/diffract.cpp.i
 
 CMakeFiles/ssnp_cpp.dir/src/diffract/diffract.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ssnp_cpp.dir/src/diffract/diffract.cpp.s"
-	/projectnb/cislbu/rsyed/wgpu_ssnp-idt/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /projectnb/cislbu/rsyed/wgpu_ssnp-idt/src/diffract/diffract.cpp -o CMakeFiles/ssnp_cpp.dir/src/diffract/diffract.cpp.s
+	/projectnb/cislbu/andrewx/ssnp_cpp/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /projectnb/cislbu/andrewx/ssnp_cpp/src/diffract/diffract.cpp -o CMakeFiles/ssnp_cpp.dir/src/diffract/diffract.cpp.s
 
 CMakeFiles/ssnp_cpp.dir/src/binary_pupil/binary_pupil.cpp.o: CMakeFiles/ssnp_cpp.dir/flags.make
 CMakeFiles/ssnp_cpp.dir/src/binary_pupil/binary_pupil.cpp.o: CMakeFiles/ssnp_cpp.dir/includes_CXX.rsp
-CMakeFiles/ssnp_cpp.dir/src/binary_pupil/binary_pupil.cpp.o: /projectnb/cislbu/rsyed/wgpu_ssnp-idt/src/binary_pupil/binary_pupil.cpp
+CMakeFiles/ssnp_cpp.dir/src/binary_pupil/binary_pupil.cpp.o: /projectnb/cislbu/andrewx/ssnp_cpp/src/binary_pupil/binary_pupil.cpp
 CMakeFiles/ssnp_cpp.dir/src/binary_pupil/binary_pupil.cpp.o: CMakeFiles/ssnp_cpp.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/ssnp_cpp.dir/src/binary_pupil/binary_pupil.cpp.o"
-	/projectnb/cislbu/rsyed/wgpu_ssnp-idt/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ssnp_cpp.dir/src/binary_pupil/binary_pupil.cpp.o -MF CMakeFiles/ssnp_cpp.dir/src/binary_pupil/binary_pupil.cpp.o.d -o CMakeFiles/ssnp_cpp.dir/src/binary_pupil/binary_pupil.cpp.o -c /projectnb/cislbu/rsyed/wgpu_ssnp-idt/src/binary_pupil/binary_pupil.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/projectnb/cislbu/andrewx/ssnp_cpp/docs/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/ssnp_cpp.dir/src/binary_pupil/binary_pupil.cpp.o"
+	/projectnb/cislbu/andrewx/ssnp_cpp/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ssnp_cpp.dir/src/binary_pupil/binary_pupil.cpp.o -MF CMakeFiles/ssnp_cpp.dir/src/binary_pupil/binary_pupil.cpp.o.d -o CMakeFiles/ssnp_cpp.dir/src/binary_pupil/binary_pupil.cpp.o -c /projectnb/cislbu/andrewx/ssnp_cpp/src/binary_pupil/binary_pupil.cpp
 
 CMakeFiles/ssnp_cpp.dir/src/binary_pupil/binary_pupil.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ssnp_cpp.dir/src/binary_pupil/binary_pupil.cpp.i"
-	/projectnb/cislbu/rsyed/wgpu_ssnp-idt/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /projectnb/cislbu/rsyed/wgpu_ssnp-idt/src/binary_pupil/binary_pupil.cpp > CMakeFiles/ssnp_cpp.dir/src/binary_pupil/binary_pupil.cpp.i
+	/projectnb/cislbu/andrewx/ssnp_cpp/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /projectnb/cislbu/andrewx/ssnp_cpp/src/binary_pupil/binary_pupil.cpp > CMakeFiles/ssnp_cpp.dir/src/binary_pupil/binary_pupil.cpp.i
 
 CMakeFiles/ssnp_cpp.dir/src/binary_pupil/binary_pupil.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ssnp_cpp.dir/src/binary_pupil/binary_pupil.cpp.s"
-	/projectnb/cislbu/rsyed/wgpu_ssnp-idt/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /projectnb/cislbu/rsyed/wgpu_ssnp-idt/src/binary_pupil/binary_pupil.cpp -o CMakeFiles/ssnp_cpp.dir/src/binary_pupil/binary_pupil.cpp.s
+	/projectnb/cislbu/andrewx/ssnp_cpp/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /projectnb/cislbu/andrewx/ssnp_cpp/src/binary_pupil/binary_pupil.cpp -o CMakeFiles/ssnp_cpp.dir/src/binary_pupil/binary_pupil.cpp.s
 
 CMakeFiles/ssnp_cpp.dir/src/tilt/tilt.cpp.o: CMakeFiles/ssnp_cpp.dir/flags.make
 CMakeFiles/ssnp_cpp.dir/src/tilt/tilt.cpp.o: CMakeFiles/ssnp_cpp.dir/includes_CXX.rsp
-CMakeFiles/ssnp_cpp.dir/src/tilt/tilt.cpp.o: /projectnb/cislbu/rsyed/wgpu_ssnp-idt/src/tilt/tilt.cpp
+CMakeFiles/ssnp_cpp.dir/src/tilt/tilt.cpp.o: /projectnb/cislbu/andrewx/ssnp_cpp/src/tilt/tilt.cpp
 CMakeFiles/ssnp_cpp.dir/src/tilt/tilt.cpp.o: CMakeFiles/ssnp_cpp.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/ssnp_cpp.dir/src/tilt/tilt.cpp.o"
-	/projectnb/cislbu/rsyed/wgpu_ssnp-idt/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ssnp_cpp.dir/src/tilt/tilt.cpp.o -MF CMakeFiles/ssnp_cpp.dir/src/tilt/tilt.cpp.o.d -o CMakeFiles/ssnp_cpp.dir/src/tilt/tilt.cpp.o -c /projectnb/cislbu/rsyed/wgpu_ssnp-idt/src/tilt/tilt.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/projectnb/cislbu/andrewx/ssnp_cpp/docs/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/ssnp_cpp.dir/src/tilt/tilt.cpp.o"
+	/projectnb/cislbu/andrewx/ssnp_cpp/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ssnp_cpp.dir/src/tilt/tilt.cpp.o -MF CMakeFiles/ssnp_cpp.dir/src/tilt/tilt.cpp.o.d -o CMakeFiles/ssnp_cpp.dir/src/tilt/tilt.cpp.o -c /projectnb/cislbu/andrewx/ssnp_cpp/src/tilt/tilt.cpp
 
 CMakeFiles/ssnp_cpp.dir/src/tilt/tilt.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ssnp_cpp.dir/src/tilt/tilt.cpp.i"
-	/projectnb/cislbu/rsyed/wgpu_ssnp-idt/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /projectnb/cislbu/rsyed/wgpu_ssnp-idt/src/tilt/tilt.cpp > CMakeFiles/ssnp_cpp.dir/src/tilt/tilt.cpp.i
+	/projectnb/cislbu/andrewx/ssnp_cpp/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /projectnb/cislbu/andrewx/ssnp_cpp/src/tilt/tilt.cpp > CMakeFiles/ssnp_cpp.dir/src/tilt/tilt.cpp.i
 
 CMakeFiles/ssnp_cpp.dir/src/tilt/tilt.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ssnp_cpp.dir/src/tilt/tilt.cpp.s"
-	/projectnb/cislbu/rsyed/wgpu_ssnp-idt/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /projectnb/cislbu/rsyed/wgpu_ssnp-idt/src/tilt/tilt.cpp -o CMakeFiles/ssnp_cpp.dir/src/tilt/tilt.cpp.s
+	/projectnb/cislbu/andrewx/ssnp_cpp/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /projectnb/cislbu/andrewx/ssnp_cpp/src/tilt/tilt.cpp -o CMakeFiles/ssnp_cpp.dir/src/tilt/tilt.cpp.s
 
 CMakeFiles/ssnp_cpp.dir/src/merge_prop/merge_prop.cpp.o: CMakeFiles/ssnp_cpp.dir/flags.make
 CMakeFiles/ssnp_cpp.dir/src/merge_prop/merge_prop.cpp.o: CMakeFiles/ssnp_cpp.dir/includes_CXX.rsp
-CMakeFiles/ssnp_cpp.dir/src/merge_prop/merge_prop.cpp.o: /projectnb/cislbu/rsyed/wgpu_ssnp-idt/src/merge_prop/merge_prop.cpp
+CMakeFiles/ssnp_cpp.dir/src/merge_prop/merge_prop.cpp.o: /projectnb/cislbu/andrewx/ssnp_cpp/src/merge_prop/merge_prop.cpp
 CMakeFiles/ssnp_cpp.dir/src/merge_prop/merge_prop.cpp.o: CMakeFiles/ssnp_cpp.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/ssnp_cpp.dir/src/merge_prop/merge_prop.cpp.o"
-	/projectnb/cislbu/rsyed/wgpu_ssnp-idt/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ssnp_cpp.dir/src/merge_prop/merge_prop.cpp.o -MF CMakeFiles/ssnp_cpp.dir/src/merge_prop/merge_prop.cpp.o.d -o CMakeFiles/ssnp_cpp.dir/src/merge_prop/merge_prop.cpp.o -c /projectnb/cislbu/rsyed/wgpu_ssnp-idt/src/merge_prop/merge_prop.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/projectnb/cislbu/andrewx/ssnp_cpp/docs/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/ssnp_cpp.dir/src/merge_prop/merge_prop.cpp.o"
+	/projectnb/cislbu/andrewx/ssnp_cpp/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ssnp_cpp.dir/src/merge_prop/merge_prop.cpp.o -MF CMakeFiles/ssnp_cpp.dir/src/merge_prop/merge_prop.cpp.o.d -o CMakeFiles/ssnp_cpp.dir/src/merge_prop/merge_prop.cpp.o -c /projectnb/cislbu/andrewx/ssnp_cpp/src/merge_prop/merge_prop.cpp
 
 CMakeFiles/ssnp_cpp.dir/src/merge_prop/merge_prop.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ssnp_cpp.dir/src/merge_prop/merge_prop.cpp.i"
-	/projectnb/cislbu/rsyed/wgpu_ssnp-idt/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /projectnb/cislbu/rsyed/wgpu_ssnp-idt/src/merge_prop/merge_prop.cpp > CMakeFiles/ssnp_cpp.dir/src/merge_prop/merge_prop.cpp.i
+	/projectnb/cislbu/andrewx/ssnp_cpp/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /projectnb/cislbu/andrewx/ssnp_cpp/src/merge_prop/merge_prop.cpp > CMakeFiles/ssnp_cpp.dir/src/merge_prop/merge_prop.cpp.i
 
 CMakeFiles/ssnp_cpp.dir/src/merge_prop/merge_prop.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ssnp_cpp.dir/src/merge_prop/merge_prop.cpp.s"
-	/projectnb/cislbu/rsyed/wgpu_ssnp-idt/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /projectnb/cislbu/rsyed/wgpu_ssnp-idt/src/merge_prop/merge_prop.cpp -o CMakeFiles/ssnp_cpp.dir/src/merge_prop/merge_prop.cpp.s
+	/projectnb/cislbu/andrewx/ssnp_cpp/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /projectnb/cislbu/andrewx/ssnp_cpp/src/merge_prop/merge_prop.cpp -o CMakeFiles/ssnp_cpp.dir/src/merge_prop/merge_prop.cpp.s
 
 CMakeFiles/ssnp_cpp.dir/src/split_prop/split_prop.cpp.o: CMakeFiles/ssnp_cpp.dir/flags.make
 CMakeFiles/ssnp_cpp.dir/src/split_prop/split_prop.cpp.o: CMakeFiles/ssnp_cpp.dir/includes_CXX.rsp
-CMakeFiles/ssnp_cpp.dir/src/split_prop/split_prop.cpp.o: /projectnb/cislbu/rsyed/wgpu_ssnp-idt/src/split_prop/split_prop.cpp
+CMakeFiles/ssnp_cpp.dir/src/split_prop/split_prop.cpp.o: /projectnb/cislbu/andrewx/ssnp_cpp/src/split_prop/split_prop.cpp
 CMakeFiles/ssnp_cpp.dir/src/split_prop/split_prop.cpp.o: CMakeFiles/ssnp_cpp.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/ssnp_cpp.dir/src/split_prop/split_prop.cpp.o"
-	/projectnb/cislbu/rsyed/wgpu_ssnp-idt/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ssnp_cpp.dir/src/split_prop/split_prop.cpp.o -MF CMakeFiles/ssnp_cpp.dir/src/split_prop/split_prop.cpp.o.d -o CMakeFiles/ssnp_cpp.dir/src/split_prop/split_prop.cpp.o -c /projectnb/cislbu/rsyed/wgpu_ssnp-idt/src/split_prop/split_prop.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/projectnb/cislbu/andrewx/ssnp_cpp/docs/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/ssnp_cpp.dir/src/split_prop/split_prop.cpp.o"
+	/projectnb/cislbu/andrewx/ssnp_cpp/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ssnp_cpp.dir/src/split_prop/split_prop.cpp.o -MF CMakeFiles/ssnp_cpp.dir/src/split_prop/split_prop.cpp.o.d -o CMakeFiles/ssnp_cpp.dir/src/split_prop/split_prop.cpp.o -c /projectnb/cislbu/andrewx/ssnp_cpp/src/split_prop/split_prop.cpp
 
 CMakeFiles/ssnp_cpp.dir/src/split_prop/split_prop.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ssnp_cpp.dir/src/split_prop/split_prop.cpp.i"
-	/projectnb/cislbu/rsyed/wgpu_ssnp-idt/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /projectnb/cislbu/rsyed/wgpu_ssnp-idt/src/split_prop/split_prop.cpp > CMakeFiles/ssnp_cpp.dir/src/split_prop/split_prop.cpp.i
+	/projectnb/cislbu/andrewx/ssnp_cpp/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /projectnb/cislbu/andrewx/ssnp_cpp/src/split_prop/split_prop.cpp > CMakeFiles/ssnp_cpp.dir/src/split_prop/split_prop.cpp.i
 
 CMakeFiles/ssnp_cpp.dir/src/split_prop/split_prop.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ssnp_cpp.dir/src/split_prop/split_prop.cpp.s"
-	/projectnb/cislbu/rsyed/wgpu_ssnp-idt/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /projectnb/cislbu/rsyed/wgpu_ssnp-idt/src/split_prop/split_prop.cpp -o CMakeFiles/ssnp_cpp.dir/src/split_prop/split_prop.cpp.s
+	/projectnb/cislbu/andrewx/ssnp_cpp/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /projectnb/cislbu/andrewx/ssnp_cpp/src/split_prop/split_prop.cpp -o CMakeFiles/ssnp_cpp.dir/src/split_prop/split_prop.cpp.s
 
 CMakeFiles/ssnp_cpp.dir/src/dft/dft.cpp.o: CMakeFiles/ssnp_cpp.dir/flags.make
 CMakeFiles/ssnp_cpp.dir/src/dft/dft.cpp.o: CMakeFiles/ssnp_cpp.dir/includes_CXX.rsp
-CMakeFiles/ssnp_cpp.dir/src/dft/dft.cpp.o: /projectnb/cislbu/rsyed/wgpu_ssnp-idt/src/dft/dft.cpp
+CMakeFiles/ssnp_cpp.dir/src/dft/dft.cpp.o: /projectnb/cislbu/andrewx/ssnp_cpp/src/dft/dft.cpp
 CMakeFiles/ssnp_cpp.dir/src/dft/dft.cpp.o: CMakeFiles/ssnp_cpp.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/ssnp_cpp.dir/src/dft/dft.cpp.o"
-	/projectnb/cislbu/rsyed/wgpu_ssnp-idt/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ssnp_cpp.dir/src/dft/dft.cpp.o -MF CMakeFiles/ssnp_cpp.dir/src/dft/dft.cpp.o.d -o CMakeFiles/ssnp_cpp.dir/src/dft/dft.cpp.o -c /projectnb/cislbu/rsyed/wgpu_ssnp-idt/src/dft/dft.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/projectnb/cislbu/andrewx/ssnp_cpp/docs/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/ssnp_cpp.dir/src/dft/dft.cpp.o"
+	/projectnb/cislbu/andrewx/ssnp_cpp/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ssnp_cpp.dir/src/dft/dft.cpp.o -MF CMakeFiles/ssnp_cpp.dir/src/dft/dft.cpp.o.d -o CMakeFiles/ssnp_cpp.dir/src/dft/dft.cpp.o -c /projectnb/cislbu/andrewx/ssnp_cpp/src/dft/dft.cpp
 
 CMakeFiles/ssnp_cpp.dir/src/dft/dft.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ssnp_cpp.dir/src/dft/dft.cpp.i"
-	/projectnb/cislbu/rsyed/wgpu_ssnp-idt/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /projectnb/cislbu/rsyed/wgpu_ssnp-idt/src/dft/dft.cpp > CMakeFiles/ssnp_cpp.dir/src/dft/dft.cpp.i
+	/projectnb/cislbu/andrewx/ssnp_cpp/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /projectnb/cislbu/andrewx/ssnp_cpp/src/dft/dft.cpp > CMakeFiles/ssnp_cpp.dir/src/dft/dft.cpp.i
 
 CMakeFiles/ssnp_cpp.dir/src/dft/dft.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ssnp_cpp.dir/src/dft/dft.cpp.s"
-	/projectnb/cislbu/rsyed/wgpu_ssnp-idt/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /projectnb/cislbu/rsyed/wgpu_ssnp-idt/src/dft/dft.cpp -o CMakeFiles/ssnp_cpp.dir/src/dft/dft.cpp.s
+	/projectnb/cislbu/andrewx/ssnp_cpp/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /projectnb/cislbu/andrewx/ssnp_cpp/src/dft/dft.cpp -o CMakeFiles/ssnp_cpp.dir/src/dft/dft.cpp.s
 
 CMakeFiles/ssnp_cpp.dir/src/mult/mult.cpp.o: CMakeFiles/ssnp_cpp.dir/flags.make
 CMakeFiles/ssnp_cpp.dir/src/mult/mult.cpp.o: CMakeFiles/ssnp_cpp.dir/includes_CXX.rsp
-CMakeFiles/ssnp_cpp.dir/src/mult/mult.cpp.o: /projectnb/cislbu/rsyed/wgpu_ssnp-idt/src/mult/mult.cpp
+CMakeFiles/ssnp_cpp.dir/src/mult/mult.cpp.o: /projectnb/cislbu/andrewx/ssnp_cpp/src/mult/mult.cpp
 CMakeFiles/ssnp_cpp.dir/src/mult/mult.cpp.o: CMakeFiles/ssnp_cpp.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/ssnp_cpp.dir/src/mult/mult.cpp.o"
-	/projectnb/cislbu/rsyed/wgpu_ssnp-idt/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ssnp_cpp.dir/src/mult/mult.cpp.o -MF CMakeFiles/ssnp_cpp.dir/src/mult/mult.cpp.o.d -o CMakeFiles/ssnp_cpp.dir/src/mult/mult.cpp.o -c /projectnb/cislbu/rsyed/wgpu_ssnp-idt/src/mult/mult.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/projectnb/cislbu/andrewx/ssnp_cpp/docs/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/ssnp_cpp.dir/src/mult/mult.cpp.o"
+	/projectnb/cislbu/andrewx/ssnp_cpp/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ssnp_cpp.dir/src/mult/mult.cpp.o -MF CMakeFiles/ssnp_cpp.dir/src/mult/mult.cpp.o.d -o CMakeFiles/ssnp_cpp.dir/src/mult/mult.cpp.o -c /projectnb/cislbu/andrewx/ssnp_cpp/src/mult/mult.cpp
 
 CMakeFiles/ssnp_cpp.dir/src/mult/mult.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ssnp_cpp.dir/src/mult/mult.cpp.i"
-	/projectnb/cislbu/rsyed/wgpu_ssnp-idt/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /projectnb/cislbu/rsyed/wgpu_ssnp-idt/src/mult/mult.cpp > CMakeFiles/ssnp_cpp.dir/src/mult/mult.cpp.i
+	/projectnb/cislbu/andrewx/ssnp_cpp/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /projectnb/cislbu/andrewx/ssnp_cpp/src/mult/mult.cpp > CMakeFiles/ssnp_cpp.dir/src/mult/mult.cpp.i
 
 CMakeFiles/ssnp_cpp.dir/src/mult/mult.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ssnp_cpp.dir/src/mult/mult.cpp.s"
-	/projectnb/cislbu/rsyed/wgpu_ssnp-idt/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /projectnb/cislbu/rsyed/wgpu_ssnp-idt/src/mult/mult.cpp -o CMakeFiles/ssnp_cpp.dir/src/mult/mult.cpp.s
+	/projectnb/cislbu/andrewx/ssnp_cpp/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /projectnb/cislbu/andrewx/ssnp_cpp/src/mult/mult.cpp -o CMakeFiles/ssnp_cpp.dir/src/mult/mult.cpp.s
 
 CMakeFiles/ssnp_cpp.dir/src/scatter_effects/scatter_effects.cpp.o: CMakeFiles/ssnp_cpp.dir/flags.make
 CMakeFiles/ssnp_cpp.dir/src/scatter_effects/scatter_effects.cpp.o: CMakeFiles/ssnp_cpp.dir/includes_CXX.rsp
-CMakeFiles/ssnp_cpp.dir/src/scatter_effects/scatter_effects.cpp.o: /projectnb/cislbu/rsyed/wgpu_ssnp-idt/src/scatter_effects/scatter_effects.cpp
+CMakeFiles/ssnp_cpp.dir/src/scatter_effects/scatter_effects.cpp.o: /projectnb/cislbu/andrewx/ssnp_cpp/src/scatter_effects/scatter_effects.cpp
 CMakeFiles/ssnp_cpp.dir/src/scatter_effects/scatter_effects.cpp.o: CMakeFiles/ssnp_cpp.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/ssnp_cpp.dir/src/scatter_effects/scatter_effects.cpp.o"
-	/projectnb/cislbu/rsyed/wgpu_ssnp-idt/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ssnp_cpp.dir/src/scatter_effects/scatter_effects.cpp.o -MF CMakeFiles/ssnp_cpp.dir/src/scatter_effects/scatter_effects.cpp.o.d -o CMakeFiles/ssnp_cpp.dir/src/scatter_effects/scatter_effects.cpp.o -c /projectnb/cislbu/rsyed/wgpu_ssnp-idt/src/scatter_effects/scatter_effects.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/projectnb/cislbu/andrewx/ssnp_cpp/docs/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/ssnp_cpp.dir/src/scatter_effects/scatter_effects.cpp.o"
+	/projectnb/cislbu/andrewx/ssnp_cpp/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ssnp_cpp.dir/src/scatter_effects/scatter_effects.cpp.o -MF CMakeFiles/ssnp_cpp.dir/src/scatter_effects/scatter_effects.cpp.o.d -o CMakeFiles/ssnp_cpp.dir/src/scatter_effects/scatter_effects.cpp.o -c /projectnb/cislbu/andrewx/ssnp_cpp/src/scatter_effects/scatter_effects.cpp
 
 CMakeFiles/ssnp_cpp.dir/src/scatter_effects/scatter_effects.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ssnp_cpp.dir/src/scatter_effects/scatter_effects.cpp.i"
-	/projectnb/cislbu/rsyed/wgpu_ssnp-idt/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /projectnb/cislbu/rsyed/wgpu_ssnp-idt/src/scatter_effects/scatter_effects.cpp > CMakeFiles/ssnp_cpp.dir/src/scatter_effects/scatter_effects.cpp.i
+	/projectnb/cislbu/andrewx/ssnp_cpp/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /projectnb/cislbu/andrewx/ssnp_cpp/src/scatter_effects/scatter_effects.cpp > CMakeFiles/ssnp_cpp.dir/src/scatter_effects/scatter_effects.cpp.i
 
 CMakeFiles/ssnp_cpp.dir/src/scatter_effects/scatter_effects.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ssnp_cpp.dir/src/scatter_effects/scatter_effects.cpp.s"
-	/projectnb/cislbu/rsyed/wgpu_ssnp-idt/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /projectnb/cislbu/rsyed/wgpu_ssnp-idt/src/scatter_effects/scatter_effects.cpp -o CMakeFiles/ssnp_cpp.dir/src/scatter_effects/scatter_effects.cpp.s
+	/projectnb/cislbu/andrewx/ssnp_cpp/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /projectnb/cislbu/andrewx/ssnp_cpp/src/scatter_effects/scatter_effects.cpp -o CMakeFiles/ssnp_cpp.dir/src/scatter_effects/scatter_effects.cpp.s
 
 CMakeFiles/ssnp_cpp.dir/src/intensity/intensity.cpp.o: CMakeFiles/ssnp_cpp.dir/flags.make
 CMakeFiles/ssnp_cpp.dir/src/intensity/intensity.cpp.o: CMakeFiles/ssnp_cpp.dir/includes_CXX.rsp
-CMakeFiles/ssnp_cpp.dir/src/intensity/intensity.cpp.o: /projectnb/cislbu/rsyed/wgpu_ssnp-idt/src/intensity/intensity.cpp
+CMakeFiles/ssnp_cpp.dir/src/intensity/intensity.cpp.o: /projectnb/cislbu/andrewx/ssnp_cpp/src/intensity/intensity.cpp
 CMakeFiles/ssnp_cpp.dir/src/intensity/intensity.cpp.o: CMakeFiles/ssnp_cpp.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object CMakeFiles/ssnp_cpp.dir/src/intensity/intensity.cpp.o"
-	/projectnb/cislbu/rsyed/wgpu_ssnp-idt/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ssnp_cpp.dir/src/intensity/intensity.cpp.o -MF CMakeFiles/ssnp_cpp.dir/src/intensity/intensity.cpp.o.d -o CMakeFiles/ssnp_cpp.dir/src/intensity/intensity.cpp.o -c /projectnb/cislbu/rsyed/wgpu_ssnp-idt/src/intensity/intensity.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/projectnb/cislbu/andrewx/ssnp_cpp/docs/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object CMakeFiles/ssnp_cpp.dir/src/intensity/intensity.cpp.o"
+	/projectnb/cislbu/andrewx/ssnp_cpp/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ssnp_cpp.dir/src/intensity/intensity.cpp.o -MF CMakeFiles/ssnp_cpp.dir/src/intensity/intensity.cpp.o.d -o CMakeFiles/ssnp_cpp.dir/src/intensity/intensity.cpp.o -c /projectnb/cislbu/andrewx/ssnp_cpp/src/intensity/intensity.cpp
 
 CMakeFiles/ssnp_cpp.dir/src/intensity/intensity.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ssnp_cpp.dir/src/intensity/intensity.cpp.i"
-	/projectnb/cislbu/rsyed/wgpu_ssnp-idt/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /projectnb/cislbu/rsyed/wgpu_ssnp-idt/src/intensity/intensity.cpp > CMakeFiles/ssnp_cpp.dir/src/intensity/intensity.cpp.i
+	/projectnb/cislbu/andrewx/ssnp_cpp/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /projectnb/cislbu/andrewx/ssnp_cpp/src/intensity/intensity.cpp > CMakeFiles/ssnp_cpp.dir/src/intensity/intensity.cpp.i
 
 CMakeFiles/ssnp_cpp.dir/src/intensity/intensity.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ssnp_cpp.dir/src/intensity/intensity.cpp.s"
-	/projectnb/cislbu/rsyed/wgpu_ssnp-idt/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /projectnb/cislbu/rsyed/wgpu_ssnp-idt/src/intensity/intensity.cpp -o CMakeFiles/ssnp_cpp.dir/src/intensity/intensity.cpp.s
+	/projectnb/cislbu/andrewx/ssnp_cpp/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /projectnb/cislbu/andrewx/ssnp_cpp/src/intensity/intensity.cpp -o CMakeFiles/ssnp_cpp.dir/src/intensity/intensity.cpp.s
 
 CMakeFiles/ssnp_cpp.dir/src/forward.cpp.o: CMakeFiles/ssnp_cpp.dir/flags.make
 CMakeFiles/ssnp_cpp.dir/src/forward.cpp.o: CMakeFiles/ssnp_cpp.dir/includes_CXX.rsp
-CMakeFiles/ssnp_cpp.dir/src/forward.cpp.o: /projectnb/cislbu/rsyed/wgpu_ssnp-idt/src/forward.cpp
+CMakeFiles/ssnp_cpp.dir/src/forward.cpp.o: /projectnb/cislbu/andrewx/ssnp_cpp/src/forward.cpp
 CMakeFiles/ssnp_cpp.dir/src/forward.cpp.o: CMakeFiles/ssnp_cpp.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building CXX object CMakeFiles/ssnp_cpp.dir/src/forward.cpp.o"
-	/projectnb/cislbu/rsyed/wgpu_ssnp-idt/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ssnp_cpp.dir/src/forward.cpp.o -MF CMakeFiles/ssnp_cpp.dir/src/forward.cpp.o.d -o CMakeFiles/ssnp_cpp.dir/src/forward.cpp.o -c /projectnb/cislbu/rsyed/wgpu_ssnp-idt/src/forward.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/projectnb/cislbu/andrewx/ssnp_cpp/docs/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building CXX object CMakeFiles/ssnp_cpp.dir/src/forward.cpp.o"
+	/projectnb/cislbu/andrewx/ssnp_cpp/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ssnp_cpp.dir/src/forward.cpp.o -MF CMakeFiles/ssnp_cpp.dir/src/forward.cpp.o.d -o CMakeFiles/ssnp_cpp.dir/src/forward.cpp.o -c /projectnb/cislbu/andrewx/ssnp_cpp/src/forward.cpp
 
 CMakeFiles/ssnp_cpp.dir/src/forward.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ssnp_cpp.dir/src/forward.cpp.i"
-	/projectnb/cislbu/rsyed/wgpu_ssnp-idt/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /projectnb/cislbu/rsyed/wgpu_ssnp-idt/src/forward.cpp > CMakeFiles/ssnp_cpp.dir/src/forward.cpp.i
+	/projectnb/cislbu/andrewx/ssnp_cpp/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /projectnb/cislbu/andrewx/ssnp_cpp/src/forward.cpp > CMakeFiles/ssnp_cpp.dir/src/forward.cpp.i
 
 CMakeFiles/ssnp_cpp.dir/src/forward.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ssnp_cpp.dir/src/forward.cpp.s"
-	/projectnb/cislbu/rsyed/wgpu_ssnp-idt/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /projectnb/cislbu/rsyed/wgpu_ssnp-idt/src/forward.cpp -o CMakeFiles/ssnp_cpp.dir/src/forward.cpp.s
+	/projectnb/cislbu/andrewx/ssnp_cpp/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /projectnb/cislbu/andrewx/ssnp_cpp/src/forward.cpp -o CMakeFiles/ssnp_cpp.dir/src/forward.cpp.s
 
 # Object files for target ssnp_cpp
 ssnp_cpp_OBJECTS = \
@@ -316,7 +316,7 @@ ssnp_cpp.js: CMakeFiles/ssnp_cpp.dir/src/forward.cpp.o
 ssnp_cpp.js: CMakeFiles/ssnp_cpp.dir/build.make
 ssnp_cpp.js: CMakeFiles/ssnp_cpp.dir/objects1.rsp
 ssnp_cpp.js: CMakeFiles/ssnp_cpp.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Linking CXX executable ssnp_cpp.js"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/projectnb/cislbu/andrewx/ssnp_cpp/docs/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Linking CXX executable ssnp_cpp.js"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/ssnp_cpp.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -328,6 +328,6 @@ CMakeFiles/ssnp_cpp.dir/clean:
 .PHONY : CMakeFiles/ssnp_cpp.dir/clean
 
 CMakeFiles/ssnp_cpp.dir/depend:
-	cd /projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /projectnb/cislbu/rsyed/wgpu_ssnp-idt /projectnb/cislbu/rsyed/wgpu_ssnp-idt /projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs /projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs /projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs/CMakeFiles/ssnp_cpp.dir/DependInfo.cmake --color=$(COLOR)
+	cd /projectnb/cislbu/andrewx/ssnp_cpp/docs && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /projectnb/cislbu/andrewx/ssnp_cpp /projectnb/cislbu/andrewx/ssnp_cpp /projectnb/cislbu/andrewx/ssnp_cpp/docs /projectnb/cislbu/andrewx/ssnp_cpp/docs /projectnb/cislbu/andrewx/ssnp_cpp/docs/CMakeFiles/ssnp_cpp.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/ssnp_cpp.dir/depend
 

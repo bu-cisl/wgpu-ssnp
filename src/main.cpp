@@ -94,8 +94,44 @@ int main(int argc, char* argv[]) {
 
 extern "C" {
     EMSCRIPTEN_KEEPALIVE
-    void callSSNP(const char* angleStr) {
+    void callSSNP(const char* inputStr) {
         try {
+            std::string fullInput(inputStr);
+            size_t firstPipe = fullInput.find('|');
+            size_t secondPipe = fullInput.find('|', firstPipe + 1);
+            size_t thirdPipe = fullInput.find('|', secondPipe + 1);
+
+            std::string anglesStr = fullInput.substr(0, firstPipe);
+            std::string resStr = fullInput.substr(firstPipe + 1, secondPipe - firstPipe - 1);
+            std::string naStr = fullInput.substr(secondPipe + 1, thirdPipe - secondPipe - 1);
+            std::string intensityStr = fullInput.substr(thirdPipe + 1);
+
+            // Parse angles
+            std::vector<std::vector<float>> angles;
+            std::istringstream angleSS(anglesStr);
+            std::string token;
+            while (std::getline(angleSS, token, ';')) {
+                std::istringstream pairStream(token);
+                std::string xStr, yStr;
+                std::getline(pairStream, xStr, ',');
+                std::getline(pairStream, yStr, ',');
+                angles.push_back({std::stof(xStr), std::stof(yStr)});
+            }
+
+            // Parse resolution
+            std::vector<float> res;
+            std::istringstream resSS(resStr);
+            while (std::getline(resSS, token, ',')) {
+                res.push_back(std::stof(token));
+            }
+
+            // Parse NA
+            float na = std::stof(naStr);
+
+            // Parse intensity
+            bool intensity = (intensityStr == "1");
+
+            // File read + processing
             std::vector<std::vector<std::vector<float>>> tensor;
             int D, H, W;
             if (!read_input_tensor("input.bin", tensor, D, H, W)) {
@@ -106,26 +142,9 @@ extern "C" {
             WebGPUContext context;
             initWebGPU(context);
 
-            // Default values
-            std::vector<float> res = {0.1f, 0.1f, 0.1f};
-            float na = 0.65f;
-            bool intensity = true;
-
-            // Read in angles
-            std::vector<std::vector<float>> angles;
-            std::istringstream ss(angleStr);
-            std::string token;
-            while (std::getline(ss, token, ';')) {
-                std::istringstream pairStream(token);
-                std::string xStr, yStr;
-                std::getline(pairStream, xStr, ',');
-                std::getline(pairStream, yStr, ',');
-                angles.push_back({std::stof(xStr), std::stof(yStr)});
-            }
-            
             auto result = forward(context, tensor, res, na, angles, intensity);
-            
-            // Flatten tensor + compute min/max for each output image for colorbar
+
+            // Flatten + emit
             std::ostringstream dataStream, minStream, maxStream;
             dataStream << "[";
             minStream << "[";
@@ -137,8 +156,8 @@ extern "C" {
                     for (size_t j = 0; j < result[d][i].size(); ++j) {
                         float val = result[d][i][j];
                         dataStream << val << ",";
-                        if (val < localMin) localMin = val;
-                        if (val > localMax) localMax = val;
+                        localMin = std::min(localMin, val);
+                        localMax = std::max(localMax, val);
                     }
                 }
                 minStream << localMin << (d < result.size()-1 ? "," : "");
@@ -148,10 +167,9 @@ extern "C" {
             minStream << "]";
             maxStream << "]";
 
-            // Plot via JS
             std::ostringstream jsCall;
             jsCall << "plotSlices(" << dataStream.str() << "," << D << "," << H << "," << W
-                   << "," << minStream.str() << "," << maxStream.str() << ");";
+                << "," << minStream.str() << "," << maxStream.str() << ");";
 
             emscripten_run_script(jsCall.str().c_str());
 
