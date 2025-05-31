@@ -29,4 +29,6 @@
 
 # Ignore extra output during testing
 input_matrix.txt
+sample.png
 *.bin
+*.tiff
