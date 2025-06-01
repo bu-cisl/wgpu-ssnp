@@ -1,258 +1,366 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SSNP-IDT WebGPU</title>
-    <style>
-        body {
-            margin: 0;
-            background-color: #202020;
-            color: #eee;
-            font-family: Arial, sans-serif;
-        }
-        h1 {
-            text-align: center;
-        }
-        #controls {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        #anglesList {
-            margin-top: 5px;
-            max-height: 100px;
-            overflow-y: auto;
-            border: 1px solid #555;
-            padding: 5px;
-            width: 200px;
-            background-color: #333;
-        }
-        #viewer {
-            display: flex;
-            flex-direction: row;
-            flex-wrap: nowrap;
-            overflow-x: auto;
-            padding: 10px;
-            background-color: #111;
-        }
-        .slice-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-right: 20px;
-        }
-        canvas {
-            image-rendering: pixelated;
-            border: 1px solid #555;
-        }
-        .colorbar {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-left: 5px;
-        }
-        .colorbar canvas {
-            width: 10px;
-            height: 100%;
-        }
-        .colorbar-label {
-            font-size: 0.75rem;
-            text-align: center;
-            color: #ccc;
-        }
-        .angle-label {
-            font-size: 0.8rem;
-            margin-top: 3px;
-            color: #ccc;
-        }
-    </style>
-    <script src="https://d3js.org/d3.v7.min.js"></script>
-    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SSNP-IDT WebGPU (with TIFF support)</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: #202020;
+      color: #eee;
+      font-family: Arial, sans-serif;
+    }
+    h1 {
+      text-align: center;
+    }
+    #controls {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    #anglesList {
+      margin-top: 5px;
+      max-height: 100px;
+      overflow-y: auto;
+      border: 1px solid #555;
+      padding: 5px;
+      width: 200px;
+      background-color: #333;
+    }
+    #viewer {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      padding: 10px;
+      background-color: #111;
+    }
+    .slice-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-right: 20px;
+    }
+    canvas {
+      image-rendering: pixelated;
+      border: 1px solid #555;
+    }
+    .colorbar {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-left: 5px;
+    }
+    .colorbar canvas {
+      width: 10px;
+      height: 100%;
+    }
+    .colorbar-label {
+      font-size: 0.75rem;
+      text-align: center;
+      color: #ccc;
+    }
+    .angle-label {
+      font-size: 0.8rem;
+      margin-top: 3px;
+      color: #ccc;
+    }
+  </style>
+
+  <!-- 1) Include UTIF.js (make sure UTIF.js is available at this path or substitute a CDN) -->
+  <script src="UTIF.js"></script>
+  <!-- 2) d3 (already present) -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
 </head>
 <body>
-    <h1>WebGPU SSNP-IDT Model</h1>
-    <div id="controls">
-        <input type="file" id="fileInput" accept=".bin" />
-        <div>
-            <input type="text" id="angleInput" placeholder="Enter angle pair as x,y" />
-            <button id="addAngleBtn">Add Angle</button>
-            <button id="clearAnglesBtn">Clear Angles</button> 
-        </div>
-        <div id="anglesList"></div>
-        <div>
-            <input type="text" id="resInput" placeholder="Resolution (e.g. 0.1,0.2,0.1)" />
-            <input type="text" id="naInput" placeholder="NA (e.g. 0.65)" />
-            <label>
-                <input type="checkbox" id="intensityInput" checked /> Intensity
-            </label>
-        </div>
-        <button id="runBtn" disabled>Run</button>
+  <h1>WebGPU SSNP-IDT Model (TIFF + BIN)</h1>
+  <div id="controls">
+    <!-- Accept both .bin and .tif/.tiff -->
+    <input type="file" id="fileInput" accept=".bin,.tif,.tiff" />
+    <div>
+      <input type="text" id="angleInput" placeholder="Enter angle pair as x,y" />
+      <button id="addAngleBtn">Add Angle</button>
+      <button id="clearAnglesBtn">Clear Angles</button>
     </div>
-    <div id="viewer"></div>
+    <div id="anglesList"></div>
+    <div>
+      <input type="text" id="resInput" placeholder="Resolution (e.g. 0.1,0.2,0.1)" />
+      <input type="text" id="naInput" placeholder="NA (e.g. 0.65)" />
+      <label>
+        <input type="checkbox" id="intensityInput" checked /> Intensity
+      </label>
+    </div>
+    <button id="runBtn" disabled>Run</button>
+  </div>
+  <div id="viewer"></div>
 
-    <script>
-        var Module = {
-            noInitialRun: true,
-            print: function (text) {
-                console.log(text);
-            },
-        };
+  <script>
+    // Emscripten/WASM Module boilerplate
+    var Module = {
+      noInitialRun: true,
+      print: function (text) {
+        console.log(text);
+      },
+    };
 
-        let angles = [];
+    let angles = [];
 
-        function plotSlices(flatArray, D, H, W, minArray, maxArray) {
-            const viewer = document.getElementById('viewer');
-            viewer.innerHTML = '';
+    // Helper: write a 32-bit‐integer header + float32 volume into a single ArrayBuffer
+    function buildBinBufferFromFloatVolume(slices, width, height) {
+      // slices: Array of Float32Array, each of length width*height
+      const D = slices.length;
+      const H = height;
+      const W = width;
+      const headerBytes = 4 * 3; // three int32
+      const floatBytesPerSlice = W * H * 4;
+      const totalBytes = headerBytes + D * floatBytesPerSlice;
+      const buffer = new ArrayBuffer(totalBytes);
+      const dv = new DataView(buffer);
+      // Write D, H, W as int32
+      dv.setInt32(0, D, true);
+      dv.setInt32(4, H, true);
+      dv.setInt32(8, W, true);
+      // Copy each slice’s Float32Array
+      let offset = headerBytes;
+      for (let d = 0; d < D; d++) {
+        const sliceArr = slices[d];
+        // Assume sliceArr is a Float32Array
+        const floatView = new Float32Array(buffer, offset, W * H);
+        floatView.set(sliceArr);
+        offset += floatBytesPerSlice;
+      }
+      return buffer;
+    }
 
-            let idx = 0;
-            for (let d = 0; d < D; d++) {
-                const localMin = minArray[d];
-                const localMax = maxArray[d];
-                const scale = localMax - localMin || 1;
+    function plotSlices(flatArray, D, H, W, minArray, maxArray) {
+      const viewer = document.getElementById('viewer');
+      viewer.innerHTML = '';
 
-                const container = document.createElement('div');
-                container.className = 'slice-container';
+      let idx = 0;
+      for (let d = 0; d < D; d++) {
+        const localMin = minArray[d];
+        const localMax = maxArray[d];
+        const scale = localMax - localMin || 1;
 
-                const horizontalContainer = document.createElement('div');
-                horizontalContainer.style.display = 'flex';
-                horizontalContainer.style.flexDirection = 'row';
-                horizontalContainer.style.alignItems = 'center';
+        const container = document.createElement('div');
+        container.className = 'slice-container';
 
-                const canvas = document.createElement('canvas');
-                canvas.width = W;
-                canvas.height = H;
-                const ctx = canvas.getContext('2d');
-                const imgData = ctx.createImageData(W, H);
+        const horizontalContainer = document.createElement('div');
+        horizontalContainer.style.display = 'flex';
+        horizontalContainer.style.flexDirection = 'row';
+        horizontalContainer.style.alignItems = 'center';
 
-                for (let i = 0; i < H; i++) {
-                    for (let j = 0; j < W; j++) {
-                        const value = flatArray[idx++];
-                        const norm = (value - localMin) / scale;
-                        const [r, g, b] = colormap(norm);
-                        const pixelIndex = (i * W + j) * 4;
-                        imgData.data[pixelIndex] = r;
-                        imgData.data[pixelIndex + 1] = g;
-                        imgData.data[pixelIndex + 2] = b;
-                        imgData.data[pixelIndex + 3] = 255;
-                    }
-                }
+        const canvas = document.createElement('canvas');
+        canvas.width = W;
+        canvas.height = H;
+        const ctx = canvas.getContext('2d');
+        const imgData = ctx.createImageData(W, H);
 
-                ctx.putImageData(imgData, 0, 0);
-                horizontalContainer.appendChild(canvas);
+        for (let i = 0; i < H; i++) {
+          for (let j = 0; j < W; j++) {
+            const value = flatArray[idx++];
+            const norm = (value - localMin) / scale;
+            const [r, g, b] = colormap(norm);
+            const pixelIndex = (i * W + j) * 4;
+            imgData.data[pixelIndex] = r;
+            imgData.data[pixelIndex + 1] = g;
+            imgData.data[pixelIndex + 2] = b;
+            imgData.data[pixelIndex + 3] = 255;
+          }
+        }
 
-                const colorbar = document.createElement('div');
-                colorbar.className = 'colorbar';
-                const colorCanvas = document.createElement('canvas');
-                colorCanvas.width = 10;
-                colorCanvas.height = H;
-                const colorCtx = colorCanvas.getContext('2d');
-                const colorImg = colorCtx.createImageData(1, H);
+        ctx.putImageData(imgData, 0, 0);
+        horizontalContainer.appendChild(canvas);
 
-                for (let i = 0; i < H; i++) {
-                    const t = 1 - i / (H - 1);
-                    const [r, g, b] = colormap(t);
-                    const idx2 = i * 4;
-                    colorImg.data[idx2] = r;
-                    colorImg.data[idx2 + 1] = g;
-                    colorImg.data[idx2 + 2] = b;
-                    colorImg.data[idx2 + 3] = 255;
-                }
-                for (let x = 0; x < 10; x++) {
-                    colorCtx.putImageData(colorImg, x, 0);
-                }
+        const colorbar = document.createElement('div');
+        colorbar.className = 'colorbar';
+        const colorCanvas = document.createElement('canvas');
+        colorCanvas.width = 10;
+        colorCanvas.height = H;
+        const colorCtx = colorCanvas.getContext('2d');
+        const colorImg = colorCtx.createImageData(1, H);
 
-                colorbar.appendChild(colorCanvas);
-                const maxLabel = document.createElement('div');
-                maxLabel.className = 'colorbar-label';
-                maxLabel.textContent = localMax.toExponential(3);
-                const minLabel = document.createElement('div');
-                minLabel.className = 'colorbar-label';
-                minLabel.textContent = localMin.toExponential(3);
-                colorbar.insertBefore(maxLabel, colorCanvas);
-                colorbar.appendChild(minLabel);
+        for (let i = 0; i < H; i++) {
+          const t = 1 - i / (H - 1);
+          const [r, g, b] = colormap(t);
+          const idx2 = i * 4;
+          colorImg.data[idx2] = r;
+          colorImg.data[idx2 + 1] = g;
+          colorImg.data[idx2 + 2] = b;
+          colorImg.data[idx2 + 3] = 255;
+        }
+        for (let x = 0; x < 10; x++) {
+          colorCtx.putImageData(colorImg, x, 0);
+        }
 
-                horizontalContainer.appendChild(colorbar);
-                container.appendChild(horizontalContainer);
+        colorbar.appendChild(colorCanvas);
+        const maxLabel = document.createElement('div');
+        maxLabel.className = 'colorbar-label';
+        maxLabel.textContent = localMax.toExponential(3);
+        const minLabel = document.createElement('div');
+        minLabel.className = 'colorbar-label';
+        minLabel.textContent = localMin.toExponential(3);
+        colorbar.insertBefore(maxLabel, colorCanvas);
+        colorbar.appendChild(minLabel);
 
-                const angleLabel = document.createElement('div');
-                angleLabel.className = 'angle-label';
-                const angleText = angles[d] ? `Angle: (${angles[d]})` : `Angle ${d + 1}`;
-                angleLabel.textContent = angleText;
-                container.appendChild(angleLabel);
+        horizontalContainer.appendChild(colorbar);
+        container.appendChild(horizontalContainer);
 
-                viewer.appendChild(container);
+        const angleLabel = document.createElement('div');
+        angleLabel.className = 'angle-label';
+        const angleText = angles[d] ? `Angle: (${angles[d]})` : `Angle ${d + 1}`;
+        angleLabel.textContent = angleText;
+        container.appendChild(angleLabel);
+
+        viewer.appendChild(container);
+      }
+    }
+
+    function colormap(t) {
+      t = Math.max(0, Math.min(1, t));
+      const c = d3.color(d3.interpolateViridis(t));
+      return [c.r, c.g, c.b];
+    }
+
+    Module.onRuntimeInitialized = () => {
+      const fileInput = document.getElementById("fileInput");
+      const runBtn = document.getElementById("runBtn");
+      const angleInput = document.getElementById("angleInput");
+      const addAngleBtn = document.getElementById("addAngleBtn");
+      const clearAnglesBtn = document.getElementById("clearAnglesBtn");
+      const anglesList = document.getElementById("anglesList");
+
+      fileInput.addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const name = file.name.toLowerCase();
+        const ext = name.substring(name.lastIndexOf(".") + 1);
+
+        if (ext === "bin") {
+          // --- EXACTLY AS BEFORE FOR BINARY ---
+          const r = new FileReader();
+          r.onload = () => {
+            const data = new Uint8Array(r.result);
+            FS.writeFile("input.bin", data);
+            runBtn.disabled = false;
+          };
+          r.readAsArrayBuffer(file);
+
+        } else if (ext === "tif" || ext === "tiff") {
+          // --- NEW: READ MULTI‐SLICE TIFF VIA UTIF.js ---
+          const reader = new FileReader();
+          reader.onload = () => {
+            const arrayBuffer = reader.result;
+            // 1) Decode IFDs
+            const ifds = UTIF.decode(arrayBuffer);
+            if (ifds.length === 0) {
+              alert("No image slices found in TIFF.");
+              return;
             }
+
+            // 2) Decode each IFD (slice)
+            const slices = [];
+            let width = null, height = null;
+            for (let i = 0; i < ifds.length; i++) {
+              UTIF.decodeImage(arrayBuffer, ifds[i]);
+              // 'ifds[i].data' holds raw pixel data for that slice.
+              // For a single‐channel float32 TIFF, 'ifd.data' should be a Float32Array.
+              const raw = ifds[i].data;
+    if (!raw) {
+      alert(`Could not decode slice #${i}`);
+      return;
+    }
+    // On first slice, grab width/height; for subsequent, sanity‐check
+    if (i === 0) {
+      width = ifds[i].width;
+      height = ifds[i].height;
+    } else {
+      if (ifds[i].width !== width || ifds[i].height !== height) {
+        alert("All TIFF slices must have identical dimensions.");
+        return;
+      }
+    }
+
+    let floatSlice;
+    if (raw instanceof Float32Array) {
+      // UTIF already gave you a Float32 per pixel
+      floatSlice = raw;
+
+    } else if (raw instanceof Uint8Array && raw.length === width * height * 4) {
+      // UTIF gave you 4 bytes per pixel (32-bit float), so reinterpret:
+      floatSlice = new Float32Array(raw.buffer, raw.byteOffset, raw.length / 4);
+
+    } else {
+      // Fallback: maybe UTIF gave you a Uint16Array or plain Uint8Array of ints
+      // In that case, just convert element-by-element into floats
+      floatSlice = new Float32Array(raw.length);
+      for (let k = 0; k < raw.length; k++) {
+        floatSlice[k] = raw[k];
+      }
+    }
+
+    // Now floatSlice.length should === width*height
+    slices.push(floatSlice);
+            }
+
+            // 3) Build a single ArrayBuffer: [ int32(D), int32(H), int32(W), all float32 voxels... ]
+            const binBuffer = buildBinBufferFromFloatVolume(slices, width, height);
+            // 4) Write to Emscripten FS as "input.bin"
+            FS.writeFile("input.bin", new Uint8Array(binBuffer));
+            runBtn.disabled = false;
+          };
+          reader.readAsArrayBuffer(file);
+
+        } else {
+          alert("Unsupported file type: please select a .bin or .tif/.tiff");
         }
+      });
 
-        function colormap(t) {
-            t = Math.max(0, Math.min(1, t));
-            const c = d3.color(d3.interpolateViridis(t));
-            return [c.r, c.g, c.b];
+      addAngleBtn.addEventListener("click", () => {
+        const inputVal = angleInput.value.trim();
+        if (inputVal.match(/^[-+]?[0-9]*\.?[0-9]+,[-+]?[0-9]*\.?[0-9]+$/)) {
+          angles.push(inputVal);
+          const angleDiv = document.createElement("div");
+          angleDiv.textContent = inputVal;
+          anglesList.appendChild(angleDiv);
+          angleInput.value = "";
+        } else {
+          alert("Please enter a valid angle pair, e.g., 0.5,1.2");
         }
+      });
 
-        Module.onRuntimeInitialized = () => {
-            const fileInput = document.getElementById("fileInput");
-            const runBtn = document.getElementById("runBtn");
-            const angleInput = document.getElementById("angleInput");
-            const addAngleBtn = document.getElementById("addAngleBtn");
-            const clearAnglesBtn = document.getElementById("clearAnglesBtn");
-            const anglesList = document.getElementById("anglesList");
+      clearAnglesBtn.addEventListener("click", () => {
+        angles = [];
+        anglesList.innerHTML = "";
+      });
 
-            fileInput.addEventListener("change", (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
-                const r = new FileReader();
-                r.onload = () => {
-                    const data = new Uint8Array(r.result);
-                    FS.writeFile("input.bin", data);
-                    runBtn.disabled = false;
-                };
-                r.readAsArrayBuffer(file);
-            });
+      runBtn.addEventListener("click", () => {
+        const angleString = angles.length ? angles.join(";") : "0.0,0.0";
+        const resVal = document.getElementById("resInput").value.trim() || "0.1,0.1,0.1";
+        const naVal = document.getElementById("naInput").value.trim() || "0.65";
+        const intensityVal = document.getElementById("intensityInput").checked ? "1" : "0";
 
-            addAngleBtn.addEventListener("click", () => {
-                const input = angleInput.value.trim();
-                if (input.match(/^[-+]?[0-9]*\.?[0-9]+,[-+]?[0-9]*\.?[0-9]+$/)) {
-                    angles.push(input);
-                    const angleDiv = document.createElement("div");
-                    angleDiv.textContent = input;
-                    anglesList.appendChild(angleDiv);
-                    angleInput.value = '';
-                } else {
-                    alert("Please enter a valid angle pair, e.g., 0.5,1.2");
-                }
-            });
+        const combinedParams = `${angleString}|${resVal}|${naVal}|${intensityVal}`;
 
-            clearAnglesBtn.addEventListener("click", () => {
-                angles = [];
-                anglesList.innerHTML = '';
-            });
+        const viewer = document.getElementById("viewer");
+        viewer.innerHTML = "";
 
-            runBtn.addEventListener("click", () => {
-                const angleString = angles.length ? angles.join(";") : "0.0,0.0";
-                const resVal = document.getElementById("resInput").value.trim() || "0.1,0.1,0.1";
-                const naVal = document.getElementById("naInput").value.trim() || "0.65";
-                const intensityVal = document.getElementById("intensityInput").checked ? "1" : "0";
+        console.log("Sending to C++:", combinedParams);
 
-                const combinedParams = `${angleString}|${resVal}|${naVal}|${intensityVal}`;
-
-                const viewer = document.getElementById('viewer');
-                viewer.innerHTML = '';
-
-                console.log("Sending to C++:", combinedParams);
-
-                Module.ccall(
-                    "callSSNP",
-                    null,
-                    ["string"],
-                    [combinedParams],
-                    { async: true }
-                ).catch(err => console.error("Error:", err));
-            });
-        };
-    </script>
-    <script async src="ssnp_cpp.js"></script>
+        Module.ccall(
+          "callSSNP",
+          null,
+          ["string"],
+          [combinedParams],
+          { async: true }
+        ).catch(err => console.error("Error:", err));
+      });
+    };
+  </script>
+  <script async src="ssnp_cpp.js"></script>
 </body>
 </html>
