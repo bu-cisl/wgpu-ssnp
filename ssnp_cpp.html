@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SSNP-IDT WebGPU (with TIFF support)</title>
+  <title>WebGPU SSNP Model</title>
   <style>
     body {
       margin: 0;
@@ -67,6 +67,45 @@
       margin-top: 3px;
       color: #ccc;
     }
+    
+    /* New styles for angle selector */
+    #angleSelectorContainer {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 20px 0;
+    }
+    #angleSelector {
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      background-color: #333;
+      position: relative;
+      cursor: crosshair;
+      border: 2px solid #555;
+    }
+    #anglePreview {
+      position: absolute;
+      background-color: rgba(0, 0, 0, 0.7);
+      padding: 5px;
+      border-radius: 3px;
+      pointer-events: none;
+      display: none;
+    }
+    #currentAngle {
+      margin-top: 10px;
+      font-size: 1.1rem;
+      color: #fff;
+    }
+    #angleIndicator {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: red;
+      transform: translate(-50%, -50%);
+      display: none;
+    }
   </style>
 
   <!-- 1) Include UTIF.js (make sure UTIF.js is available at this path or substitute a CDN) -->
@@ -76,16 +115,20 @@
   <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
 </head>
 <body>
-  <h1>WebGPU SSNP-IDT Model (TIFF + BIN)</h1>
+  <h1>WebGPU SSNP Model</h1>
   <div id="controls">
     <!-- Accept both .bin and .tif/.tiff -->
     <input type="file" id="fileInput" accept=".bin,.tif,.tiff" />
-    <div>
-      <input type="text" id="angleInput" placeholder="Enter angle pair as x,y" />
-      <button id="addAngleBtn">Add Angle</button>
-      <button id="clearAnglesBtn">Clear Angles</button>
+    
+    <!-- Angle selector section -->
+    <div id="angleSelectorContainer">
+      <div id="angleSelector">
+        <div id="angleIndicator"></div>
+        <div id="anglePreview"></div>
+      </div>
+      <div id="currentAngle">Selected angle: (0.00, 0.00)</div>
     </div>
-    <div id="anglesList"></div>
+    
     <div>
       <input type="text" id="resInput" placeholder="Resolution (e.g. 0.1,0.2,0.1)" />
       <input type="text" id="naInput" placeholder="NA (e.g. 0.65)" />
@@ -106,7 +149,7 @@
       },
     };
 
-    let angles = [];
+    let currentAngle = [0, 0];
 
     // Helper: write a 32-bit‐integer header + float32 volume into a single ArrayBuffer
     function buildBinBufferFromFloatVolume(slices, width, height) {
@@ -123,7 +166,7 @@
       dv.setInt32(0, D, true);
       dv.setInt32(4, H, true);
       dv.setInt32(8, W, true);
-      // Copy each slice’s Float32Array
+      // Copy each slice's Float32Array
       let offset = headerBytes;
       for (let d = 0; d < D; d++) {
         const sliceArr = slices[d];
@@ -211,8 +254,7 @@
 
         const angleLabel = document.createElement('div');
         angleLabel.className = 'angle-label';
-        const angleText = angles[d] ? `Angle: (${angles[d]})` : `Angle ${d + 1}`;
-        angleLabel.textContent = angleText;
+        angleLabel.textContent = `Angle: (${currentAngle[0].toFixed(2)}, ${currentAngle[1].toFixed(2)})`;
         container.appendChild(angleLabel);
 
         viewer.appendChild(container);
@@ -228,10 +270,83 @@
     Module.onRuntimeInitialized = () => {
       const fileInput = document.getElementById("fileInput");
       const runBtn = document.getElementById("runBtn");
-      const angleInput = document.getElementById("angleInput");
-      const addAngleBtn = document.getElementById("addAngleBtn");
-      const clearAnglesBtn = document.getElementById("clearAnglesBtn");
-      const anglesList = document.getElementById("anglesList");
+      const angleSelector = document.getElementById("angleSelector");
+      const anglePreview = document.getElementById("anglePreview");
+      const angleIndicator = document.getElementById("angleIndicator");
+      const currentAngleDisplay = document.getElementById("currentAngle");
+
+      // Set up angle selector
+      angleSelector.addEventListener("mousemove", (e) => {
+        const rect = angleSelector.getBoundingClientRect();
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        
+        // Get mouse position relative to center
+        const mouseX = e.clientX - rect.left - centerX;
+        const mouseY = e.clientY - rect.top - centerY;
+        
+        // Calculate distance from center
+        const distance = Math.sqrt(mouseX * mouseX + mouseY * mouseY);
+        const maxDistance = centerX;
+        
+        // Normalize to unit circle
+        let normalizedX = mouseX / maxDistance;
+        let normalizedY = mouseY / maxDistance;
+        
+        // If outside circle, project onto circle
+        if (distance > maxDistance) {
+          const angle = Math.atan2(mouseY, mouseX);
+          normalizedX = Math.cos(angle);
+          normalizedY = Math.sin(angle);
+        }
+        
+        // Update preview
+        anglePreview.style.display = "block";
+        anglePreview.style.left = `${e.clientX - rect.left + 10}px`;
+        anglePreview.style.top = `${e.clientY - rect.top + 10}px`;
+        anglePreview.textContent = `(${normalizedX.toFixed(2)}, ${normalizedY.toFixed(2)})`;
+      });
+      
+      angleSelector.addEventListener("mouseleave", () => {
+        anglePreview.style.display = "none";
+      });
+      
+      angleSelector.addEventListener("click", (e) => {
+        const rect = angleSelector.getBoundingClientRect();
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        
+        // Get mouse position relative to center
+        const mouseX = e.clientX - rect.left - centerX;
+        const mouseY = e.clientY - rect.top - centerY;
+        
+        // Calculate distance from center
+        const distance = Math.sqrt(mouseX * mouseX + mouseY * mouseY);
+        const maxDistance = centerX;
+        
+        // Normalize to unit circle
+        let normalizedX = mouseX / maxDistance;
+        let normalizedY = mouseY / maxDistance;
+        
+        // If outside circle, project onto circle
+        if (distance > maxDistance) {
+          const angle = Math.atan2(mouseY, mouseX);
+          normalizedX = Math.cos(angle);
+          normalizedY = Math.sin(angle);
+        }
+        
+        // Update current angle
+        currentAngle = [normalizedX, normalizedY];
+        currentAngleDisplay.textContent = `Selected angle: (${normalizedX.toFixed(2)}, ${normalizedY.toFixed(2)})`;
+        
+        // Show indicator
+        angleIndicator.style.display = "block";
+        angleIndicator.style.left = `${rect.width / 2 + normalizedX * maxDistance}px`;
+        angleIndicator.style.top = `${rect.height / 2 + normalizedY * maxDistance}px`;
+        
+        // Automatically run the forward function
+        runForwardFunction();
+      });
 
       fileInput.addEventListener("change", (e) => {
         const file = e.target.files[0];
@@ -241,7 +356,6 @@
         const ext = name.substring(name.lastIndexOf(".") + 1);
 
         if (ext === "bin") {
-          // --- EXACTLY AS BEFORE FOR BINARY ---
           const r = new FileReader();
           r.onload = () => {
             const data = new Uint8Array(r.result);
@@ -251,65 +365,50 @@
           r.readAsArrayBuffer(file);
 
         } else if (ext === "tif" || ext === "tiff") {
-          // --- NEW: READ MULTI‐SLICE TIFF VIA UTIF.js ---
           const reader = new FileReader();
           reader.onload = () => {
             const arrayBuffer = reader.result;
-            // 1) Decode IFDs
             const ifds = UTIF.decode(arrayBuffer);
             if (ifds.length === 0) {
               alert("No image slices found in TIFF.");
               return;
             }
 
-            // 2) Decode each IFD (slice)
             const slices = [];
             let width = null, height = null;
             for (let i = 0; i < ifds.length; i++) {
               UTIF.decodeImage(arrayBuffer, ifds[i]);
-              // 'ifds[i].data' holds raw pixel data for that slice.
-              // For a single‐channel float32 TIFF, 'ifd.data' should be a Float32Array.
               const raw = ifds[i].data;
-    if (!raw) {
-      alert(`Could not decode slice #${i}`);
-      return;
-    }
-    // On first slice, grab width/height; for subsequent, sanity‐check
-    if (i === 0) {
-      width = ifds[i].width;
-      height = ifds[i].height;
-    } else {
-      if (ifds[i].width !== width || ifds[i].height !== height) {
-        alert("All TIFF slices must have identical dimensions.");
-        return;
-      }
-    }
+              if (!raw) {
+                alert(`Could not decode slice #${i}`);
+                return;
+              }
+              if (i === 0) {
+                width = ifds[i].width;
+                height = ifds[i].height;
+              } else {
+                if (ifds[i].width !== width || ifds[i].height !== height) {
+                  alert("All TIFF slices must have identical dimensions.");
+                  return;
+                }
+              }
 
-    let floatSlice;
-    if (raw instanceof Float32Array) {
-      // UTIF already gave you a Float32 per pixel
-      floatSlice = raw;
+              let floatSlice;
+              if (raw instanceof Float32Array) {
+                floatSlice = raw;
+              } else if (raw instanceof Uint8Array && raw.length === width * height * 4) {
+                floatSlice = new Float32Array(raw.buffer, raw.byteOffset, raw.length / 4);
+              } else {
+                floatSlice = new Float32Array(raw.length);
+                for (let k = 0; k < raw.length; k++) {
+                  floatSlice[k] = raw[k];
+                }
+              }
 
-    } else if (raw instanceof Uint8Array && raw.length === width * height * 4) {
-      // UTIF gave you 4 bytes per pixel (32-bit float), so reinterpret:
-      floatSlice = new Float32Array(raw.buffer, raw.byteOffset, raw.length / 4);
-
-    } else {
-      // Fallback: maybe UTIF gave you a Uint16Array or plain Uint8Array of ints
-      // In that case, just convert element-by-element into floats
-      floatSlice = new Float32Array(raw.length);
-      for (let k = 0; k < raw.length; k++) {
-        floatSlice[k] = raw[k];
-      }
-    }
-
-    // Now floatSlice.length should === width*height
-    slices.push(floatSlice);
+              slices.push(floatSlice);
             }
 
-            // 3) Build a single ArrayBuffer: [ int32(D), int32(H), int32(W), all float32 voxels... ]
             const binBuffer = buildBinBufferFromFloatVolume(slices, width, height);
-            // 4) Write to Emscripten FS as "input.bin"
             FS.writeFile("input.bin", new Uint8Array(binBuffer));
             runBtn.disabled = false;
           };
@@ -320,30 +419,12 @@
         }
       });
 
-      addAngleBtn.addEventListener("click", () => {
-        const inputVal = angleInput.value.trim();
-        if (inputVal.match(/^[-+]?[0-9]*\.?[0-9]+,[-+]?[0-9]*\.?[0-9]+$/)) {
-          angles.push(inputVal);
-          const angleDiv = document.createElement("div");
-          angleDiv.textContent = inputVal;
-          anglesList.appendChild(angleDiv);
-          angleInput.value = "";
-        } else {
-          alert("Please enter a valid angle pair, e.g., 0.5,1.2");
-        }
-      });
-
-      clearAnglesBtn.addEventListener("click", () => {
-        angles = [];
-        anglesList.innerHTML = "";
-      });
-
-      runBtn.addEventListener("click", () => {
-        const angleString = angles.length ? angles.join(";") : "0.0,0.0";
+      function runForwardFunction() {
         const resVal = document.getElementById("resInput").value.trim() || "0.1,0.1,0.1";
         const naVal = document.getElementById("naInput").value.trim() || "0.65";
         const intensityVal = document.getElementById("intensityInput").checked ? "1" : "0";
 
+        const angleString = `${currentAngle[0]},${currentAngle[1]}`;
         const combinedParams = `${angleString}|${resVal}|${naVal}|${intensityVal}`;
 
         const viewer = document.getElementById("viewer");
@@ -358,7 +439,9 @@
           [combinedParams],
           { async: true }
         ).catch(err => console.error("Error:", err));
-      });
+      }
+
+      runBtn.addEventListener("click", runForwardFunction);
     };
   </script>
   <script async src="ssnp_cpp.js"></script>

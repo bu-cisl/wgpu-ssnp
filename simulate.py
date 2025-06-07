@@ -5,12 +5,12 @@ import matplotlib.pyplot as plt
 import tifffile
 from py.ssnp_model import SSNPBeam
 
-SHAPE = (50,128,128)
-ANGLE = [.3, .5]
-RES = (0.1,0.2,0.1)
-NA = 0.65
-INTENSITY = True
-TYPE = "tiff" # tiff or bin
+SHAPE = (50, 128, 128)
+ANGLE = [.13,.12]
+RES = (.1,.1,.1)
+NA = .65
+INTENSITY = False
+TYPE = "bin" # tiff or bin
 
 def save_tensor(tensor: np.ndarray, type="bin"):
     assert tensor.ndim == 3
