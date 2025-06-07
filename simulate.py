@@ -6,10 +6,10 @@ import tifffile
 from py.ssnp_model import SSNPBeam
 
 SHAPE = (50, 128, 128)
-ANGLE = [.13,.12]
+ANGLE = [-0.88,0.07]
 RES = (.1,.1,.1)
 NA = .65
-INTENSITY = False
+INTENSITY = True
 TYPE = "bin" # tiff or bin
 
 def save_tensor(tensor: np.ndarray, type="bin"):
