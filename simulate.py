@@ -6,9 +6,9 @@ import tifffile
 from py.ssnp_model import SSNPBeam
 
 SHAPE = (50, 128, 128)
-ANGLE = [-0.88,0.07]
-RES = (.1,.1,.1)
-NA = .65
+ANGLE = [-0.21, -0.05]
+RES = (.9,.9,.9)
+NA = .05
 INTENSITY = True
 TYPE = "bin" # tiff or bin
 

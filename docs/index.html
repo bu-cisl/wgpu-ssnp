@@ -5,106 +5,254 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>WebGPU SSNP Model</title>
   <style>
+    :root {
+      --bg-dark: #121212;
+      --bg-darker: #0a0a0a;
+      --bg-light: #1e1e1e;
+      --accent: #4a6fa5;
+      --accent-hover: #5a8ad8;
+      --text-primary: #f0f0f0;
+      --text-secondary: #b0b0b0;
+      --border: #333;
+      --border-light: #444;
+    }
+    
     body {
       margin: 0;
-      background-color: #202020;
-      color: #eee;
-      font-family: Arial, sans-serif;
+      padding: 0;
+      background-color: var(--bg-dark);
+      color: var(--text-primary);
+      font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', sans-serif;
+      line-height: 1.6;
     }
+    
     h1 {
       text-align: center;
+      margin: 20px 0;
+      color: var(--text-primary);
+      font-weight: 300;
+      letter-spacing: 0.5px;
     }
+    
     #controls {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-bottom: 10px;
+      background-color: var(--bg-light);
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 800px;
+      margin: 0 auto 20px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
-    #anglesList {
-      margin-top: 5px;
-      max-height: 100px;
-      overflow-y: auto;
-      border: 1px solid #555;
-      padding: 5px;
-      width: 200px;
-      background-color: #333;
+    
+    .control-group {
+      margin-bottom: 15px;
     }
-    #viewer {
-      display: flex;
-      flex-direction: row;
-      flex-wrap: nowrap;
-      overflow-x: auto;
+    
+    .control-group label {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+    
+    input[type="file"],
+    input[type="text"] {
+      width: 100%;
       padding: 10px;
-      background-color: #111;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background-color: var(--bg-darker);
+      color: var(--text-primary);
+      margin-bottom: 10px;
+      box-sizing: border-box;
     }
+    
+    input[type="file"]:focus,
+    input[type="text"]:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(74, 111, 165, 0.3);
+    }
+    
+    .checkbox-container {
+      display: flex;
+      align-items: center;
+      margin: 10px 0;
+    }
+    
+    .checkbox-container input {
+      margin-right: 8px;
+    }
+    
+    #runBtn {
+      background-color: var(--accent);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1rem;
+      width: 100%;
+      transition: background-color 0.2s;
+    }
+    
+    #runBtn:hover {
+      background-color: var(--accent-hover);
+    }
+    
+    #runBtn:disabled {
+      background-color: #555;
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+    
+    #viewer {
+      background-color: var(--bg-darker);
+      padding: 20px;
+      border-radius: 8px;
+      margin: 20px auto;
+      max-width: 95%;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
     .slice-container {
       display: flex;
       flex-direction: column;
       align-items: center;
-      margin-right: 20px;
+      margin: 0 15px 20px;
+      background-color: var(--bg-light);
+      padding: 15px;
+      border-radius: 6px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
+    
     canvas {
       image-rendering: pixelated;
-      border: 1px solid #555;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      margin-bottom: 10px;
     }
+    
     .colorbar {
       display: flex;
       flex-direction: column;
       align-items: center;
-      margin-left: 5px;
+      margin-left: 15px;
     }
+    
     .colorbar canvas {
-      width: 10px;
+      width: 20px;
       height: 100%;
+      border-radius: 3px;
     }
+    
     .colorbar-label {
       font-size: 0.75rem;
       text-align: center;
-      color: #ccc;
-    }
-    .angle-label {
-      font-size: 0.8rem;
-      margin-top: 3px;
-      color: #ccc;
+      color: var(--text-secondary);
+      margin: 5px 0;
     }
     
-    /* New styles for angle selector */
+    .angle-label {
+      font-size: 0.85rem;
+      margin-top: 10px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+    
+    /* Angle selector styles */
     #angleSelectorContainer {
       display: flex;
       flex-direction: column;
       align-items: center;
-      margin: 20px 0;
+      margin: 25px 0;
     }
+    
     #angleSelector {
-      width: 300px;
-      height: 300px;
+      width: 250px;
+      height: 250px;
       border-radius: 50%;
-      background-color: #333;
+      background-color: var(--bg-darker);
       position: relative;
       cursor: crosshair;
-      border: 2px solid #555;
+      border: 2px solid var(--border-light);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
+    
     #anglePreview {
       position: absolute;
-      background-color: rgba(0, 0, 0, 0.7);
-      padding: 5px;
-      border-radius: 3px;
+      background-color: rgba(0, 0, 0, 0.8);
+      padding: 8px 12px;
+      border-radius: 4px;
       pointer-events: none;
       display: none;
+      color: white;
+      font-size: 0.9rem;
+      z-index: 10;
     }
+    
     #currentAngle {
-      margin-top: 10px;
+      margin-top: 15px;
       font-size: 1.1rem;
-      color: #fff;
+      color: var(--text-primary);
+      background-color: var(--bg-light);
+      padding: 8px 15px;
+      border-radius: 20px;
+      font-weight: 500;
     }
+    
     #angleIndicator {
       position: absolute;
-      width: 8px;
-      height: 8px;
+      width: 12px;
+      height: 12px;
       border-radius: 50%;
-      background-color: red;
+      background-color: #ff4757;
       transform: translate(-50%, -50%);
       display: none;
+      box-shadow: 0 0 0 2px rgba(255, 71, 87, 0.5);
+      z-index: 5;
+    }
+    
+    /* Grid layout for slices */
+    .slices-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+      width: 100%;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      #controls {
+        padding: 15px;
+      }
+      
+      #angleSelector {
+        width: 200px;
+        height: 200px;
+      }
+      
+      .slices-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    /* Scrollbar styling */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: var(--bg-light);
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-light);
+      border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--accent);
     }
   </style>
 
@@ -115,13 +263,16 @@
   <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
 </head>
 <body>
-  <h1>WebGPU SSNP Model</h1>
+  <h1>WebGPU SSNP Model Viewer</h1>
   <div id="controls">
-    <!-- Accept both .bin and .tif/.tiff -->
-    <input type="file" id="fileInput" accept=".bin,.tif,.tiff" />
+    <div class="control-group">
+      <label for="fileInput">Upload Volume Data (.bin or .tiff)</label>
+      <input type="file" id="fileInput" accept=".bin,.tif,.tiff" />
+    </div>
     
     <!-- Angle selector section -->
     <div id="angleSelectorContainer">
+      <label>Select Angle</label>
       <div id="angleSelector">
         <div id="angleIndicator"></div>
         <div id="anglePreview"></div>
@@ -129,16 +280,27 @@
       <div id="currentAngle">Selected angle: (0.00, 0.00)</div>
     </div>
     
-    <div>
-      <input type="text" id="resInput" placeholder="Resolution (e.g. 0.1,0.2,0.1)" />
-      <input type="text" id="naInput" placeholder="NA (e.g. 0.65)" />
-      <label>
-        <input type="checkbox" id="intensityInput" checked /> Intensity
-      </label>
+    <div class="control-group">
+      <label for="resInput">Resolution (e.g. 0.1,0.2,0.1)</label>
+      <input type="text" id="resInput" placeholder="Enter resolution values" />
     </div>
-    <button id="runBtn" disabled>Run</button>
+    
+    <div class="control-group">
+      <label for="naInput">Numerical Aperture (e.g. 0.65)</label>
+      <input type="text" id="naInput" placeholder="Enter NA value" />
+    </div>
+    
+    <div class="checkbox-container">
+      <input type="checkbox" id="intensityInput" checked />
+      <label for="intensityInput">Show Intensity</label>
+    </div>
+    
+    <button id="runBtn" disabled>Run Simulation</button>
   </div>
-  <div id="viewer"></div>
+  
+  <div id="viewer">
+    <div class="slices-grid" id="slicesContainer"></div>
+  </div>
 
   <script>
     if (!navigator.gpu) {
@@ -190,8 +352,8 @@
     }
 
     function plotSlices(flatArray, D, H, W, minArray, maxArray) {
-      const viewer = document.getElementById('viewer');
-      viewer.innerHTML = '';
+      const slicesContainer = document.getElementById('slicesContainer');
+      slicesContainer.innerHTML = '';
 
       let idx = 0;
       for (let d = 0; d < D; d++) {
@@ -232,7 +394,7 @@
         const colorbar = document.createElement('div');
         colorbar.className = 'colorbar';
         const colorCanvas = document.createElement('canvas');
-        colorCanvas.width = 10;
+        colorCanvas.width = 20;
         colorCanvas.height = H;
         const colorCtx = colorCanvas.getContext('2d');
         const colorImg = colorCtx.createImageData(1, H);
@@ -246,7 +408,7 @@
           colorImg.data[idx2 + 2] = b;
           colorImg.data[idx2 + 3] = 255;
         }
-        for (let x = 0; x < 10; x++) {
+        for (let x = 0; x < 20; x++) {
           colorCtx.putImageData(colorImg, x, 0);
         }
 
@@ -268,7 +430,7 @@
         angleLabel.textContent = `Angle: (${currentAngle[0].toFixed(2)}, ${currentAngle[1].toFixed(2)})`;
         container.appendChild(angleLabel);
 
-        viewer.appendChild(container);
+        slicesContainer.appendChild(container);
       }
     }
 
@@ -438,7 +600,7 @@
         const angleString = `${currentAngle[0]},${currentAngle[1]}`;
         const combinedParams = `${angleString}|${resVal}|${naVal}|${intensityVal}`;
 
-        const viewer = document.getElementById("viewer");
+        const viewer = document.getElementById("slicesContainer");
         viewer.innerHTML = "";
 
         console.log("Sending to C++:", combinedParams);
