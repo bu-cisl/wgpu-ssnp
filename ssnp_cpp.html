@@ -354,25 +354,37 @@
 
     // Helper: write a 32-bit‐integer header + float32 volume into a single ArrayBuffer
     function buildBinBufferFromFloatVolume(slices, width, height) {
-      // slices: Array of Float32Array, each of length width*height
+      // slices: Array of Float32Array
       const D = slices.length;
       const H = height;
       const W = width;
-      const headerBytes = 4 * 3; // three int32
-      const floatBytesPerSlice = W * H * 4;
+      
+      // Detect if dual-channel (2 values per pixel)
+      const isDualChannel = slices[0].length === (2 * W * H);
+      const channels = isDualChannel ? 2 : 1;
+      
+      const headerBytes = 4 * 4; // Four int32 (now including channels)
+      const floatBytesPerSlice = W * H * channels * 4;
       const totalBytes = headerBytes + D * floatBytesPerSlice;
       const buffer = new ArrayBuffer(totalBytes);
       const dv = new DataView(buffer);
-      // Write D, H, W as int32
+      
+      // Write D, H, W, C as int32
       dv.setInt32(0, D, true);
       dv.setInt32(4, H, true);
       dv.setInt32(8, W, true);
-      // Copy each slice's Float32Array
+      dv.setInt32(12, channels, true); // Add channels to header
+      
       let offset = headerBytes;
       for (let d = 0; d < D; d++) {
         const sliceArr = slices[d];
-        // Assume sliceArr is a Float32Array
-        const floatView = new Float32Array(buffer, offset, W * H);
+        const floatView = new Float32Array(buffer, offset, W * H * channels);
+        
+        // Verify size matches
+        if (sliceArr.length !== W * H * channels) {
+          throw new Error(`Slice ${d} has ${sliceArr.length} elements but expected ${W * H * channels}`);
+        }
+        
         floatView.set(sliceArr);
         offset += floatBytesPerSlice;
       }
