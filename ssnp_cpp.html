@@ -249,6 +249,54 @@
 			::-webkit-scrollbar-thumb:hover {
 			background: var(--accent);
 			}
+			.tooltip-icon {
+			display: inline-block;
+			width: 16px;
+			height: 16px;
+			background-color: var(--accent);
+			color: var(--text-primary);
+			border-radius: 50%;
+			text-align: center;
+			font-size: 12px;
+			line-height: 16px;
+			margin-left: 5px;
+			cursor: help;
+			position: relative;
+			}
+			.tooltip-text {
+			visibility: hidden;
+			width: 200px;
+			background-color: var(--bg-light);
+			color: var(--text-primary);
+			text-align: center;
+			border-radius: 6px;
+			padding: 8px;
+			position: absolute;
+			z-index: 1;
+			bottom: 125%;
+			left: 50%;
+			transform: translateX(-50%);
+			opacity: 0;
+			transition: opacity 0.3s;
+			border: 1px solid var(--border);
+			font-size: 0.8rem;
+			font-weight: normal;
+			pointer-events: none;
+			}
+			.tooltip-icon:hover .tooltip-text {
+			visibility: visible;
+			opacity: 1;
+			}
+			.tooltip-text::after {
+			content: "";
+			position: absolute;
+			top: 100%;
+			left: 50%;
+			margin-left: -5px;
+			border-width: 5px;
+			border-style: solid;
+			border-color: var(--bg-light) transparent transparent transparent;
+			}
 		</style>
 		<script src="UTIF.js"></script>
 		<script src="https://d3js.org/d3.v7.min.js"></script>
@@ -271,16 +319,31 @@
 				<div id="currentAngle">Selected angle: (0.00, 0.00)</div>
 			</div>
 			<div class="control-group">
-				<label for="resInput">Resolution</label>
+				<label for="resInput">
+				Resolution
+				<span class="tooltip-icon">?
+				<span class="tooltip-text">Resolution Info</span>
+				</span>
+				</label>
 				<input type="text" id="resInput" placeholder="e.g.: 0.1,0.1,0.1" />
 			</div>
 			<div class="control-group">
-				<label for="naInput">Numerical Aperture</label>
+				<label for="naInput">
+				Numerical Aperture
+				<span class="tooltip-icon">?
+				<span class="tooltip-text">Numerical Aperture Info</span>
+				</span>
+				</label>
 				<input type="text" id="naInput" placeholder="e.g.: 0.65" />
 			</div>
 			<div class="checkbox-container">
 				<input type="checkbox" id="intensityInput" checked />
-				<label for="intensityInput">Show Intensity</label>
+				<label for="intensityInput">
+				Show Intensity
+				<span class="tooltip-icon">?
+				<span class="tooltip-text">Intensity Info</span>
+				</span>
+				</label>
 			</div>
 			<button id="runBtn" disabled>Run Simulation</button>
 		</div>
@@ -298,7 +361,6 @@
 			}
 		</script>
 		<script>
-			// Emscripten/WASM Module boilerplate
 			var Module = {
 			  noInitialRun: true,
 			  print: function (text) {
@@ -319,13 +381,13 @@
 			  const totalElements = slices[0].length;
 			  const channels = Math.floor(totalElements / (W * H));
 			  
-			  const headerBytes = 3 * 4; // Three int32 (D, H, W), no C
+			  const headerBytes = 3 * 4;
 			  const floatBytesPerSlice = W * H * 4; // Always output single channel
 			  const totalBytes = headerBytes + D * floatBytesPerSlice;
 			  const buffer = new ArrayBuffer(totalBytes);
 			  const dv = new DataView(buffer);
 			  
-			  // Write D, H, W as int32 (skip C)
+			  // Write D, H, W as int32
 			  dv.setInt32(0, D, true);
 			  dv.setInt32(4, H, true);
 			  dv.setInt32(8, W, true);
@@ -344,7 +406,7 @@
 			      // If multi-channel, extract first channel
 			      if (channels > 1) {
 			          for (let i = 0; i < W * H; i++) {
-			              floatView[i] = sliceArr[i * channels]; // Take first channel of each pixel
+			              floatView[i] = sliceArr[i * channels];
 			          }
 			      } else {
 			          // Single channel
@@ -698,12 +760,12 @@
 			            if (bitsPerSample === 8) {
 			                const int8 = raw instanceof Int8Array ? raw : new Int8Array(raw.buffer);
 			                for (let i = 0; i < int8.length; i++) {
-			                    output[i] = int8[i] / 128.0; // [-1, ~0.992]
+			                    output[i] = int8[i] / 128.0;
 			                }
 			            } else if (bitsPerSample === 16) {
 			                const int16 = raw instanceof Int16Array ? raw : new Int16Array(raw.buffer);
 			                for (let i = 0; i < int16.length; i++) {
-			                    output[i] = int16[i] / 32768.0; // [-1, ~0.99997]
+			                    output[i] = int16[i] / 32768.0;
 			                }
 			            }
 			            break;
@@ -714,7 +776,7 @@
 			            } else if (bitsPerSample === 64) {
 			                const float64 = raw instanceof Float64Array ? raw : new Float64Array(raw.buffer);
 			                for (let i = 0; i < float64.length; i++) {
-			                    output[i] = float64[i]; // Precision loss possible
+			                    output[i] = float64[i];
 			                }
 			            }
 			            break;
