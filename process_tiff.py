@@ -4,11 +4,11 @@ import tifffile
 import matplotlib.pyplot as plt
 from py.ssnp_model import SSNPBeam
 
-ANGLE = [-0.49, 0.33]
+ANGLE = [-0.11, -0.05]
 RES = (0.1, 0.1, 0.1)
 NA = 0.65
 INTENSITY = True
-TIFF_PATH = "pycuda.tiff"
+TIFF_PATH = "uint16.tiff"
 
 def main():
     # Load TIFF file
@@ -19,7 +19,7 @@ def main():
     # Convert to float32
     if input_tensor.dtype != np.float32:
         # change this:
-        input_tensor = 0.01 * input_tensor.astype(np.float32) / 0xFFFF
+        input_tensor = input_tensor.astype(np.float32) / 0xFFFF
     
     print(f"Shape: {input_tensor.shape}, dtype: {input_tensor.dtype}")
     print(f"Value range: {input_tensor.min():.4f} to {input_tensor.max():.4f}")

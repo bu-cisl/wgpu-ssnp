@@ -1,701 +1,780 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>WebGPU SSNP Model</title>
-  <style>
-    :root {
-      --bg-dark: #121212;
-      --bg-darker: #0a0a0a;
-      --bg-light: #1e1e1e;
-      --accent: #4a6fa5;
-      --accent-hover: #5a8ad8;
-      --text-primary: #f0f0f0;
-      --text-secondary: #b0b0b0;
-      --border: #333;
-      --border-light: #444;
-    }
-    
-    body {
-      margin: 0;
-      padding: 0;
-      background-color: var(--bg-dark);
-      color: var(--text-primary);
-      font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', sans-serif;
-      line-height: 1.6;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
-    
-    h1 {
-      text-align: center;
-      margin: 20px 0;
-      color: var(--text-primary);
-      font-weight: 300;
-      letter-spacing: 0.5px;
-    }
-    
-    #controls {
-      background-color: var(--bg-light);
-      padding: 20px;
-      border-radius: 8px;
-      max-width: 800px;
-      width: 50%;  
-      margin: 0 auto 20px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-    
-    .control-group {
-      margin-bottom: 15px;
-    }
-    
-    .control-group label {
-      display: block;
-      margin-bottom: 5px;
-      color: var(--text-secondary);
-      font-size: 0.9rem;
-    }
-    
-    input[type="file"],
-    input[type="text"] {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      background-color: var(--bg-darker);
-      color: var(--text-primary);
-      margin-bottom: 10px;
-      box-sizing: border-box;
-    }
-    
-    input[type="file"]:focus,
-    input[type="text"]:focus {
-      outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 2px rgba(74, 111, 165, 0.3);
-    }
-    
-    .checkbox-container {
-      display: flex;
-      align-items: center;
-      margin: 10px 0;
-    }
-    
-    .checkbox-container input {
-      margin-right: 8px;
-    }
-    
-    #runBtn {
-      background-color: var(--accent);
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 1rem;
-      width: 100%;
-      transition: background-color 0.2s;
-    }
-    
-    #runBtn:hover {
-      background-color: var(--accent-hover);
-    }
-    
-    #runBtn:disabled {
-      background-color: #555;
-      cursor: not-allowed;
-      opacity: 0.7;
-    }
-    
-    #viewer {
-      background-color: var(--bg-darker);
-      padding: 20px;
-      border-radius: 8px;
-      margin: 20px auto;
-      max-width: 95%;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      flex-grow: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-    }
-    
-    .result-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin: 0 auto;
-      background-color: var(--bg-light);
-      padding: 20px;
-      border-radius: 6px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      max-width: 800px;
-      width: 100%;
-    }
-    
-    canvas {
-      image-rendering: pixelated;
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      margin-bottom: 10px;
-      max-width: 100%;
-    }
-    
-    .colorbar {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-left: 15px;
-    }
-    
-    .colorbar canvas {
-      width: 20px;
-      height: 100%;
-      border-radius: 3px;
-    }
-    
-    .colorbar-label {
-      font-size: 0.75rem;
-      text-align: center;
-      color: var(--text-secondary);
-      margin: 5px 0;
-    }
-    
-    .angle-label {
-      font-size: 0.85rem;
-      margin-top: 10px;
-      color: var(--text-secondary);
-      font-weight: 500;
-      text-align: center;
-    }
-    
-    /* Angle selector styles */
-    #angleSelectorContainer {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin: 25px 0;
-    }
-    
-    #angleSelector {
-      width: 350px;
-      height: 350px;
-      border-radius: 50%;
-      background-color: var(--bg-darker);
-      position: relative;
-      cursor: crosshair;
-      border: 2px solid var(--border-light);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
-    
-    #anglePreview {
-      position: absolute;
-      background-color: rgba(0, 0, 0, 0.8);
-      padding: 8px 12px;
-      border-radius: 4px;
-      pointer-events: none;
-      display: none;
-      color: white;
-      font-size: 0.9rem;
-      z-index: 10;
-    }
-    
-    #currentAngle {
-      margin-top: 15px;
-      font-size: 1.1rem;
-      color: var(--text-primary);
-      background-color: var(--bg-light);
-      padding: 8px 15px;
-      border-radius: 20px;
-      font-weight: 500;
-    }
-    
-    #angleIndicator {
-      position: absolute;
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background-color: #ff4757;
-      transform: translate(-50%, -50%);
-      display: none;
-      box-shadow: 0 0 0 2px rgba(255, 71, 87, 0.5);
-      z-index: 5;
-    }
-    
-    .result-display {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      margin-top: 20px;
-    }
-    
-    /* Responsive adjustments */
-    @media (max-width: 768px) {
-      #controls {
-        padding: 15px;
-      }
-      
-      #angleSelector {
-        width: 200px;
-        height: 200px;
-      }
-      
-      .result-display {
-        flex-direction: column;
-      }
-      
-      .colorbar {
-        margin-left: 0;
-        margin-top: 15px;
-        flex-direction: row;
-      }
-      
-      .colorbar canvas {
-        width: 100%;
-        height: 20px;
-      }
-      
-      .colorbar-label {
-        margin: 0 10px;
-      }
-    }
-    
-    /* Scrollbar styling */
-    ::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
-    }
-    
-    ::-webkit-scrollbar-track {
-      background: var(--bg-light);
-    }
-    
-    ::-webkit-scrollbar-thumb {
-      background: var(--border-light);
-      border-radius: 4px;
-    }
-    
-    ::-webkit-scrollbar-thumb:hover {
-      background: var(--accent);
-    }
-  </style>
-
-  <script src="UTIF.js"></script>
-  <script src="https://d3js.org/d3.v7.min.js"></script>
-  <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
-</head>
-<body>
-  <h1>WebGPU SSNP Model Viewer</h1>
-  <div id="controls">
-    <div class="control-group">
-      <label for="fileInput">Upload Volume Data (.bin or .tiff)</label>
-      <input type="file" id="fileInput" accept=".bin,.tif,.tiff" />
-    </div>
-    
-    <!-- Angle selector section -->
-    <div id="angleSelectorContainer">
-      <label>Select Angle</label>
-      <div id="angleSelector">
-        <div id="angleIndicator"></div>
-        <div id="anglePreview"></div>
-      </div>
-      <div id="currentAngle">Selected angle: (0.00, 0.00)</div>
-    </div>
-    
-    <div class="control-group">
-      <label for="resInput">Resolution</label>
-      <input type="text" id="resInput" placeholder="e.g.: 0.1,0.1,0.1" />
-    </div>
-    
-    <div class="control-group">
-      <label for="naInput">Numerical Aperture</label>
-      <input type="text" id="naInput" placeholder="e.g.: 0.65" />
-    </div>
-    
-    <div class="checkbox-container">
-      <input type="checkbox" id="intensityInput" checked />
-      <label for="intensityInput">Show Intensity</label>
-    </div>
-    
-    <button id="runBtn" disabled>Run Simulation</button>
-  </div>
-  
-  <div id="viewer">
-    <div class="result-container" id="resultContainer"></div>
-  </div>
-
-  <script>
-    if (!navigator.gpu) {
-      alert("Your browser does not support WebGPU. Please use a compatible browser such as the latest version of Google Chrome or Edge.");
-      // Optionally disable UI interactions
-      document.addEventListener("DOMContentLoaded", () => {
-        document.getElementById("fileInput").disabled = true;
-        document.getElementById("runBtn").disabled = true;
-      });
-    }
-  </script>
-
-  <script>
-    // Emscripten/WASM Module boilerplate
-    var Module = {
-      noInitialRun: true,
-      print: function (text) {
-        console.log(text);
-      },
-    };
-
-    let currentAngle = [0, 0];
-
-    // Helper: write a 32-bit‐integer header + float32 volume into a single ArrayBuffer
-    function buildBinBufferFromFloatVolume(slices, width, height) {
-      // slices: Array of Float32Array
-      const D = slices.length;
-      const H = height;
-      const W = width;
-      
-      // Detect if dual-channel (2 values per pixel)
-      const isDualChannel = slices[0].length === (2 * W * H);
-      const channels = isDualChannel ? 2 : 1;
-      
-      const headerBytes = 4 * 4; // Four int32 (now including channels)
-      const floatBytesPerSlice = W * H * channels * 4;
-      const totalBytes = headerBytes + D * floatBytesPerSlice;
-      const buffer = new ArrayBuffer(totalBytes);
-      const dv = new DataView(buffer);
-      
-      // Write D, H, W, C as int32
-      dv.setInt32(0, D, true);
-      dv.setInt32(4, H, true);
-      dv.setInt32(8, W, true);
-      dv.setInt32(12, channels, true); // Add channels to header
-      
-      let offset = headerBytes;
-      for (let d = 0; d < D; d++) {
-        const sliceArr = slices[d];
-        const floatView = new Float32Array(buffer, offset, W * H * channels);
-        
-        // Verify size matches
-        if (sliceArr.length !== W * H * channels) {
-          throw new Error(`Slice ${d} has ${sliceArr.length} elements but expected ${W * H * channels}`);
-        }
-        
-        floatView.set(sliceArr);
-        offset += floatBytesPerSlice;
-      }
-      return buffer;
-    }
-
-    function plotSlices(flatArray, D, H, W, minArray, maxArray) {
-      const resultContainer = document.getElementById('resultContainer');
-      resultContainer.innerHTML = '';
-
-      // Fixed display dimensions
-      const DISPLAY_SIZE = 512; 
-
-      const d = 0;
-      const localMin = minArray[d];
-      const localMax = maxArray[d];
-      const scale = localMax - localMin || 1;
-
-      const container = document.createElement('div');
-      container.className = 'result-display';
-
-      // Create main canvas (will be scaled to DISPLAY_SIZE)
-      const canvas = document.createElement('canvas');
-      canvas.width = DISPLAY_SIZE;
-      canvas.height = DISPLAY_SIZE;
-      const ctx = canvas.getContext('2d');
-
-      // Create temporary canvas at original dimensions
-      const tempCanvas = document.createElement('canvas');
-      tempCanvas.width = W;
-      tempCanvas.height = H;
-      const tempCtx = tempCanvas.getContext('2d');
-      const tempImgData = tempCtx.createImageData(W, H);
-
-      // Fill temporary canvas with pixel data
-      let idx = 0;
-      for (let i = 0; i < H; i++) {
-        for (let j =  0; j < W; j++) {
-          const value = flatArray[idx++];
-          const norm = (value - localMin) / scale;
-          const [r, g, b] = colormap(norm);
-          const pixelIndex = (i * W + j) * 4;
-          tempImgData.data[pixelIndex] = r;
-          tempImgData.data[pixelIndex + 1] = g;
-          tempImgData.data[pixelIndex + 2] = b;
-          tempImgData.data[pixelIndex + 3] = 255;
-        }
-      }
-
-      // Put data into temp canvas
-      tempCtx.putImageData(tempImgData, 0, 0);
-
-      // Calculate scaling while maintaining aspect ratio
-      const scaleFactor = Math.min(DISPLAY_SIZE / W, DISPLAY_SIZE / H);
-      const scaledWidth = W * scaleFactor;
-      const scaledHeight = H * scaleFactor;
-      const offsetX = (DISPLAY_SIZE - scaledWidth) / 2;
-      const offsetY = (DISPLAY_SIZE - scaledHeight) / 2;
-
-      // Draw scaled version to main canvas
-      ctx.imageSmoothingEnabled = false; // For crisp pixel scaling
-      ctx.clearRect(0, 0, DISPLAY_SIZE, DISPLAY_SIZE);
-      ctx.drawImage(tempCanvas, 0, 0, W, H, offsetX, offsetY, scaledWidth, scaledHeight);
-
-      container.appendChild(canvas);
-
-      // Colorbar (matches display height)
-      const colorbar = document.createElement('div');
-      colorbar.className = 'colorbar';
-      const colorCanvas = document.createElement('canvas');
-      colorCanvas.width = 20;
-      colorCanvas.height = DISPLAY_SIZE;
-      const colorCtx = colorCanvas.getContext('2d');
-      const colorImg = colorCtx.createImageData(1, DISPLAY_SIZE);
-
-      for (let i = 0; i < DISPLAY_SIZE; i++) {
-        const t = 1 - i / (DISPLAY_SIZE - 1);
-        const [r, g, b] = colormap(t);
-        const idx2 = i * 4;
-        colorImg.data[idx2] = r;
-        colorImg.data[idx2 + 1] = g;
-        colorImg.data[idx2 + 2] = b;
-        colorImg.data[idx2 + 3] = 255;
-      }
-      for (let x = 0; x < 20; x++) {
-        colorCtx.putImageData(colorImg, x, 0);
-      }
-
-      colorbar.appendChild(colorCanvas);
-      const maxLabel = document.createElement('div');
-      maxLabel.className = 'colorbar-label';
-      maxLabel.textContent = localMax.toExponential(3);
-      const minLabel = document.createElement('div');
-      minLabel.className = 'colorbar-label';
-      minLabel.textContent = localMin.toExponential(3);
-      colorbar.insertBefore(maxLabel, colorCanvas);
-      colorbar.appendChild(minLabel);
-
-      container.appendChild(colorbar);
-      resultContainer.appendChild(container);
-
-      const angleLabel = document.createElement('div');
-      angleLabel.className = 'angle-label';
-      angleLabel.textContent = `Angle: (${currentAngle[0].toFixed(2)}, ${currentAngle[1].toFixed(2)})`;
-      resultContainer.appendChild(angleLabel);
-    }
-
-    function colormap(t) {
-      t = Math.max(0, Math.min(1, t));
-      const c = d3.color(d3.interpolateViridis(t));
-      return [c.r, c.g, c.b];
-    }
-
-    Module.onRuntimeInitialized = () => {
-      const fileInput = document.getElementById("fileInput");
-      const runBtn = document.getElementById("runBtn");
-      const angleSelector = document.getElementById("angleSelector");
-      const anglePreview = document.getElementById("anglePreview");
-      const angleIndicator = document.getElementById("angleIndicator");
-      const currentAngleDisplay = document.getElementById("currentAngle");
-
-      // Set up angle selector
-      angleSelector.addEventListener("mousemove", (e) => {
-        const rect = angleSelector.getBoundingClientRect();
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
-        
-        // Get mouse position relative to center
-        const mouseX = e.clientX - rect.left - centerX;
-        const mouseY = e.clientY - rect.top - centerY;
-        
-        // Calculate distance from center
-        const distance = Math.sqrt(mouseX * mouseX + mouseY * mouseY);
-        const maxDistance = centerX;
-        
-        // Normalize to unit circle
-        let normalizedX = mouseX / maxDistance;
-        let normalizedY = mouseY / maxDistance;
-        
-        // If outside circle, project onto circle
-        if (distance > maxDistance) {
-          const angle = Math.atan2(mouseY, mouseX);
-          normalizedX = Math.cos(angle);
-          normalizedY = Math.sin(angle);
-        }
-        
-        // Update preview
-        anglePreview.style.display = "block";
-        anglePreview.style.left = `${e.clientX - rect.left + 10}px`;
-        anglePreview.style.top = `${e.clientY - rect.top + 10}px`;
-        anglePreview.textContent = `(${normalizedX.toFixed(2)}, ${normalizedY.toFixed(2)})`;
-      });
-      
-      angleSelector.addEventListener("mouseleave", () => {
-        anglePreview.style.display = "none";
-      });
-      
-      angleSelector.addEventListener("click", (e) => {
-        const rect = angleSelector.getBoundingClientRect();
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
-        
-        // Get mouse position relative to center
-        const mouseX = e.clientX - rect.left - centerX;
-        const mouseY = e.clientY - rect.top - centerY;
-        
-        // Calculate distance from center
-        const distance = Math.sqrt(mouseX * mouseX + mouseY * mouseY);
-        const maxDistance = centerX;
-        
-        // Normalize to unit circle
-        let normalizedX = mouseX / maxDistance;
-        let normalizedY = mouseY / maxDistance;
-        
-        // If outside circle, project onto circle
-        if (distance > maxDistance) {
-          const angle = Math.atan2(mouseY, mouseX);
-          normalizedX = Math.cos(angle);
-          normalizedY = Math.sin(angle);
-        }
-        
-        // Update current angle
-        currentAngle = [normalizedX, normalizedY];
-        currentAngleDisplay.textContent = `Selected angle: (${normalizedX.toFixed(2)}, ${normalizedY.toFixed(2)})`;
-        
-        // Show indicator
-        angleIndicator.style.display = "block";
-        angleIndicator.style.left = `${rect.width / 2 + normalizedX * maxDistance}px`;
-        angleIndicator.style.top = `${rect.height / 2 + normalizedY * maxDistance}px`;
-        
-        // Automatically run the forward function
-        runForwardFunction();
-      });
-
-      fileInput.addEventListener("change", (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        const name = file.name.toLowerCase();
-        const ext = name.substring(name.lastIndexOf(".") + 1);
-
-        if (ext === "bin") {
-          const r = new FileReader();
-          r.onload = () => {
-            const data = new Uint8Array(r.result);
-            FS.writeFile("input.bin", data);
-            runBtn.disabled = false;
-          };
-          r.readAsArrayBuffer(file);
-
-        } else if (ext === "tif" || ext === "tiff") {
-          const reader = new FileReader();
-          reader.onload = () => {
-            const arrayBuffer = reader.result;
-            const ifds = UTIF.decode(arrayBuffer);
-            if (ifds.length === 0) {
-              alert("No image slices found in TIFF.");
-              return;
-            }
-
-            const slices = [];
-            let width = null, height = null;
-            for (let i = 0; i < ifds.length; i++) {
-              UTIF.decodeImage(arrayBuffer, ifds[i]);
-              const raw = ifds[i].data;
-              if (!raw) {
-                alert(`Could not decode slice #${i}`);
-                return;
-              }
-              if (i === 0) {
-                width = ifds[i].width;
-                height = ifds[i].height;
-              } else {
-                if (ifds[i].width !== width || ifds[i].height !== height) {
-                  alert("All TIFF slices must have identical dimensions.");
-                  return;
-                }
-              }
-
-              let floatSlice;
-              if (raw instanceof Float32Array) {
-                floatSlice = raw;
-              } else if (raw instanceof Uint8Array && raw.length === width * height * 4) {
-                floatSlice = new Float32Array(raw.buffer, raw.byteOffset, raw.length / 4);
-              } else {
-                floatSlice = new Float32Array(raw.length);
-                for (let k = 0; k < raw.length; k++) {
-                  floatSlice[k] = raw[k];
-                }
-              }
-
-              slices.push(floatSlice);
-            }
-
-            const binBuffer = buildBinBufferFromFloatVolume(slices, width, height);
-            FS.writeFile("input.bin", new Uint8Array(binBuffer));
-            runBtn.disabled = false;
-          };
-          reader.readAsArrayBuffer(file);
-
-        } else {
-          alert("Unsupported file type: please select a .bin or .tif/.tiff");
-        }
-      });
-
-      function validateInputs(resVal, naVal) {
-        // Validate resolution format (exactly 3 numbers separated by commas)
-        const resParts = resVal.split(',');
-        if (resParts.length !== 3 || resParts.some(part => isNaN(parseFloat(part)))) {
-          alert("Resolution must be exactly 3 numbers separated by commas (e.g. '0.1,0.1,0.1')");
-          return false;
-        }
-        
-        // Validate NA (single number)
-        if (isNaN(naVal) || isNaN(parseFloat(naVal))) {
-          alert("NA must be a single number (e.g. '0.65')");
-          return false;
-        }
-        
-        return true;
-      }
-
-      function runForwardFunction() {
-        const resVal = document.getElementById("resInput").value.trim() || "0.1,0.1,0.1";
-        const naVal = document.getElementById("naInput").value.trim() || "0.65";
-        const intensityVal = document.getElementById("intensityInput").checked ? "1" : "0";
-
-        if (!validateInputs(resVal, naVal)) {
-          return; // Stop execution if validation fails
-        }
-
-        const angleString = `${currentAngle[0]},${currentAngle[1]}`;
-        const combinedParams = `${angleString}|${resVal}|${naVal}|${intensityVal}`;
-
-        const viewer = document.getElementById("resultContainer");
-        viewer.innerHTML = "";
-
-        console.log("Sending to C++:", combinedParams);
-
-        Module.ccall(
-          "callSSNP",
-          null,
-          ["string"],
-          [combinedParams],
-          { async: true }
-        ).catch(err => console.error("Error:", err));
-      }
-
-      runBtn.addEventListener("click", runForwardFunction);
-    };
-  </script>
-  <script async src="ssnp_cpp.js"></script>
-</body>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>WebGPU SSNP Model</title>
+		<style>
+			:root {
+			--bg-dark: #121212;
+			--bg-darker: #0a0a0a;
+			--bg-light: #1e1e1e;
+			--accent: #4a6fa5;
+			--accent-hover: #5a8ad8;
+			--text-primary: #f0f0f0;
+			--text-secondary: #b0b0b0;
+			--border: #333;
+			--border-light: #444;
+			}
+			body {
+			margin: 0;
+			padding: 0;
+			background-color: var(--bg-dark);
+			color: var(--text-primary);
+			font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', sans-serif;
+			line-height: 1.6;
+			display: flex;
+			flex-direction: column;
+			min-height: 100vh;
+			}
+			h1 {
+			text-align: center;
+			margin: 20px 0;
+			color: var(--text-primary);
+			font-weight: 300;
+			letter-spacing: 0.5px;
+			}
+			#controls {
+			background-color: var(--bg-light);
+			padding: 20px;
+			border-radius: 8px;
+			max-width: 800px;
+			width: 50%;  
+			margin: 0 auto 20px;
+			box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+			}
+			.control-group {
+			margin-bottom: 15px;
+			}
+			.control-group label {
+			display: block;
+			margin-bottom: 5px;
+			color: var(--text-secondary);
+			font-size: 0.9rem;
+			}
+			input[type="file"],
+			input[type="text"] {
+			width: 100%;
+			padding: 10px;
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			background-color: var(--bg-darker);
+			color: var(--text-primary);
+			margin-bottom: 10px;
+			box-sizing: border-box;
+			}
+			input[type="file"]:focus,
+			input[type="text"]:focus {
+			outline: none;
+			border-color: var(--accent);
+			box-shadow: 0 0 0 2px rgba(74, 111, 165, 0.3);
+			}
+			.checkbox-container {
+			display: flex;
+			align-items: center;
+			margin: 10px 0;
+			}
+			.checkbox-container input {
+			margin-right: 8px;
+			}
+			#runBtn {
+			background-color: var(--accent);
+			color: white;
+			border: none;
+			padding: 10px 20px;
+			border-radius: 4px;
+			cursor: pointer;
+			font-size: 1rem;
+			width: 100%;
+			transition: background-color 0.2s;
+			}
+			#runBtn:hover {
+			background-color: var(--accent-hover);
+			}
+			#runBtn:disabled {
+			background-color: #555;
+			cursor: not-allowed;
+			opacity: 0.7;
+			}
+			#viewer {
+			background-color: var(--bg-darker);
+			padding: 20px;
+			border-radius: 8px;
+			margin: 20px auto;
+			max-width: 95%;
+			box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+			flex-grow: 1;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			width: 100%;
+			}
+			.result-container {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			margin: 0 auto;
+			background-color: var(--bg-light);
+			padding: 20px;
+			border-radius: 6px;
+			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+			max-width: 800px;
+			width: 100%;
+			}
+			canvas {
+			image-rendering: pixelated;
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			margin-bottom: 10px;
+			max-width: 100%;
+			}
+			.colorbar {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			margin-left: 15px;
+			}
+			.colorbar canvas {
+			width: 20px;
+			height: 100%;
+			border-radius: 3px;
+			}
+			.colorbar-label {
+			font-size: 0.75rem;
+			text-align: center;
+			color: var(--text-secondary);
+			margin: 5px 0;
+			}
+			.angle-label {
+			font-size: 0.85rem;
+			margin-top: 10px;
+			color: var(--text-secondary);
+			font-weight: 500;
+			text-align: center;
+			}
+			/* Angle selector styles */
+			#angleSelectorContainer {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			margin: 25px 0;
+			}
+			#angleSelector {
+			width: 350px;
+			height: 350px;
+			border-radius: 50%;
+			background-color: var(--bg-darker);
+			position: relative;
+			cursor: crosshair;
+			border: 2px solid var(--border-light);
+			box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+			}
+			#anglePreview {
+			position: absolute;
+			background-color: rgba(0, 0, 0, 0.8);
+			padding: 8px 12px;
+			border-radius: 4px;
+			pointer-events: none;
+			display: none;
+			color: white;
+			font-size: 0.9rem;
+			z-index: 10;
+			}
+			#currentAngle {
+			margin-top: 15px;
+			font-size: 1.1rem;
+			color: var(--text-primary);
+			background-color: var(--bg-light);
+			padding: 8px 15px;
+			border-radius: 20px;
+			font-weight: 500;
+			}
+			#angleIndicator {
+			position: absolute;
+			width: 12px;
+			height: 12px;
+			border-radius: 50%;
+			background-color: #ff4757;
+			transform: translate(-50%, -50%);
+			display: none;
+			box-shadow: 0 0 0 2px rgba(255, 71, 87, 0.5);
+			z-index: 5;
+			}
+			.result-display {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			justify-content: center;
+			width: 100%;
+			margin-top: 20px;
+			}
+			/* Responsive adjustments */
+			@media (max-width: 768px) {
+			#controls {
+			padding: 15px;
+			}
+			#angleSelector {
+			width: 200px;
+			height: 200px;
+			}
+			.result-display {
+			flex-direction: column;
+			}
+			.colorbar {
+			margin-left: 0;
+			margin-top: 15px;
+			flex-direction: row;
+			}
+			.colorbar canvas {
+			width: 100%;
+			height: 20px;
+			}
+			.colorbar-label {
+			margin: 0 10px;
+			}
+			}
+			/* Scrollbar styling */
+			::-webkit-scrollbar {
+			width: 8px;
+			height: 8px;
+			}
+			::-webkit-scrollbar-track {
+			background: var(--bg-light);
+			}
+			::-webkit-scrollbar-thumb {
+			background: var(--border-light);
+			border-radius: 4px;
+			}
+			::-webkit-scrollbar-thumb:hover {
+			background: var(--accent);
+			}
+		</style>
+		<script src="UTIF.js"></script>
+		<script src="https://d3js.org/d3.v7.min.js"></script>
+		<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+	</head>
+	<body>
+		<h1>WebGPU SSNP Model Viewer</h1>
+		<div id="controls">
+			<div class="control-group">
+				<label for="fileInput">Upload Volume Data (.bin or .tiff)</label>
+				<input type="file" id="fileInput" accept=".bin,.tif,.tiff" />
+			</div>
+			<!-- Angle selector section -->
+			<div id="angleSelectorContainer">
+				<label>Select Angle</label>
+				<div id="angleSelector">
+					<div id="angleIndicator"></div>
+					<div id="anglePreview"></div>
+				</div>
+				<div id="currentAngle">Selected angle: (0.00, 0.00)</div>
+			</div>
+			<div class="control-group">
+				<label for="resInput">Resolution</label>
+				<input type="text" id="resInput" placeholder="e.g.: 0.1,0.1,0.1" />
+			</div>
+			<div class="control-group">
+				<label for="naInput">Numerical Aperture</label>
+				<input type="text" id="naInput" placeholder="e.g.: 0.65" />
+			</div>
+			<div class="checkbox-container">
+				<input type="checkbox" id="intensityInput" checked />
+				<label for="intensityInput">Show Intensity</label>
+			</div>
+			<button id="runBtn" disabled>Run Simulation</button>
+		</div>
+		<div id="viewer">
+			<div class="result-container" id="resultContainer"></div>
+		</div>
+		<script>
+			if (!navigator.gpu) {
+			  alert("Your browser does not support WebGPU. Please use a compatible browser such as the latest version of Google Chrome or Edge.");
+			  // Optionally disable UI interactions
+			  document.addEventListener("DOMContentLoaded", () => {
+			    document.getElementById("fileInput").disabled = true;
+			    document.getElementById("runBtn").disabled = true;
+			  });
+			}
+		</script>
+		<script>
+			// Emscripten/WASM Module boilerplate
+			var Module = {
+			  noInitialRun: true,
+			  print: function (text) {
+			    console.log(text);
+			  },
+			};
+			
+			let currentAngle = [0, 0];
+			
+			// Write a 32-bit‐integer header + float32 volume into a single ArrayBuffer
+			function buildBinBufferFromFloatVolume(slices, width, height) {
+			  // slices: Array of Float32Array
+			  const D = slices.length;
+			  const H = height;
+			  const W = width;
+			  
+			  // Detect number of channels (default to first channel for multi-channel)
+			  const totalElements = slices[0].length;
+			  const channels = Math.floor(totalElements / (W * H));
+			  
+			  const headerBytes = 3 * 4; // Three int32 (D, H, W), no C
+			  const floatBytesPerSlice = W * H * 4; // Always output single channel
+			  const totalBytes = headerBytes + D * floatBytesPerSlice;
+			  const buffer = new ArrayBuffer(totalBytes);
+			  const dv = new DataView(buffer);
+			  
+			  // Write D, H, W as int32 (skip C)
+			  dv.setInt32(0, D, true);
+			  dv.setInt32(4, H, true);
+			  dv.setInt32(8, W, true);
+			  
+			  let offset = headerBytes;
+			  for (let d = 0; d < D; d++) {
+			      const sliceArr = slices[d];
+			      
+			      // Verify size matches expected channels
+			      if (sliceArr.length !== W * H * channels) {
+			          throw new Error(`Slice ${d} has ${sliceArr.length} elements but expected ${W * H * channels}`);
+			      }
+			      
+			      const floatView = new Float32Array(buffer, offset, W * H);
+			      
+			      // If multi-channel, extract first channel
+			      if (channels > 1) {
+			          for (let i = 0; i < W * H; i++) {
+			              floatView[i] = sliceArr[i * channels]; // Take first channel of each pixel
+			          }
+			      } else {
+			          // Single channel
+			          floatView.set(sliceArr);
+			      }
+			      
+			      offset += floatBytesPerSlice;
+			  }
+			  return buffer;
+			}
+			
+			function plotSlices(flatArray, D, H, W, minArray, maxArray) {
+			  const resultContainer = document.getElementById('resultContainer');
+			  resultContainer.innerHTML = '';
+			
+			  // Fixed display dimensions
+			  const DISPLAY_SIZE = 512; 
+			
+			  const d = 0;
+			  const localMin = minArray[d];
+			  const localMax = maxArray[d];
+			  const scale = localMax - localMin || 1;
+			
+			  const container = document.createElement('div');
+			  container.className = 'result-display';
+			
+			  // Create main canvas (will be scaled to DISPLAY_SIZE)
+			  const canvas = document.createElement('canvas');
+			  canvas.width = DISPLAY_SIZE;
+			  canvas.height = DISPLAY_SIZE;
+			  const ctx = canvas.getContext('2d');
+			
+			  // Create temporary canvas at original dimensions
+			  const tempCanvas = document.createElement('canvas');
+			  tempCanvas.width = W;
+			  tempCanvas.height = H;
+			  const tempCtx = tempCanvas.getContext('2d');
+			  const tempImgData = tempCtx.createImageData(W, H);
+			
+			  // Fill temporary canvas with pixel data
+			  let idx = 0;
+			  for (let i = 0; i < H; i++) {
+			    for (let j =  0; j < W; j++) {
+			      const value = flatArray[idx++];
+			      const norm = (value - localMin) / scale;
+			      const [r, g, b] = colormap(norm);
+			      const pixelIndex = (i * W + j) * 4;
+			      tempImgData.data[pixelIndex] = r;
+			      tempImgData.data[pixelIndex + 1] = g;
+			      tempImgData.data[pixelIndex + 2] = b;
+			      tempImgData.data[pixelIndex + 3] = 255;
+			    }
+			  }
+			
+			  // Put data into temp canvas
+			  tempCtx.putImageData(tempImgData, 0, 0);
+			
+			  // Calculate scaling while maintaining aspect ratio
+			  const scaleFactor = Math.min(DISPLAY_SIZE / W, DISPLAY_SIZE / H);
+			  const scaledWidth = W * scaleFactor;
+			  const scaledHeight = H * scaleFactor;
+			  const offsetX = (DISPLAY_SIZE - scaledWidth) / 2;
+			  const offsetY = (DISPLAY_SIZE - scaledHeight) / 2;
+			
+			  // Draw scaled version to main canvas
+			  ctx.imageSmoothingEnabled = false; // For crisp pixel scaling
+			  ctx.clearRect(0, 0, DISPLAY_SIZE, DISPLAY_SIZE);
+			  ctx.drawImage(tempCanvas, 0, 0, W, H, offsetX, offsetY, scaledWidth, scaledHeight);
+			
+			  container.appendChild(canvas);
+			
+			  // Colorbar (matches display height)
+			  const colorbar = document.createElement('div');
+			  colorbar.className = 'colorbar';
+			  const colorCanvas = document.createElement('canvas');
+			  colorCanvas.width = 20;
+			  colorCanvas.height = DISPLAY_SIZE;
+			  const colorCtx = colorCanvas.getContext('2d');
+			  const colorImg = colorCtx.createImageData(1, DISPLAY_SIZE);
+			
+			  for (let i = 0; i < DISPLAY_SIZE; i++) {
+			    const t = 1 - i / (DISPLAY_SIZE - 1);
+			    const [r, g, b] = colormap(t);
+			    const idx2 = i * 4;
+			    colorImg.data[idx2] = r;
+			    colorImg.data[idx2 + 1] = g;
+			    colorImg.data[idx2 + 2] = b;
+			    colorImg.data[idx2 + 3] = 255;
+			  }
+			  for (let x = 0; x < 20; x++) {
+			    colorCtx.putImageData(colorImg, x, 0);
+			  }
+			
+			  colorbar.appendChild(colorCanvas);
+			  const maxLabel = document.createElement('div');
+			  maxLabel.className = 'colorbar-label';
+			  maxLabel.textContent = localMax.toExponential(3);
+			  const minLabel = document.createElement('div');
+			  minLabel.className = 'colorbar-label';
+			  minLabel.textContent = localMin.toExponential(3);
+			  colorbar.insertBefore(maxLabel, colorCanvas);
+			  colorbar.appendChild(minLabel);
+			
+			  container.appendChild(colorbar);
+			  resultContainer.appendChild(container);
+			
+			  const angleLabel = document.createElement('div');
+			  angleLabel.className = 'angle-label';
+			  angleLabel.textContent = `Angle: (${currentAngle[0].toFixed(2)}, ${currentAngle[1].toFixed(2)})`;
+			  resultContainer.appendChild(angleLabel);
+			}
+			
+			function colormap(t) {
+			  t = Math.max(0, Math.min(1, t));
+			  const c = d3.color(d3.interpolateViridis(t));
+			  return [c.r, c.g, c.b];
+			}
+			
+			Module.onRuntimeInitialized = () => {
+			  const fileInput = document.getElementById("fileInput");
+			  const runBtn = document.getElementById("runBtn");
+			  const angleSelector = document.getElementById("angleSelector");
+			  const anglePreview = document.getElementById("anglePreview");
+			  const angleIndicator = document.getElementById("angleIndicator");
+			  const currentAngleDisplay = document.getElementById("currentAngle");
+			
+			  // Set up angle selector
+			  angleSelector.addEventListener("mousemove", (e) => {
+			    const rect = angleSelector.getBoundingClientRect();
+			    const centerX = rect.width / 2;
+			    const centerY = rect.height / 2;
+			    
+			    // Get mouse position relative to center
+			    const mouseX = e.clientX - rect.left - centerX;
+			    const mouseY = e.clientY - rect.top - centerY;
+			    
+			    // Calculate distance from center
+			    const distance = Math.sqrt(mouseX * mouseX + mouseY * mouseY);
+			    const maxDistance = centerX;
+			    
+			    // Normalize to unit circle
+			    let normalizedX = mouseX / maxDistance;
+			    let normalizedY = mouseY / maxDistance;
+			    
+			    // If outside circle, project onto circle
+			    if (distance > maxDistance) {
+			      const angle = Math.atan2(mouseY, mouseX);
+			      normalizedX = Math.cos(angle);
+			      normalizedY = Math.sin(angle);
+			    }
+			    
+			    // Update preview
+			    anglePreview.style.display = "block";
+			    anglePreview.style.left = `${e.clientX - rect.left + 10}px`;
+			    anglePreview.style.top = `${e.clientY - rect.top + 10}px`;
+			    anglePreview.textContent = `(${normalizedX.toFixed(2)}, ${normalizedY.toFixed(2)})`;
+			  });
+			  
+			  angleSelector.addEventListener("mouseleave", () => {
+			    anglePreview.style.display = "none";
+			  });
+			  
+			  angleSelector.addEventListener("click", (e) => {
+			    const rect = angleSelector.getBoundingClientRect();
+			    const centerX = rect.width / 2;
+			    const centerY = rect.height / 2;
+			    
+			    // Get mouse position relative to center
+			    const mouseX = e.clientX - rect.left - centerX;
+			    const mouseY = e.clientY - rect.top - centerY;
+			    
+			    // Calculate distance from center
+			    const distance = Math.sqrt(mouseX * mouseX + mouseY * mouseY);
+			    const maxDistance = centerX;
+			    
+			    // Normalize to unit circle
+			    let normalizedX = mouseX / maxDistance;
+			    let normalizedY = mouseY / maxDistance;
+			    
+			    // If outside circle, project onto circle
+			    if (distance > maxDistance) {
+			      const angle = Math.atan2(mouseY, mouseX);
+			      normalizedX = Math.cos(angle);
+			      normalizedY = Math.sin(angle);
+			    }
+			    
+			    // Update current angle
+			    currentAngle = [normalizedX, normalizedY];
+			    currentAngleDisplay.textContent = `Selected angle: (${normalizedX.toFixed(2)}, ${normalizedY.toFixed(2)})`;
+			    
+			    // Show indicator
+			    angleIndicator.style.display = "block";
+			    angleIndicator.style.left = `${rect.width / 2 + normalizedX * maxDistance}px`;
+			    angleIndicator.style.top = `${rect.height / 2 + normalizedY * maxDistance}px`;
+			    
+			    // Automatically run the forward function
+			    runForwardFunction();
+			  });
+			
+			  fileInput.addEventListener("change", async (e) => {
+			    const file = e.target.files[0];
+			    if (!file) return;
+			
+			    const name = file.name.toLowerCase();
+			    const ext = name.substring(name.lastIndexOf(".") + 1);
+			
+			    if (ext === "bin") {
+			        const r = new FileReader();
+			        r.onload = () => {
+			            const data = new Uint8Array(r.result);
+			            FS.writeFile("input.bin", data);
+			            runBtn.disabled = false;
+			        };
+			        r.readAsArrayBuffer(file);
+			    } 
+			    else if (ext === "tif" || ext === "tiff") {
+			        try {
+			            const arrayBuffer = await file.arrayBuffer();
+			            const ifds = UTIF.decode(arrayBuffer);
+			            
+			            if (ifds.length === 0) {
+			                throw new Error("No image slices found in TIFF");
+			            }
+			
+			            // Decode first IFD to get metadata
+			            UTIF.decodeImage(arrayBuffer, ifds[0]);
+			            const firstIfd = ifds[0];
+			            
+			            // Get dimensions
+			            const width = firstIfd.width || firstIfd['t256']?.[0];
+			            const height = firstIfd.height || firstIfd['t257']?.[0];
+			            const bps = firstIfd.bps || firstIfd['t258']?.[0] || 8;
+			            const spp = firstIfd.spp || firstIfd['t277']?.[0] || 1;
+			            const sampleFormat = firstIfd.sampleFormat || firstIfd['t339']?.[0] || 1; // 1=uint, 2=int, 3=float
+			            const photometric = firstIfd.photometric || firstIfd['t262']?.[0];
+			            
+			            // Validate dimensions
+			            if (!width || !height) {
+			                throw new Error("Could not determine image dimensions");
+			            }
+			
+			            // Log complete metadata
+			            console.log("TIFF Metadata:", {
+			                width,
+			                height,
+			                bitsPerSample: bps,
+			                samplesPerPixel: spp,
+			                sampleFormat: getSampleFormatName(sampleFormat),
+			                photometricInterpretation: getPhotometricName(photometric),
+			                compression: firstIfd.compression,
+			                planarConfiguration: firstIfd.planarConfig,
+			                ifdEntries: Object.keys(firstIfd).filter(k => k.startsWith('t'))
+			            });
+			
+			            const slices = [];
+			            for (let i = 0; i < ifds.length; i++) {
+			                UTIF.decodeImage(arrayBuffer, ifds[i]);
+			                const ifd = ifds[i];
+			                const raw = ifd.data;
+			                
+			                if (!raw) {
+			                  throw new Error(`Could not decode slice #${i}`);
+			                }
+			
+			                // Verify dimensions match first slice
+			                const sliceWidth = ifd.width || ifd['t256']?.[0];
+			                const sliceHeight = ifd.height || ifd['t257']?.[0];
+			                if (sliceWidth !== width || sliceHeight !== height) {
+			                  throw new Error(`Slice ${i} dimensions (${sliceWidth}x${sliceHeight}) don't match first slice (${width}x${height})`);
+			                }
+			
+			                // Convert to Float32Array based on detected type
+			                const floatSlice = convertTiffDataToFloat32(raw, {
+			                    bitsPerSample: bps,
+			                    samplesPerPixel: spp,
+			                    sampleFormat,
+			                    width,
+			                    height
+			                });
+			
+			                // Take first channel if multi-channel
+			                if (spp > 1) {
+			                    const singleChannel = new Float32Array(width * height);
+			                    for (let p = 0; p < width * height; p++) {
+			                        singleChannel[p] = floatSlice[p * spp];
+			                    }
+			                    slices.push(singleChannel);
+			                } else {
+			                    slices.push(floatSlice);
+			                }
+			            }
+			
+			            const binBuffer = buildBinBufferFromFloatVolume(slices, width, height);
+			            FS.writeFile("input.bin", new Uint8Array(binBuffer));
+			            runBtn.disabled = false;
+			
+			        } catch (error) {
+			            console.error("TIFF processing error:", error);
+			            alert(`Error processing TIFF: ${error.message}`);
+			        }
+			      } 
+			    else {
+			        alert("Unsupported file type: please select a .bin or .tif/.tiff");
+			    }
+			  });
+			
+			  // Helper functions
+			  function getSampleFormatName(format) {
+			      return ['undefined', 'unsigned integer', 'signed integer', 'IEEE float'][format] || `unknown (${format})`;
+			  }
+			
+			  function getPhotometricName(photometric) {
+			      const names = {
+			          0: 'WhiteIsZero',
+			          1: 'BlackIsZero',
+			          2: 'RGB',
+			          3: 'RGB Palette',
+			          4: 'Transparency Mask',
+			          5: 'CMYK',
+			          6: 'YCbCr',
+			          8: 'CIELab'
+			      };
+			      return names[photometric] || `unknown (${photometric})`;
+			  }
+			
+			  function convertTiffDataToFloat32(raw, metadata) {
+			    const { bitsPerSample, samplesPerPixel, sampleFormat, width, height } = metadata;
+			    const expectedLength = width * height * samplesPerPixel;
+			    
+			    // Handle typed arrays directly
+			    if (raw instanceof Float32Array) return raw;
+			    if (raw instanceof Float64Array) return new Float32Array(raw);
+			
+			    const output = new Float32Array(expectedLength);
+			    
+			    switch (sampleFormat) {
+			        case 1: // Unsigned integer
+			            if (bitsPerSample === 8) {
+			                for (let i = 0; i < raw.length; i++) {
+			                    output[i] = raw[i] / 0xFF; // [0, 1]
+			                }
+			            } else if (bitsPerSample === 16) {
+			                const uint16 = raw instanceof Uint16Array ? raw : new Uint16Array(raw.buffer);
+			                for (let i = 0; i < uint16.length; i++) {
+			                    output[i] = uint16[i] / 0xFFFF; // [0, 1]
+			                }
+			            }
+			            break;
+			            
+			        case 2: // Signed integer
+			            if (bitsPerSample === 8) {
+			                const int8 = raw instanceof Int8Array ? raw : new Int8Array(raw.buffer);
+			                for (let i = 0; i < int8.length; i++) {
+			                    output[i] = int8[i] / 128.0; // [-1, ~0.992]
+			                }
+			            } else if (bitsPerSample === 16) {
+			                const int16 = raw instanceof Int16Array ? raw : new Int16Array(raw.buffer);
+			                for (let i = 0; i < int16.length; i++) {
+			                    output[i] = int16[i] / 32768.0; // [-1, ~0.99997]
+			                }
+			            }
+			            break;
+			            
+			        case 3: // Float
+			            if (bitsPerSample === 32) {
+			                return raw instanceof Float32Array ? raw : new Float32Array(raw.buffer);
+			            } else if (bitsPerSample === 64) {
+			                const float64 = raw instanceof Float64Array ? raw : new Float64Array(raw.buffer);
+			                for (let i = 0; i < float64.length; i++) {
+			                    output[i] = float64[i]; // Precision loss possible
+			                }
+			            }
+			            break;
+			            
+			        default:
+			            console.warn("Unknown sample format. Raw values will not be normalized.");
+			            for (let i = 0; i < raw.length; i++) {
+			                output[i] = raw[i];
+			            }
+			    }
+			    
+			    return output;
+			  }
+			
+			  function validateInputs(resVal, naVal) {
+			    // Validate resolution format (exactly 3 numbers separated by commas)
+			    const resParts = resVal.split(',');
+			    if (resParts.length !== 3 || resParts.some(part => isNaN(parseFloat(part)))) {
+			      alert("Resolution must be exactly 3 numbers separated by commas (e.g. '0.1,0.1,0.1')");
+			      return false;
+			    }
+			    
+			    // Validate NA (single number)
+			    if (isNaN(naVal) || isNaN(parseFloat(naVal))) {
+			      alert("NA must be a single number (e.g. '0.65')");
+			      return false;
+			    }
+			    
+			    return true;
+			  }
+			
+			  function runForwardFunction() {
+			    const resVal = document.getElementById("resInput").value.trim() || "0.1,0.1,0.1";
+			    const naVal = document.getElementById("naInput").value.trim() || "0.65";
+			    const intensityVal = document.getElementById("intensityInput").checked ? "1" : "0";
+			
+			    if (!validateInputs(resVal, naVal)) {
+			      return; // Stop execution if validation fails
+			    }
+			
+			    const angleString = `${currentAngle[0]},${currentAngle[1]}`;
+			    const combinedParams = `${angleString}|${resVal}|${naVal}|${intensityVal}`;
+			
+			    const viewer = document.getElementById("resultContainer");
+			    viewer.innerHTML = "";
+			
+			    console.log("Sending to C++:", combinedParams);
+			
+			    Module.ccall(
+			      "callSSNP",
+			      null,
+			      ["string"],
+			      [combinedParams],
+			      { async: true }
+			    ).catch(err => console.error("Error:", err));
+			  }
+			
+			  runBtn.addEventListener("click", runForwardFunction);
+			};
+		</script>
+		<script async src="ssnp_cpp.js"></script>
+	</body>
 </html>
