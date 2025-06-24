@@ -297,28 +297,28 @@
 			border-style: solid;
 			border-color: var(--bg-light) transparent transparent transparent;
 			}
-      /* Author link styles */
-      .author-link {
-      text-align: center;
-      margin-top: -15px;
-      margin-bottom: 20px;
-      }
-      .author-link a {
-      color: var(--text-secondary);
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: color 0.2s;
-      font-size: 0.9rem;
-      }
-      .author-link a:hover {
-      color: var(--accent);
-      }
-      .author-link svg {
-      width: 16px;
-      height: 16px;
-      }
+			/* Author link styles */
+			.author-link {
+			text-align: center;
+			margin-top: -15px;
+			margin-bottom: 20px;
+			}
+			.author-link a {
+			color: var(--text-secondary);
+			text-decoration: none;
+			display: inline-flex;
+			align-items: center;
+			gap: 6px;
+			transition: color 0.2s;
+			font-size: 0.9rem;
+			}
+			.author-link a:hover {
+			color: var(--accent);
+			}
+			.author-link svg {
+			width: 16px;
+			height: 16px;
+			}
 		</style>
 		<script src="UTIF.js"></script>
 		<script src="https://d3js.org/d3.v7.min.js"></script>
@@ -326,14 +326,14 @@
 	</head>
 	<body>
 		<h1>WebGPU SSNP Model Viewer</h1>
-    <div class="author-link">
-        <a href="https://github.com/andrewx-bu/wgpu_ssnp-idt" target="_blank" rel="noopener noreferrer">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
-          </svg>
-          Andrew Xin, Rayan Syed
-        </a>
-    </div>
+		<div class="author-link">
+			<a href="https://github.com/andrewx-bu/wgpu_ssnp-idt" target="_blank" rel="noopener noreferrer">
+				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+				</svg>
+				Andrew Xin, Rayan Syed
+			</a>
+		</div>
 		<div id="controls">
 			<div class="control-group">
 				<label for="fileInput">Upload Volume Data (.bin or .tiff)</label>
@@ -352,7 +352,7 @@
 				<label for="resInput">
 				Resolution
 				<span class="tooltip-icon">?
-				<span class="tooltip-text">Resolution Info</span>
+				<span class="tooltip-text">Spatial resolution (dx, dy, dz) in meters, by default (0.1, 0.1, 0.1)</span>
 				</span>
 				</label>
 				<input type="text" id="resInput" placeholder="e.g.: 0.1,0.1,0.1" />
@@ -365,6 +365,15 @@
 				</span>
 				</label>
 				<input type="text" id="naInput" placeholder="e.g.: 0.65" />
+			</div>
+			<div class="control-group">
+				<label for="n0Input">
+				n0
+				<span class="tooltip-icon">?
+				<span class="tooltip-text">Background refractive index, by default 1.33</span>
+				</span>
+				</label>
+				<input type="text" id="n0Input" placeholder="e.g.: 1.33" />
 			</div>
 			<div class="checkbox-container">
 				<input type="checkbox" id="intensityInput" checked />
@@ -821,48 +830,57 @@
 			    return output;
 			  }
 			
-			  function validateInputs(resVal, naVal) {
-			    // Validate resolution format (exactly 3 numbers separated by commas)
-			    const resParts = resVal.split(',');
-			    if (resParts.length !== 3 || resParts.some(part => isNaN(parseFloat(part)))) {
-			      alert("Resolution must be exactly 3 numbers separated by commas (e.g. '0.1,0.1,0.1')");
-			      return false;
-			    }
-			    
-			    // Validate NA (single number)
-			    if (isNaN(naVal) || isNaN(parseFloat(naVal))) {
-			      alert("NA must be a single number (e.g. '0.65')");
-			      return false;
-			    }
-			    
-			    return true;
-			  }
+			  function validateInputs(resVal, naVal, n0Val) {
+				// Validate resolution format (exactly 3 numbers separated by commas)
+				const resParts = resVal.split(',');
+				if (resParts.length !== 3 || resParts.some(part => isNaN(parseFloat(part)))) {
+					alert("Resolution must be exactly 3 numbers separated by commas (e.g. '0.1,0.1,0.1')");
+					return false;
+				}
+				
+				// Validate NA (single number)
+				if (isNaN(naVal) || isNaN(parseFloat(naVal))) {
+					alert("NA must be a single number (e.g. '0.65')");
+					return false;
+				}
+				
+				// Validate n0 (single number, optional with default)
+				if (isNaN(n0Val) || isNaN(parseFloat(n0Val))) {
+					alert("n0 must be a single number (e.g. '1.33')");
+					return false;
+				}
+				
+				return true;
+			}
 			
-			  function runForwardFunction() {
-			    const resVal = document.getElementById("resInput").value.trim() || "0.1,0.1,0.1";
-			    const naVal = document.getElementById("naInput").value.trim() || "0.65";
-			    const intensityVal = document.getElementById("intensityInput").checked ? "1" : "0";
+			function runForwardFunction() {
+				const resVal = document.getElementById("resInput").value.trim() || "0.1,0.1,0.1";
+				const naVal = document.getElementById("naInput").value.trim() || "0.65";
+				const intensityVal = document.getElementById("intensityInput").checked ? "1" : "0";
+				const n0Val = document.getElementById("n0Input").value.trim() || "1.33";
 			
-			    if (!validateInputs(resVal, naVal)) {
-			      return; // Stop execution if validation fails
-			    }
+				if (!validateInputs(resVal, naVal, n0Val)) {
+					return; // Stop execution if validation fails
+				}
 			
-			    const angleString = `${currentAngle[0]},${currentAngle[1]}`;
-			    const combinedParams = `${angleString}|${resVal}|${naVal}|${intensityVal}`;
+				const angleString = `${currentAngle[0]},${currentAngle[1]}`;
+				const combinedParams = `${angleString}|${resVal}|${naVal}|${intensityVal}|${n0Val}`;
 			
-			    const viewer = document.getElementById("resultContainer");
-			    viewer.innerHTML = "";
+				const viewer = document.getElementById("resultContainer");
+				viewer.innerHTML = "";
 			
-			    console.log("Sending to C++:", combinedParams);
+				console.log("Sending to C++:", combinedParams);
 			
-			    Module.ccall(
-			      "callSSNP",
-			      null,
-			      ["string"],
-			      [combinedParams],
-			      { async: true }
-			    ).catch(err => console.error("Error:", err));
-			  }
+				Module.ccall(
+					"callSSNP",
+					null,
+					["string"],
+					[combinedParams],
+					{ async: true }
+				).catch(err => console.error("Error:", err));
+			}
+			
+			runBtn.addEventListener("click", runForwardFunction);
 			
 			  runBtn.addEventListener("click", runForwardFunction);
 			};

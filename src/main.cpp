@@ -101,11 +101,14 @@ extern "C" {
             size_t firstPipe = fullInput.find('|');
             size_t secondPipe = fullInput.find('|', firstPipe + 1);
             size_t thirdPipe = fullInput.find('|', secondPipe + 1);
+            size_t fourthPipe = fullInput.find('|', thirdPipe + 1);
 
+            // Extract all components
             std::string anglesStr = fullInput.substr(0, firstPipe);
             std::string resStr = fullInput.substr(firstPipe + 1, secondPipe - firstPipe - 1);
             std::string naStr = fullInput.substr(secondPipe + 1, thirdPipe - secondPipe - 1);
-            std::string intensityStr = fullInput.substr(thirdPipe + 1);
+            std::string intensityStr = fullInput.substr(thirdPipe + 1, fourthPipe - thirdPipe - 1);
+            std::string n0Str = fullInput.substr(fourthPipe + 1);
 
             // Parse angles
             std::vector<std::vector<float>> angles;
@@ -126,11 +129,9 @@ extern "C" {
                 res.push_back(std::stof(token));
             }
 
-            // Parse NA
             float na = std::stof(naStr);
-
-            // Parse intensity
             bool intensity = (intensityStr == "1");
+            float n0 = std::stof(n0Str);
 
             // File read + processing
             std::vector<std::vector<std::vector<float>>> tensor;
@@ -143,9 +144,10 @@ extern "C" {
             WebGPUContext context;
             initWebGPU(context);
 
-            auto result = forward(context, tensor, res, na, angles, 1.33, intensity);
+            // Pass n0 to forward function
+            auto result = forward(context, tensor, res, na, angles, n0, intensity);
 
-            // Flatten + emit
+            // Rest of your existing code...
             std::ostringstream dataStream, minStream, maxStream;
             dataStream << "[";
             minStream << "[";
