@@ -7,6 +7,7 @@ vector<vector<vector<float>>> forward(
     vector<float> res, 
     float na, 
     vector<vector<float>> angles, 
+    float n0,
     bool intensity
 ) {
     vector<int> shape = {int(n[0].size()), int(n[0][0].size())};
@@ -67,7 +68,7 @@ vector<vector<vector<float>>> forward(
                 complexSlice.push_back(0); // 0 for imag part
             }        
             wgpu::Buffer sliceBuffer = createBuffer(context.device, complexSlice.data(), sizeof(float) * buffer_len * 2, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
-            scatter_factor(context, scatterBuffer, sliceBuffer, buffer_len, res[0], 1, 1.33); // compute scatter factor output
+            scatter_factor(context, scatterBuffer, sliceBuffer, buffer_len, res[0], 1, n0); // compute scatter factor output
             scatter_effects(context, UD, scatterBuffer, u, UD2, buffer_len, shape); // compute ud - fft(scatter*u)
             u.release();
             scatterBuffer.release();

@@ -79,9 +79,10 @@ int main(int argc, char* argv[]) {
     vector<float> res = {0.1f, 0.1f, 0.1f};
     float na = 0.65f;
     bool intensity = true;
+    float n0 = 1.33f;
     vector<vector<float>> angles(1, vector<float>(2, 0.0f)); // default [0, 0]
 
-    auto result = forward(context, input_tensor, res, na, angles, intensity);
+    auto result = forward(context, input_tensor, res, na, angles, n0, intensity);
 
     if (!write_output_tensor(output_filename, result)) return 1;
 
@@ -142,7 +143,7 @@ extern "C" {
             WebGPUContext context;
             initWebGPU(context);
 
-            auto result = forward(context, tensor, res, na, angles, intensity);
+            auto result = forward(context, tensor, res, na, angles, 1.33, intensity);
 
             // Flatten + emit
             std::ostringstream dataStream, minStream, maxStream;

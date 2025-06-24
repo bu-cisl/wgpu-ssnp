@@ -23,6 +23,7 @@ vector<vector<vector<float>>> forward(
     vector<float> res, 
     float na, 
     vector<vector<float>> angles, 
+    float n0,
     bool intensity
 );
 
