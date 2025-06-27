@@ -580,7 +580,7 @@
 			    
 			    // Get mouse position relative to center
 			    const mouseX = e.clientX - rect.left - centerX;
-			    const mouseY = e.clientY - rect.top - centerY;
+			    const mouseY = -(e.clientY - rect.top - centerY);
 			    
 			    // Calculate distance from center
 			    const distance = Math.sqrt(mouseX * mouseX + mouseY * mouseY);
@@ -615,7 +615,7 @@
 			    
 			    // Get mouse position relative to center
 			    const mouseX = e.clientX - rect.left - centerX;
-			    const mouseY = e.clientY - rect.top - centerY;
+			    const mouseY = -(e.clientY - rect.top - centerY);
 			    
 			    // Calculate distance from center
 			    const distance = Math.sqrt(mouseX * mouseX + mouseY * mouseY);
@@ -639,7 +639,7 @@
 			    // Show indicator
 			    angleIndicator.style.display = "block";
 			    angleIndicator.style.left = `${rect.width / 2 + normalizedX * maxDistance}px`;
-			    angleIndicator.style.top = `${rect.height / 2 + normalizedY * maxDistance}px`;
+			    angleIndicator.style.top = `${rect.height / 2 - normalizedY * maxDistance}px`;
 			    
 			    // Automatically run the forward function
 			    runForwardFunction();
