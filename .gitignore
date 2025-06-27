@@ -23,6 +23,7 @@
 
 # Ignore sandbox and testing files
 /test
+process_tiff.py
 
 # Ignore VS code settings
 .vscode
