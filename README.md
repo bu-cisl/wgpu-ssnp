@@ -20,9 +20,9 @@ This project ports the SSNP-IDT algorithm to the browser using **WebGPU** via C+
 
 Recent advances in computational imaging have produced powerful models, but most remain difficult to deploy due to hardware dependencies, proprietary drivers, and complex software stacks.
 
-SSNP-IDT is one such model: a physics-based 3D phase retrieval method for diffraction tomography, which models non-paraxial multiple scattering using a Born-series approach. The original implementation is written in PyCUDA and optimized for NVIDIA GPUs, requiring a Python/CUDA environment and compatible hardware.
+SSNP is one such model: a waved-based physics model for diffraction tomography, which is non-paraxial and models multiple scattering. The original implementation is written in PyCUDA and optimized for NVIDIA GPUs, requiring a Python/CUDA environment and compatible hardware.
 
-This project reimplements SSNP-IDT in WebGPU and C++, compiled to WebAssembly via Emscripten. It runs entirely in the browser, with no installation or platform constraints, making the model broadly accessible while retaining competitive performance.
+This project is a new implemention of SSNP in WebGPU and C++, compiled to WebAssembly via Emscripten. It runs entirely in the browser, with no installation or platform constraints, making the model broadly accessible while retaining competitive performance.
 
 ## Features
 
@@ -37,7 +37,7 @@ This project reimplements SSNP-IDT in WebGPU and C++, compiled to WebAssembly vi
 
 Intensity Diffraction Tomography (IDT) is a computational imaging technique that reconstructs the 3D refractive index of a sample by analyzing how light scatters through it under varying illumination angles. Traditional IDT methods often rely on single-scattering (Born) approximations and paraxial assumptions, which limit accuracy in high-resolution or strongly scattering regimes.
 
-SSNP-IDT addresses these limitations by incorporating a **non-paraxial multiple-scattering model**. It models light propagation using a Born series expansion, capturing multiple forward-scattering events and high-angle diffraction. The forward model is fully physics-based and differentiable, enabling iterative gradient-based inversion from intensity-only measurements.
+SSNP-IDT addresses these limitations by incorporating a **non-paraxial multiple-scattering model**. The forward model is fully physics-based and differentiable, enabling iterative gradient-based inversion from intensity-only measurements. **This implementation omits the gradient computation for prototyping focusing on the forward pass only.**
 
 This approach allows for high-fidelity 3D reconstruction of complex, thick samples using a compact, single-shot data acquisition setup.
 
@@ -46,7 +46,7 @@ This approach allows for high-fidelity 3D reconstruction of complex, thick sampl
 To test the model in the browser, visit the live demo:  
 [https://andrewx-bu.github.io/wgpu_ssnp-idt/](https://andrewx-bu.github.io/wgpu_ssnp-idt/)
 
-1. Upload a volumetric `.tif` or `.tiff` dataset using the file input panel  
+1. Upload a volumetric `.tif` or `.tiff` data using the file input panel
 2. Adjust key imaging parameters such as:
    - Numerical aperture  
    - Resolution  
