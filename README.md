@@ -1,4 +1,4 @@
-# WebGPU SSNP-IDT Model
+# WebGPU SSNP Model
 
 A WebGPU-based reimplementation of **High-Fidelity Intensity Diffraction Tomography with a Non-Paraxial Multiple-Scattering Model (SSNP-IDT)**, originally introduced by Jiabei Zhu, Hao Wang, and Lei Tian [[paper]](https://opg.optica.org/oe/fulltext.cfm?uri=oe-30-18-32808&id=495495) and implemented in PyCUDA [[original code]](https://github.com/bu-cisl/SSNP-IDT).
 
