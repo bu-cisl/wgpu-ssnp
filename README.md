@@ -4,7 +4,7 @@ A WebGPU-based reimplementation of **High-Fidelity Intensity Diffraction Tomogra
 
 This project ports the SSNP-IDT algorithm to the browser using **WebGPU** via C++ and **Emscripten**, making it device-agnostic and fully browser-compatible.
 
-**Live demo**: [https://andrewx-bu.github.io/wgpu_ssnp-idt/](https://andrewx-bu.github.io/wgpu_ssnp-idt/)
+**Live demo**: [https://andrewx-bu.github.io/wgpu-ssnp/](https://andrewx-bu.github.io/wgpu-ssnp/)
 
 ## Table of Contents
 - [Motivation](#motivation)
@@ -44,7 +44,7 @@ This approach allows for high-fidelity 3D reconstruction of complex, thick sampl
 ## Demo
 
 To test the model in the browser, visit the live demo:  
-[https://andrewx-bu.github.io/wgpu_ssnp-idt/](https://andrewx-bu.github.io/wgpu_ssnp-idt/)
+[https://andrewx-bu.github.io/wgpu-ssnp/](https://andrewx-bu.github.io/wgpu-ssnp/)
 
 1. Upload a volumetric `.tif` or `.tiff` data using the file input panel
 2. Adjust key imaging parameters such as:
@@ -54,17 +54,17 @@ To test the model in the browser, visit the live demo:
    - Illumination mode  
 3. Run the model to generate a reconstruction  
 
-A sample input file is provided: [`input.tiff`](https://github.com/andrewx-bu/wgpu_ssnp-idt/blob/main/input.tiff)  
+A sample input file is provided: [`input.tiff`](https://github.com/andrewx-bu/wgpu-ssnp/blob/main/input.tiff)  
 This volume is 128×128×50 and contains a quarter-radius sphere with voxel values set to `0.01` inside and `0` outside.
 
 
 **Sample Input (Volume Rendering):**  
 
-<img src="https://github.com/andrewx-bu/wgpu_ssnp-idt/blob/main/images/128x128x50/input.png?raw=true" alt="Input Volume" width="350"/>
+<img src="https://github.com/andrewx-bu/wgpu-ssnp/blob/main/images/128x128x50/input.png" alt="Input Volume" width="350"/>
 
 **Expected Output (With Default Settings):**
 
-<img src="https://github.com/andrewx-bu/wgpu_ssnp-idt/blob/main/images/128x128x50/py_0.0.png?raw=true" alt="Expected Output" width="350"/>
+<img src="https://github.com/andrewx-bu/wgpu-ssnp/blob/main/images/128x128x50/py_0.0.png?raw=true" alt="Expected Output" width="350"/>
 
 Feel free to experiment with different parameters or upload custom volumetric inputs!
 
