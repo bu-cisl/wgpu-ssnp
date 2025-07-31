@@ -34,3 +34,7 @@ sample.png
 output.png
 *.bin
 *.tiff
+
+# Ignore excess benchmark output
+benchmark/build
+benchmark/SSNP-IDT
