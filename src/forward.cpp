@@ -19,7 +19,7 @@ vector<vector<vector<float>>> forward(
 
     for(vector<float> c_ba : angles) {
         // Console updates
-        cout << "Starting compute for angle " << count << " ..." << endl;
+        // cout << "Starting compute for angle " << count << " ..." << endl;
         count++;
 
         // CONFIGURING INPUT FIELD
