@@ -57,10 +57,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /projectnb/cislbu/andrewx/ssnp_cpp
+CMAKE_SOURCE_DIR = /projectnb/cislbu/rsyed/wgpu_ssnp-idt
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /projectnb/cislbu/andrewx/ssnp_cpp/docs
+CMAKE_BINARY_DIR = /projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -87,9 +87,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /projectnb/cislbu/andrewx/ssnp_cpp/docs/CMakeFiles /projectnb/cislbu/andrewx/ssnp_cpp/docs//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs/CMakeFiles /projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /projectnb/cislbu/andrewx/ssnp_cpp/docs/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs/CMakeFiles 0
 .PHONY : all
 
 # The main clean target

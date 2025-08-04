@@ -7,12 +7,12 @@ set(CMAKE_DEPENDS_GENERATOR "Unix Makefiles")
 # The top level Makefile was generated from the following files:
 set(CMAKE_MAKEFILE_DEPENDS
   "CMakeCache.txt"
-  "/projectnb/cislbu/andrewx/ssnp_cpp/CMakeLists.txt"
+  "/projectnb/cislbu/rsyed/wgpu_ssnp-idt/CMakeLists.txt"
   "CMakeFiles/3.26.5/CMakeCCompiler.cmake"
   "CMakeFiles/3.26.5/CMakeCXXCompiler.cmake"
   "CMakeFiles/3.26.5/CMakeSystem.cmake"
-  "/projectnb/cislbu/andrewx/ssnp_cpp/emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake"
-  "/projectnb/cislbu/andrewx/ssnp_cpp/webgpu/CMakeLists.txt"
+  "/projectnb/cislbu/rsyed/wgpu_ssnp-idt/emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake"
+  "/projectnb/cislbu/rsyed/wgpu_ssnp-idt/webgpu/CMakeLists.txt"
   "/usr/share/cmake/Modules/CMakeCInformation.cmake"
   "/usr/share/cmake/Modules/CMakeCXXInformation.cmake"
   "/usr/share/cmake/Modules/CMakeCommonLanguageInclude.cmake"

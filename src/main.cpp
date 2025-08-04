@@ -147,7 +147,6 @@ extern "C" {
             // Pass n0 to forward function
             auto result = forward(context, tensor, res, na, angles, n0, intensity);
 
-            // Rest of your existing code...
             std::ostringstream dataStream, minStream, maxStream;
             dataStream << "[";
             minStream << "[";

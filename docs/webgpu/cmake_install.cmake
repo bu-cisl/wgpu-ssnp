@@ -1,8 +1,8 @@
-# Install script for directory: /projectnb/cislbu/andrewx/ssnp_cpp/webgpu
+# Install script for directory: /projectnb/cislbu/rsyed/wgpu_ssnp-idt/webgpu
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "/projectnb/cislbu/andrewx/ssnp_cpp/emsdk/upstream/emscripten/cache/sysroot")
+  set(CMAKE_INSTALL_PREFIX "/projectnb/cislbu/rsyed/wgpu_ssnp-idt/emsdk/upstream/emscripten/cache/sysroot")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 

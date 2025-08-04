@@ -1,8 +1,8 @@
-# Install script for directory: /projectnb/cislbu/andrewx/ssnp_cpp
+# Install script for directory: /projectnb/cislbu/rsyed/wgpu_ssnp-idt
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "/projectnb/cislbu/andrewx/ssnp_cpp/emsdk/upstream/emscripten/cache/sysroot")
+  set(CMAKE_INSTALL_PREFIX "/projectnb/cislbu/rsyed/wgpu_ssnp-idt/emsdk/upstream/emscripten/cache/sysroot")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
@@ -39,7 +39,7 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("/projectnb/cislbu/andrewx/ssnp_cpp/docs/webgpu/cmake_install.cmake")
+  include("/projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs/webgpu/cmake_install.cmake")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT)
@@ -50,5 +50,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/projectnb/cislbu/andrewx/ssnp_cpp/docs/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

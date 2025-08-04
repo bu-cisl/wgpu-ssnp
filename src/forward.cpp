@@ -14,16 +14,9 @@ vector<vector<vector<float>>> forward(
 
     // initialize the final result output
     vector<vector<vector<float>>> result; // angle_size x shape[0] x shape[1]
-    
-    int count = 1;
 
     for(vector<float> c_ba : angles) {
-        // Console updates
-        // cout << "Starting compute for angle " << count << " ..." << endl;
-        count++;
-
         // CONFIGURING INPUT FIELD
-
         // Generate Forward/Backward
         size_t buffer_len = shape[0] * shape[1];
         wgpu::Buffer tiltResultBuffer = createBuffer(context.device, nullptr, sizeof(float) * buffer_len * 2, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));

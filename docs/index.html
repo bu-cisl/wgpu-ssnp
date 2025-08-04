@@ -387,6 +387,7 @@
 				</select>
 			</div>
 			<button id="runBtn" disabled>Run Simulation</button>
+			<button id="downloadBtn" disabled style="margin-top: 10px;">Download as .npy</button>
 		</div>
 		<div id="viewer">
 			<div class="result-container" id="resultContainer"></div>
@@ -410,6 +411,7 @@
 			};
 			
 			let currentAngle = [0, 0];
+			let currentResultData = null;
 			
 			// Write a 32-bit‐integer header + float32 volume into a single ArrayBuffer
 			function buildBinBufferFromFloatVolume(slices, width, height) {
@@ -460,6 +462,13 @@
 			}
 			
 			function plotSlices(flatArray, D, H, W, minArray, maxArray) {
+			  // save current data for user download
+			  currentResultData = { 
+				data: flatArray.slice(0, H * W), 
+				H: H, 
+				W: W 
+			  };
+
 			  const resultContainer = document.getElementById('resultContainer');
 			  resultContainer.innerHTML = '';
 			
@@ -558,12 +567,63 @@
 			  angleLabel.className = 'angle-label';
 			  angleLabel.textContent = `Angle: (${currentAngle[0].toFixed(2)}, ${currentAngle[1].toFixed(2)})`;
 			  resultContainer.appendChild(angleLabel);
+
+			  // allow users to download output
+			  document.getElementById("downloadBtn").disabled = false;
 			}
 			
 			function colormap(t) {
 			  t = Math.max(0, Math.min(1, t));
 			  const c = d3.color(d3.interpolateViridis(t));
 			  return [c.r, c.g, c.b];
+			}
+
+			function downloadNumPy() {
+				if (!currentResultData) return;
+				const { data, H, W } = currentResultData;
+
+				// --- build the (unpadded) header dict with trailing‐comma in shape ---
+				const headerDict = 
+					`{'descr': '<f4', 'fortran_order': False, 'shape': (${H}, ${W},)}`;
+				const encoder = new TextEncoder();
+				const headerBytes = encoder.encode(headerDict);
+
+				// --- compute padding so that (10 + headerBlockLength) % 16 === 0 ---
+				const padLen = (16 - ((10 + headerBytes.length + 1) % 16)) % 16;
+
+				// --- allocate headerBlock = [ headerBytes | pad spaces | newline ] ---
+				const headerBlock = new Uint8Array(headerBytes.length + padLen + 1);
+				headerBlock.set(headerBytes, 0);
+				// fill spaces
+				for (let i = headerBytes.length; i < headerBytes.length + padLen; i++) {
+					headerBlock[i] = 0x20; // space
+				}
+				headerBlock[headerBlock.length - 1] = 0x0A; // '\n'
+
+				// --- now build the final .npy buffer ---
+				const totalLen = 10 + headerBlock.length + data.length * 4;
+				const buffer   = new Uint8Array(totalLen);
+
+				// magic string + version
+				buffer.set([0x93,0x4E,0x55,0x4D,0x50,0x59, 1, 0], 0);
+				// header length (little‐endian uint16)
+				buffer[8] = headerBlock.length & 0xFF;
+				buffer[9] = (headerBlock.length >> 8) & 0xFF;
+
+				// copy in headerBlock
+				buffer.set(headerBlock, 10);
+
+				// copy in the float32 data
+				new Float32Array(buffer.buffer, 10 + headerBlock.length)
+					.set(data);
+
+				// kick off the download
+				const blob = new Blob([buffer], { type: 'application/octet-stream' });
+				const a = document.createElement('a');
+				a.href = URL.createObjectURL(blob);
+				a.download = 'ssnp_output.npy';
+				a.click();
+				URL.revokeObjectURL(a.href);
 			}
 			
 			Module.onRuntimeInitialized = () => {
@@ -573,6 +633,9 @@
 			  const anglePreview = document.getElementById("anglePreview");
 			  const angleIndicator = document.getElementById("angleIndicator");
 			  const currentAngleDisplay = document.getElementById("currentAngle");
+			  
+			  // activate download button
+			  document.getElementById("downloadBtn").addEventListener("click", downloadNumPy);
 			
 			  // Set up angle selector
 			  angleSelector.addEventListener("mousemove", (e) => {
@@ -871,7 +934,7 @@
 				const viewer = document.getElementById("resultContainer");
 				viewer.innerHTML = "";
 				
-				console.log("Sending to C++:", combinedParams);
+				console.log("Sending input to C++");
 				
 				Module.ccall(
 					"callSSNP",

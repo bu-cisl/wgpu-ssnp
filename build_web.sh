@@ -8,4 +8,5 @@ emcmake cmake -B docs
 # Build + save html as index for git
 cmake --build docs
 cp ssnp_cpp.html docs/index.html
+cp UTIF.js docs/UTIF.js
 python -m http.server -d docs

@@ -57,10 +57,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /projectnb/cislbu/andrewx/ssnp_cpp
+CMAKE_SOURCE_DIR = /projectnb/cislbu/rsyed/wgpu_ssnp-idt
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /projectnb/cislbu/andrewx/ssnp_cpp/docs
+CMAKE_BINARY_DIR = /projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -87,14 +87,14 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	cd /projectnb/cislbu/andrewx/ssnp_cpp/docs && $(CMAKE_COMMAND) -E cmake_progress_start /projectnb/cislbu/andrewx/ssnp_cpp/docs/CMakeFiles /projectnb/cislbu/andrewx/ssnp_cpp/docs/webgpu//CMakeFiles/progress.marks
-	cd /projectnb/cislbu/andrewx/ssnp_cpp/docs && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 webgpu/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /projectnb/cislbu/andrewx/ssnp_cpp/docs/CMakeFiles 0
+	cd /projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs && $(CMAKE_COMMAND) -E cmake_progress_start /projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs/CMakeFiles /projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs/webgpu//CMakeFiles/progress.marks
+	cd /projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 webgpu/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	cd /projectnb/cislbu/andrewx/ssnp_cpp/docs && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 webgpu/clean
+	cd /projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 webgpu/clean
 .PHONY : clean
 
 # The main clean target
@@ -103,17 +103,17 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	cd /projectnb/cislbu/andrewx/ssnp_cpp/docs && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 webgpu/preinstall
+	cd /projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 webgpu/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	cd /projectnb/cislbu/andrewx/ssnp_cpp/docs && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 webgpu/preinstall
+	cd /projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 webgpu/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-	cd /projectnb/cislbu/andrewx/ssnp_cpp/docs && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+	cd /projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
 # Help Target
@@ -135,6 +135,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	cd /projectnb/cislbu/andrewx/ssnp_cpp/docs && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+	cd /projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 

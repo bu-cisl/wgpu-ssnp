@@ -1,4 +1,4 @@
-set(CMAKE_CXX_COMPILER "/projectnb/cislbu/andrewx/ssnp_cpp/emsdk/upstream/emscripten/em++")
+set(CMAKE_CXX_COMPILER "/projectnb/cislbu/rsyed/wgpu_ssnp-idt/emsdk/upstream/emscripten/em++")
 set(CMAKE_CXX_COMPILER_ARG1 "")
 set(CMAKE_CXX_COMPILER_ID "Clang")
 set(CMAKE_CXX_COMPILER_VERSION "21.0.0")
@@ -22,10 +22,10 @@ set(CMAKE_CXX_SIMULATE_VERSION "")
 
 
 
-set(CMAKE_AR "/projectnb/cislbu/andrewx/ssnp_cpp/emsdk/upstream/emscripten/emar")
-set(CMAKE_CXX_COMPILER_AR "/projectnb/cislbu/andrewx/ssnp_cpp/emsdk/upstream/emscripten/emar")
-set(CMAKE_RANLIB "/projectnb/cislbu/andrewx/ssnp_cpp/emsdk/upstream/emscripten/emranlib")
-set(CMAKE_CXX_COMPILER_RANLIB "/projectnb/cislbu/andrewx/ssnp_cpp/emsdk/upstream/emscripten/emranlib")
+set(CMAKE_AR "/projectnb/cislbu/rsyed/wgpu_ssnp-idt/emsdk/upstream/emscripten/emar")
+set(CMAKE_CXX_COMPILER_AR "/projectnb/cislbu/rsyed/wgpu_ssnp-idt/emsdk/upstream/emscripten/emar")
+set(CMAKE_RANLIB "/projectnb/cislbu/rsyed/wgpu_ssnp-idt/emsdk/upstream/emscripten/emranlib")
+set(CMAKE_CXX_COMPILER_RANLIB "/projectnb/cislbu/rsyed/wgpu_ssnp-idt/emsdk/upstream/emscripten/emranlib")
 set(CMAKE_LINKER "/usr/bin/ld")
 set(CMAKE_MT "")
 set(CMAKE_COMPILER_IS_GNUCXX )
@@ -77,7 +77,7 @@ endif()
 
 
 
-set(CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES "/projectnb/cislbu/andrewx/ssnp_cpp/emsdk/upstream/emscripten/cache/sysroot/include;/projectnb/cislbu/andrewx/ssnp_cpp/emsdk/upstream/emscripten/cache/sysroot/include/c++/v1")
+set(CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES "/projectnb/cislbu/rsyed/wgpu_ssnp-idt/emsdk/upstream/emscripten/cache/sysroot/include;/projectnb/cislbu/rsyed/wgpu_ssnp-idt/emsdk/upstream/emscripten/cache/sysroot/include/c++/v1")
 set(CMAKE_CXX_IMPLICIT_LINK_LIBRARIES "")
 set(CMAKE_CXX_IMPLICIT_LINK_DIRECTORIES "")
 set(CMAKE_CXX_IMPLICIT_LINK_FRAMEWORK_DIRECTORIES "")
