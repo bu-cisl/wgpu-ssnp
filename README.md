@@ -29,8 +29,8 @@ This project is a new implemention of SSNP in WebGPU and C++, compiled to WebAss
 - **Device-Agnostic**: Compatible with various GPU and compute backends, not tied to a specific platform or vendor  
 - **Browser-Native Execution**: Runs entirely in-browser via WebGPU with no installation required  
 - **Interactive Visualization**: Displays reconstructed output in real time within a browser interface  
+- **Downloadable Results**: Provides option to export reconstructed output tensors as numpy files
 - **User-Configurable Inputs**: Adjustable parameters include numerical aperture, resolution, refractive index, and illumination mode  
-- **Model Fidelity**: Faithfully reimplements the original SSNP-IDT architecture with comparable runtime performance  
 - **Volumetric Input**: Accepts **.tiff** volume datasets directly through the web interface  
 
 ## Physics Background
@@ -53,6 +53,7 @@ To test the model in the browser, visit the live demo:
    - Refractive index  
    - Illumination mode  
 3. Run the model to generate a reconstruction  
+4. Download the output tensor as a numpy file (optional)
 
 A sample input file is provided: [**input.tiff**](https://github.com/andrewx-bu/wgpu-ssnp/blob/main/input.tiff)  
 This volume is 128×128×50 and contains a quarter-radius sphere with voxel values set to **0.01** inside and **0** outside.
