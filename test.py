@@ -5,7 +5,8 @@ import struct
 import torch
 import matplotlib.pyplot as plt
 import pyvista as pv
-from py.ssnp_model import SSNPBeam
+from python.ssnp_model import SSNPBeam
+import pytest
 
 SLICES = 100
 ROWS = 512
@@ -109,10 +110,12 @@ def compare_outputs(py_output, cpp_output, rtol=TOL, atol=1e-4):
         print(f"  C++ value     : {cpp_val}")
         print(f"  Rel. diff     : {worst_diff:.6e}")
         print(f"  Abs. diff     : {worst_abs_diff:.6e}")
+        return False
     else:
         print("✅ All outputs match within specified tolerances.")
+        return True
 
-if __name__ == "__main__":
+def test_ssnp_model_comparison():
     print("Building C++ model...")
     subprocess.run(["cmake", "-B", "build", "-S", "."])
     subprocess.run(["cmake", "--build", "build"])
@@ -137,4 +140,7 @@ if __name__ == "__main__":
         save_output_as_png(py_output, f"{output_dir}/py_{IMAGE_NAME}.png")
 
     print("Comparing outputs...")
-    compare_outputs(py_output, cpp_output)
+    assert compare_outputs(py_output, cpp_output), "Outputs do not match within tolerance. Run `python test.py` for detailed debugging"
+
+if __name__ == "__main__":
+    test_ssnp_model_comparison()

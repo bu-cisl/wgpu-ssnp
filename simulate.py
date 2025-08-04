@@ -3,7 +3,7 @@ import torch
 import struct
 import matplotlib.pyplot as plt
 import tifffile
-from py.ssnp_model import SSNPBeam
+from python.ssnp_model import SSNPBeam
 
 SHAPE = (100, 256, 256)
 ANGLE = [-0.49,0.33]
