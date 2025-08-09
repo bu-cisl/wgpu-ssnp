@@ -45,6 +45,14 @@ target_link_libraries(ssnp_cpp PRIVATE webgpu)
 # Copy necessary runtime binaries
 target_copy_webgpu_binaries(ssnp_cpp)
 
+# Copy web assets to docs/
+add_custom_target(copy_web ALL
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+            ${CMAKE_SOURCE_DIR}/web
+            ${CMAKE_BINARY_DIR}
+    COMMENT "Copying web assets to build directory"
+)
+
 if (EMSCRIPTEN)
     # apply Emscripten flags
     target_link_options(ssnp_cpp PRIVATE
