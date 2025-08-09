@@ -24,16 +24,12 @@ else()
     target_compile_options(optics_sim PRIVATE -Wall -Wextra -pedantic)
 endif()
 
-# Include WebGPU subdirectory
+# Link WebGPU
 add_subdirectory(external/webgpu)
-
-# Link WebGPU library
 target_link_libraries(optics_sim PRIVATE webgpu)
-
-# Copy necessary runtime binaries
 target_copy_webgpu_binaries(optics_sim)
 
-# Copy web assets to docs/
+# Copy web assets
 add_custom_target(copy_web ALL
     COMMAND ${CMAKE_COMMAND} -E copy_directory
             ${CMAKE_SOURCE_DIR}/web
@@ -42,14 +38,15 @@ add_custom_target(copy_web ALL
 )
 
 if (EMSCRIPTEN)
-    # apply Emscripten flags
-    target_link_options(optics_sim PRIVATE
-        "-sUSE_WEBGPU"   # hook WebGPU calls into JS API
-        "-sASYNCIFY"     # allow sync requestAdapter/Device
-        "--preload-file=${CMAKE_CURRENT_SOURCE_DIR}/src@/src"  
-        "-sALLOW_MEMORY_GROWTH"  # let the browser grow the Wasm heap
-        "-sEXPORTED_FUNCTIONS=['_callSSNP']"
-        "-sEXPORTED_RUNTIME_METHODS=['ccall']"
-        "-sNO_DISABLE_EXCEPTION_CATCHING"  
-    )
+  target_link_options(optics_sim PRIVATE
+    -sUSE_WEBGPU
+    -sASYNCIFY
+    "--preload-file=${CMAKE_CURRENT_SOURCE_DIR}/src@/src"
+    -sALLOW_MEMORY_GROWTH=1
+    -O3
+    -msimd128
+    "-sEXPORTED_FUNCTIONS=['_callSSNP']"
+    "-sEXPORTED_RUNTIME_METHODS=['ccall','HEAPF32','HEAPU8']"
+    -sNO_DISABLE_EXCEPTION_CATCHING
+  )
 endif()

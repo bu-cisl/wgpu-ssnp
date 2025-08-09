@@ -7,21 +7,13 @@ function colormap(t) {
 	return [c.r, c.g, c.b];
 }
 
-function plotSlices(flatArray, D, H, W, minArray, maxArray) {
-	currentResultData = { 
-		data: flatArray.slice(0, H * W), 
-		H: H, 
-		W: W 
-	};
+function plotSlices(flatArray, H, W, localMin, localMax) {
+	currentResultData = { data: flatArray, H, W };
 
 	const resultContainer = document.getElementById('resultContainer');
 	resultContainer.innerHTML = '';
 
-	const DISPLAY_SIZE = 512; 
-
-	const d = 0;
-	const localMin = minArray[d];
-	const localMax = maxArray[d];
+	const DISPLAY_SIZE = 512;
 	const scale = localMax - localMin || 1;
 
 	const container = document.createElement('div');

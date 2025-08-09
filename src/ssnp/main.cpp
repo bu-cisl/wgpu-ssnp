@@ -93,6 +93,12 @@ int main(int argc, char* argv[]) {
 #include <emscripten.h>
 #include <sstream>
 
+EM_JS(void, plot_from_heap, (uintptr_t ptr, int len, int H, int W, float mn, float mx), {
+  var view = new Float32Array(HEAPF32.buffer, ptr, len);
+  var copy = new Float32Array(view);
+  plotSlices(copy, H|0, W|0, Number(mn), Number(mx));
+});
+
 extern "C" {
     EMSCRIPTEN_KEEPALIVE
     void callSSNP(const char* inputStr) {
@@ -146,34 +152,25 @@ extern "C" {
 
             // Pass n0 to forward function
             auto result = forward(context, tensor, res, na, angles, n0, intensity);
+            auto output = result[0]; // only keep the 2d output since one angle at a time
 
-            std::ostringstream dataStream, minStream, maxStream;
-            dataStream << "[";
-            minStream << "[";
-            maxStream << "[";
-            for (size_t d = 0; d < result.size(); ++d) {
-                float localMin = result[d][0][0];
-                float localMax = result[d][0][0];
-                for (size_t i = 0; i < result[d].size(); ++i) {
-                    for (size_t j = 0; j < result[d][i].size(); ++j) {
-                        float val = result[d][i][j];
-                        dataStream << val << ",";
-                        localMin = std::min(localMin, val);
-                        localMax = std::max(localMax, val);
-                    }
+            size_t N = (size_t)H * (size_t)W;
+            float* out = (float*)malloc(sizeof(float) * N);
+            size_t k = 0;
+
+            float localMin = output[0][0];
+            float localMax = output[0][0];
+            for (int i = 0; i < H; ++i) {
+                for (int j = 0; j < W; ++j) {
+                    float v = output[i][j];
+                    out[k++] = v;
+                    if (v < localMin) localMin = v;
+                    if (v > localMax) localMax = v;
                 }
-                minStream << localMin << (d < result.size()-1 ? "," : "");
-                maxStream << localMax << (d < result.size()-1 ? "," : "");
             }
-            dataStream.seekp(-1, dataStream.cur); dataStream << "]";
-            minStream << "]";
-            maxStream << "]";
 
-            std::ostringstream jsCall;
-            jsCall << "plotSlices(" << dataStream.str() << "," << D << "," << H << "," << W
-                << "," << minStream.str() << "," << maxStream.str() << ");";
-
-            emscripten_run_script(jsCall.str().c_str());
+            plot_from_heap((uintptr_t)out, N, H, W, localMin, localMax);
+            free(out);
 
         } catch (const std::exception &e) {
             printf("C++ exception: %s\n", e.what());
