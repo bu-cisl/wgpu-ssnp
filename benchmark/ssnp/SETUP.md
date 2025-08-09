@@ -27,7 +27,7 @@ python forward_model.py
 ### Generate comparison results
 Go to root directory of the entire wgpu-ssnp repo and run:
 ```
-python benchmark/benchmark.py
+python benchmark/ssnp/benchmark.py
 ```
 
 Repo's README.md summarizes results

@@ -115,7 +115,7 @@ if __name__ == "__main__":
     ax2.legend()
     
     plt.tight_layout()
-    plt.savefig('benchmark/benchmark_results.png', dpi=300, bbox_inches='tight')
+    plt.savefig('benchmark/ssnp/benchmark_results.png', dpi=300, bbox_inches='tight')
     plt.show()
     
     print("\nBenchmark complete. Results saved to benchmark_results.png")

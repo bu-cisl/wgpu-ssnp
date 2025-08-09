@@ -1,5 +1,5 @@
 #define WEBGPU_CPP_IMPLEMENTATION
-#include "../src/forward.h"
+#include "../../src/ssnp/forward.h"
 #include <iostream>
 #include <vector>
 #include <chrono>

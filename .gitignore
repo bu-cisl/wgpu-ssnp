@@ -1,5 +1,5 @@
 # Ignore build artifacts
-/build/
+**/build
 *.o
 *.out
 *.exe
@@ -8,12 +8,6 @@
 *.lib
 *.obj
 
-# Ignore CMake files
-/CMakeCache.txt
-/CMakeFiles/
-/cmake_install.cmake
-/Makefile
-
 # Ignore Python virtual environments
 *venv
 *.venv
@@ -21,20 +15,14 @@
 *.pyc
 *.pytest_cache/
 
-# Ignore sandbox and testing files
-/test
-process_tiff.py
-
 # Ignore VS code settings
 .vscode
 
 # Ignore extra output during testing
-input_matrix.txt
 sample.png
 output.png
 *.bin
 *.tiff
 
 # Ignore excess benchmark output
-benchmark/build
-benchmark/SSNP-IDT
+**/SSNP-IDT
