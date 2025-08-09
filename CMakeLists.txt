@@ -25,7 +25,7 @@ else()
 endif()
 
 # Include WebGPU subdirectory
-add_subdirectory(webgpu)
+add_subdirectory(external/webgpu)
 
 # Link WebGPU library
 target_link_libraries(optics_sim PRIVATE webgpu)
