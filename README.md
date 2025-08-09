@@ -88,7 +88,7 @@ The system consists of a WebAssembly-compiled C++ backend and a lightweight brow
 ### Frontend
 
 - Provides a browser interface for uploading **.tiff** volume data  
-- Carefully decodes the volume data into a **.bin** file using **UTIF.js** for the C++ executable to use as input
+- Carefully decodes the volume data into a **.bin** file for the C++ executable to use as input
 - Coordinates execution of the backend pipeline and retrieves output data  
 - Displays reconstructed results interactively using standard browser rendering techniques  
 - Exposes controls for key imaging parameters such as numerical aperture, resolution, and refractive index  
@@ -129,4 +129,4 @@ This work was conducted as part of the Computational Imaging Systems Lab (CISL) 
 
 We thank Jiabei Zhu, Hao Wang, and Lei Tian for developing the original SSNP-IDT model and releasing the PyCUDA implementation.  
 Special thanks to [Mitchell Gilmore](https://github.com/mitch-gilmore) and [Jeffrey Alido](https://github.com/jeffreyalido) for their support and feedback throughout the project.  
-We also acknowledge [Elie Michel](https://github.com/eliemichel) for the WebGPU-Cpp library, which served as the foundation for the C++ backend, and [Photopea](https://github.com/photopea/UTIF.js) for the UTIF.js library used for TIFF decoding.
+We also acknowledge [Elie Michel](https://github.com/eliemichel) for the WebGPU-Cpp library, which served as the foundation for the C++ backend
