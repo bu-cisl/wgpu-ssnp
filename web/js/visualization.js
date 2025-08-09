@@ -76,9 +76,8 @@ function plotSlices(flatArray, H, W, localMin, localMax) {
 		colorImg.data[idx2 + 2] = b;
 		colorImg.data[idx2 + 3] = 255;
 	}
-	for (let x = 0; x < 20; x++) {
-		colorCtx.putImageData(colorImg, x, 0);
-	}
+	colorCtx.putImageData(colorImg, 0, 0);
+	colorCtx.drawImage(colorCanvas, 0, 0, 1, DISPLAY_SIZE, 0, 0, 20, DISPLAY_SIZE);
 
 	colorbar.appendChild(colorCanvas);
 	const maxLabel = document.createElement('div');
