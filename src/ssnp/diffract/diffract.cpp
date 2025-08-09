@@ -138,7 +138,7 @@ void diffract(
     
     // LOADING AND COMPILING SHADER CODE
     WorkgroupLimits limits = getWorkgroupLimits(device);
-    std::string shaderCode = readShaderFile("src/diffract/diffract.wgsl", limits.maxWorkgroupSizeX);
+    std::string shaderCode = readShaderFile("src/ssnp/diffract/diffract.wgsl", limits.maxWorkgroupSizeX);
     wgpu::ShaderModule shaderModule = createShaderModule(device, shaderCode);
 
     // CREATING BUFFERS

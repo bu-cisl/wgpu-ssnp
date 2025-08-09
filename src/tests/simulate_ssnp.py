@@ -5,22 +5,15 @@ import matplotlib.pyplot as plt
 import tifffile
 from python.ssnp_model import SSNPBeam
 
-SHAPE = (100, 256, 256)
+SHAPE = (32, 128, 128)
 ANGLE = [-0.49,0.33]
 RES = (.1,.1,.1)
 NA = .65
 INTENSITY = True
-TYPE = "tiff" # tiff or bin
 
-def save_tensor(tensor: np.ndarray, type="bin"):
+def save_tensor(tensor: np.ndarray):
     assert tensor.ndim == 3
-    D, H, W = tensor.shape
-    if type=="bin":
-        with open("input.bin", "wb") as f:
-            f.write(struct.pack("iii", D, H, W))
-            f.write(tensor.astype(np.float32).tobytes())
-    if type=="tiff":
-        tifffile.imwrite("input.tiff", tensor.astype(np.float32))
+    tifffile.imwrite("input.tiff", tensor.astype(np.float32))
 
 def create_sphere(shape, radius_fraction=0.25, value_inside=0.01, value_outside=0.0):
     z, y, x = np.indices(shape)
@@ -61,6 +54,6 @@ if __name__ == "__main__":
     plt.close()
 
     # Save input tensor for site testing
-    save_tensor(input.detach().numpy(), type=TYPE)
+    save_tensor(input.detach().numpy())
     print("Expected output saved to 'sample.png'")
     print("Input file to upload to site saved as 'input.tiff'")

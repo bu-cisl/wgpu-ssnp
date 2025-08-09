@@ -1,7 +1,10 @@
-#include "intensity.h"
+#include "scatter_factor.h"
 
+// INPUT PARAMS
 struct Params {
-    int intensity;
+    float res_z;
+    float dz;
+    float n0;
 };
 
 static size_t buffer_len;
@@ -49,7 +52,7 @@ static wgpu::BindGroup createBindGroup(
     outputEntry.binding = 1;
     outputEntry.buffer = outputBuffer;
     outputEntry.offset = 0;
-    outputEntry.size = sizeof(float) * buffer_len;
+    outputEntry.size = sizeof(float) * buffer_len * 2;
 
     wgpu::BindGroupEntry uniformEntry = {};
     uniformEntry.binding = 2;
@@ -67,15 +70,17 @@ static wgpu::BindGroup createBindGroup(
     return device.createBindGroup(bindGroupDesc);
 }
 
-void intense(
+void scatter_factor(
     WebGPUContext& context, 
     wgpu::Buffer& outputBuffer, 
     wgpu::Buffer& inputBuffer, 
     size_t bufferlen,
-    bool intensity
+    std::optional<float> res_z, 
+    std::optional<float> dz, 
+    std::optional<float> n0
 ) {
     buffer_len = bufferlen;
-    Params params = {int(intensity)};
+    Params params = {res_z.value(), dz.value(), n0.value()};
 
     // INITIALIZING WEBGPU
     wgpu::Device device = context.device;
@@ -83,7 +88,7 @@ void intense(
 
     // LOADING AND COMPILING SHADER CODE
     WorkgroupLimits limits = getWorkgroupLimits(device);
-    std::string shaderCode = readShaderFile("src/intensity/intensity.wgsl", limits.maxWorkgroupSizeX);
+    std::string shaderCode = readShaderFile("src/ssnp/scatter_factor/scatter_factor.wgsl", limits.maxWorkgroupSizeX);
     wgpu::ShaderModule shaderModule = createShaderModule(device, shaderCode);
 
     // CREATING BUFFERS

@@ -1,25 +1,25 @@
-#include "scatter_effects.h"
+#include "mult.h"
 
 static size_t buffer_len;
 
 // CREATING BIND GROUP AND LAYOUT
 static wgpu::BindGroupLayout createBindGroupLayout(wgpu::Device& device) {
-    wgpu::BindGroupLayoutEntry inputBufferLayout1 = {};
-    inputBufferLayout1.binding = 0;
-    inputBufferLayout1.visibility = wgpu::ShaderStage::Compute;
-    inputBufferLayout1.buffer.type = wgpu::BufferBindingType::ReadOnlyStorage;
+    wgpu::BindGroupLayoutEntry inputBuffer1Layout = {};
+    inputBuffer1Layout.binding = 0;
+    inputBuffer1Layout.visibility = wgpu::ShaderStage::Compute;
+    inputBuffer1Layout.buffer.type = wgpu::BufferBindingType::ReadOnlyStorage;
 
-    wgpu::BindGroupLayoutEntry inputBufferLayout2 = {};
-    inputBufferLayout2.binding = 1;
-    inputBufferLayout2.visibility = wgpu::ShaderStage::Compute;
-    inputBufferLayout2.buffer.type = wgpu::BufferBindingType::ReadOnlyStorage;
-   
+    wgpu::BindGroupLayoutEntry inputBuffer2Layout = {};
+    inputBuffer2Layout.binding = 1;
+    inputBuffer2Layout.visibility = wgpu::ShaderStage::Compute;
+    inputBuffer2Layout.buffer.type = wgpu::BufferBindingType::ReadOnlyStorage;
+
     wgpu::BindGroupLayoutEntry outputBufferLayout = {};
     outputBufferLayout.binding = 2;
     outputBufferLayout.visibility = wgpu::ShaderStage::Compute;
     outputBufferLayout.buffer.type = wgpu::BufferBindingType::Storage;
 
-    wgpu::BindGroupLayoutEntry entries[] = {inputBufferLayout1, inputBufferLayout2, outputBufferLayout};
+    wgpu::BindGroupLayoutEntry entries[] = {inputBuffer1Layout, inputBuffer2Layout, outputBufferLayout};
 
     wgpu::BindGroupLayoutDescriptor layoutDesc = {};
     layoutDesc.entryCount = 3;
@@ -45,7 +45,7 @@ static wgpu::BindGroup createBindGroup(
     inputEntry2.binding = 1;
     inputEntry2.buffer = inputBuffer2;
     inputEntry2.offset = 0;
-    inputEntry2.size = sizeof(float) * buffer_len * 2;
+    inputEntry2.size = sizeof(float) * buffer_len;
 
     wgpu::BindGroupEntry outputEntry = {};
     outputEntry.binding = 2;
@@ -63,14 +63,12 @@ static wgpu::BindGroup createBindGroup(
     return device.createBindGroup(bindGroupDesc);
 }
 
-void scatter_effects(
+void mult(
     WebGPUContext& context, 
     wgpu::Buffer& outputBuffer, 
-    wgpu::Buffer& scatterBuffer, 
-    wgpu::Buffer& uBuffer, 
-    wgpu::Buffer& udBuffer,
-    size_t bufferlen,
-    std::vector<int> shape
+    wgpu::Buffer& inputBuffer1, // forward
+    wgpu::Buffer& inputBuffer2, // pupil
+    size_t bufferlen
 ) {
     buffer_len = bufferlen;
 
@@ -78,62 +76,30 @@ void scatter_effects(
     wgpu::Device device = context.device;
     wgpu::Queue queue = context.queue;
 
-    // shader file for complex multiplication
+    // LOADING AND COMPILING SHADER CODE
     WorkgroupLimits limits = getWorkgroupLimits(device);
-    std::string shaderCode = readShaderFile("src/scatter_effects/complex_mult.wgsl", limits.maxWorkgroupSizeX);
+    std::string shaderCode = readShaderFile("src/ssnp/mult/mult.wgsl", limits.maxWorkgroupSizeX);
     wgpu::ShaderModule shaderModule = createShaderModule(device, shaderCode);
 
-    // bind group/layout for complex multiplication
-    wgpu::Buffer fftInputBuffer = createBuffer(context.device, nullptr, sizeof(float) * buffer_len * 2, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
+    // CREATING BIND GROUP AND LAYOUT
     wgpu::BindGroupLayout bindGroupLayout = createBindGroupLayout(device);
     wgpu::BindGroup bindGroup = createBindGroup(
         device, 
         bindGroupLayout, 
-        scatterBuffer,
-        uBuffer, 
-        fftInputBuffer
+        inputBuffer1,
+        inputBuffer2,
+        outputBuffer
     );
 
-    // perform scatter factor * u
+    // CREATING COMPUTE PIPELINE
     wgpu::ComputePipeline computePipeline = createComputePipeline(device, shaderModule, bindGroupLayout);
+
+    // ENCODING AND DISPATCHING COMPUTE COMMANDS
     uint32_t workgroupsX = std::ceil(double(buffer_len)/limits.maxWorkgroupSizeX);
     wgpu::CommandBuffer commandBuffer = createComputeCommandBuffer(device, computePipeline, bindGroup, workgroupsX);
     queue.submit(1, &commandBuffer);
 
-    // release resources so far
-    commandBuffer.release();
-    computePipeline.release();
-    bindGroup.release();
-    bindGroupLayout.release();
-    shaderModule.release();
-
-    // perform fft(scatter*u)
-    wgpu::Buffer fftBuffer = createBuffer(context.device, nullptr, sizeof(float) * buffer_len * 2, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
-    dft(context, fftBuffer, fftInputBuffer, buffer_len, shape[0], shape[1], 0);
-    fftInputBuffer.release();
-
-
-    // shader file for subtraction
-    shaderCode = readShaderFile("src/scatter_effects/complex_sub.wgsl", limits.maxWorkgroupSizeX);
-    shaderModule = createShaderModule(device, shaderCode);
-
-    // bind group/layout for subtraction
-    bindGroupLayout = createBindGroupLayout(device);
-    bindGroup = createBindGroup(
-        device, 
-        bindGroupLayout, 
-        udBuffer,
-        fftBuffer, 
-        outputBuffer
-    );
-
-    // perform ud - fft(scatter*u)
-    computePipeline = createComputePipeline(device, shaderModule, bindGroupLayout);
-    commandBuffer = createComputeCommandBuffer(device, computePipeline, bindGroup, workgroupsX);
-    queue.submit(1, &commandBuffer);
-
-    // Cleanup Resources
-    fftBuffer.release();
+    // RELEASE RESOURCES
     commandBuffer.release();
     computePipeline.release();
     bindGroup.release();

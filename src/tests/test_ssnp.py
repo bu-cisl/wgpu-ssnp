@@ -8,9 +8,9 @@ import pyvista as pv
 from python.ssnp_model import SSNPBeam
 import pytest
 
-SLICES = 100
-ROWS = 512
-COLS = 512
+SLICES = 32
+ROWS = 128
+COLS = 128
 TOL = 1e-4 # rtol
 IMAGE_NAME = None # None if no save
 
@@ -50,7 +50,7 @@ def generate_input(shape=(3, 128, 128)) -> np.ndarray:
     return create_sphere(shape)
 
 def run_cpp_model(input_path="input.bin", output_path="output.bin"):
-    result = subprocess.run(["./build/ssnp_cpp", input_path, output_path], capture_output=True, text=True)
+    result = subprocess.run(["./build/optics_sim", input_path, output_path], capture_output=True, text=True)
     if result.returncode != 0:
         print("C++ Error:", result.stderr, result.stdout)
         raise RuntimeError("C++ execution failed.")
@@ -132,7 +132,7 @@ def test_ssnp_model_comparison():
 
     if IMAGE_NAME is not None:
         image_folder = f"{ROWS}x{COLS}x{SLICES}"
-        output_dir = f"images/{image_folder}/"
+        output_dir = f"images/ssnp_out/{image_folder}/"
         print(f"Saving images to {output_dir}...")
         os.makedirs(output_dir, exist_ok=True)
         save_input_as_png(input_tensor, f"{output_dir}/input")
@@ -140,7 +140,12 @@ def test_ssnp_model_comparison():
         save_output_as_png(py_output, f"{output_dir}/py_{IMAGE_NAME}.png")
 
     print("Comparing outputs...")
-    assert compare_outputs(py_output, cpp_output), "Outputs do not match within tolerance. Run `python test.py` for detailed debugging"
+    assert compare_outputs(py_output, cpp_output), "Outputs do not match within tolerance."
+    
+    # Cleanup temporary files
+    for file in ["input.bin", "output.bin"]:
+        if os.path.exists(file):
+            os.remove(file)
 
 if __name__ == "__main__":
     test_ssnp_model_comparison()

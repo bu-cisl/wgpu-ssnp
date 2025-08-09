@@ -134,7 +134,7 @@ void merge_prop(
     
     // LOADING AND COMPILING SHADER CODE
     WorkgroupLimits limits = getWorkgroupLimits(device);
-    std::string shaderCode = readShaderFile("src/merge_prop/merge_prop.wgsl", limits.maxWorkgroupSizeX);
+    std::string shaderCode = readShaderFile("src/ssnp/merge_prop/merge_prop.wgsl", limits.maxWorkgroupSizeX);
     wgpu::ShaderModule shaderModule = createShaderModule(device, shaderCode);
 
     // CREATING BUFFERS

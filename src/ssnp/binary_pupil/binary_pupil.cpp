@@ -1,32 +1,30 @@
-#include "scatter_factor.h"
+#include "binary_pupil.h"
 
 // INPUT PARAMS
 struct Params {
-    float res_z;
-    float dz;
-    float n0;
+    float na;
 };
 
 static size_t buffer_len;
 
 // CREATING BIND GROUP AND LAYOUT
 static wgpu::BindGroupLayout createBindGroupLayout(wgpu::Device& device) {
-    wgpu::BindGroupLayoutEntry inputBufferLayout = {};
-    inputBufferLayout.binding = 0;
-    inputBufferLayout.visibility = wgpu::ShaderStage::Compute;
-    inputBufferLayout.buffer.type = wgpu::BufferBindingType::ReadOnlyStorage;
+    wgpu::BindGroupLayoutEntry cgammaBufferLayout = {};
+    cgammaBufferLayout.binding = 0;
+    cgammaBufferLayout.visibility = wgpu::ShaderStage::Compute;
+    cgammaBufferLayout.buffer.type = wgpu::BufferBindingType::ReadOnlyStorage;
 
-    wgpu::BindGroupLayoutEntry outputBufferLayout = {};
-    outputBufferLayout.binding = 1;
-    outputBufferLayout.visibility = wgpu::ShaderStage::Compute;
-    outputBufferLayout.buffer.type = wgpu::BufferBindingType::Storage;
+    wgpu::BindGroupLayoutEntry maskBufferLayout = {};
+    maskBufferLayout.binding = 1;
+    maskBufferLayout.visibility = wgpu::ShaderStage::Compute;
+    maskBufferLayout.buffer.type = wgpu::BufferBindingType::Storage;
 
     wgpu::BindGroupLayoutEntry uniformBufferLayout = {};
     uniformBufferLayout.binding = 2;
     uniformBufferLayout.visibility = wgpu::ShaderStage::Compute;
     uniformBufferLayout.buffer.type = wgpu::BufferBindingType::Uniform;
 
-    wgpu::BindGroupLayoutEntry entries[] = {inputBufferLayout, outputBufferLayout, uniformBufferLayout};
+    wgpu::BindGroupLayoutEntry entries[] = {cgammaBufferLayout, maskBufferLayout, uniformBufferLayout};
 
     wgpu::BindGroupLayoutDescriptor layoutDesc = {};
     layoutDesc.entryCount = 3;
@@ -38,21 +36,21 @@ static wgpu::BindGroupLayout createBindGroupLayout(wgpu::Device& device) {
 static wgpu::BindGroup createBindGroup(
     wgpu::Device& device, 
     wgpu::BindGroupLayout bindGroupLayout, 
-    wgpu::Buffer inputBuffer, 
-    wgpu::Buffer outputBuffer, 
+    wgpu::Buffer cgammaBuffer, 
+    wgpu::Buffer maskBuffer, 
     wgpu::Buffer uniformBuffer
 ) {
-    wgpu::BindGroupEntry inputEntry = {};
-    inputEntry.binding = 0;
-    inputEntry.buffer = inputBuffer;
-    inputEntry.offset = 0;
-    inputEntry.size = sizeof(float) * buffer_len * 2;
+    wgpu::BindGroupEntry cgammaEntry = {};
+    cgammaEntry.binding = 0;
+    cgammaEntry.buffer = cgammaBuffer;
+    cgammaEntry.offset = 0;
+    cgammaEntry.size = sizeof(float) * buffer_len;
 
-    wgpu::BindGroupEntry outputEntry = {};
-    outputEntry.binding = 1;
-    outputEntry.buffer = outputBuffer;
-    outputEntry.offset = 0;
-    outputEntry.size = sizeof(float) * buffer_len * 2;
+    wgpu::BindGroupEntry maskEntry = {};
+    maskEntry.binding = 1;
+    maskEntry.buffer = maskBuffer;
+    maskEntry.offset = 0;
+    maskEntry.size = sizeof(uint32_t) * buffer_len;
 
     wgpu::BindGroupEntry uniformEntry = {};
     uniformEntry.binding = 2;
@@ -60,7 +58,7 @@ static wgpu::BindGroup createBindGroup(
     uniformEntry.offset = 0;
     uniformEntry.size = sizeof(Params);
 
-    wgpu::BindGroupEntry entries[] = {inputEntry, outputEntry, uniformEntry};
+    wgpu::BindGroupEntry entries[] = {cgammaEntry, maskEntry, uniformEntry};
 
     wgpu::BindGroupDescriptor bindGroupDesc = {};
     bindGroupDesc.layout = bindGroupLayout;
@@ -70,17 +68,15 @@ static wgpu::BindGroup createBindGroup(
     return device.createBindGroup(bindGroupDesc);
 }
 
-void scatter_factor(
+void binary_pupil(
     WebGPUContext& context, 
-    wgpu::Buffer& outputBuffer, 
-    wgpu::Buffer& inputBuffer, 
-    size_t bufferlen,
-    std::optional<float> res_z, 
-    std::optional<float> dz, 
-    std::optional<float> n0
+    wgpu::Buffer& maskBuffer,
+    std::vector<int> shape,
+    float na,
+    std::optional<std::vector<float>> res 
 ) {
-    buffer_len = bufferlen;
-    Params params = {res_z.value(), dz.value(), n0.value()};
+    buffer_len = shape[0] * shape[1];
+    Params params = {na};
 
     // INITIALIZING WEBGPU
     wgpu::Device device = context.device;
@@ -88,21 +84,17 @@ void scatter_factor(
 
     // LOADING AND COMPILING SHADER CODE
     WorkgroupLimits limits = getWorkgroupLimits(device);
-    std::string shaderCode = readShaderFile("src/scatter_factor/scatter_factor.wgsl", limits.maxWorkgroupSizeX);
+    std::string shaderCode = readShaderFile("src/ssnp/binary_pupil/binary_pupil.wgsl", limits.maxWorkgroupSizeX);
     wgpu::ShaderModule shaderModule = createShaderModule(device, shaderCode);
 
     // CREATING BUFFERS
+    wgpu::Buffer cgammaBuffer = createBuffer(device, nullptr, sizeof(float) * buffer_len, wgpu::BufferUsage::Storage);
+    c_gamma(context, cgammaBuffer, res.value(), shape);
     wgpu::Buffer uniformBuffer = createBuffer(device, &params, sizeof(Params), wgpu::BufferUsage::Uniform);
 
     // CREATING BIND GROUP AND LAYOUT
     wgpu::BindGroupLayout bindGroupLayout = createBindGroupLayout(device);
-    wgpu::BindGroup bindGroup = createBindGroup(
-        device, 
-        bindGroupLayout, 
-        inputBuffer, 
-        outputBuffer, 
-        uniformBuffer
-    );
+    wgpu::BindGroup bindGroup = createBindGroup(device, bindGroupLayout, cgammaBuffer, maskBuffer, uniformBuffer);
 
     // CREATING COMPUTE PIPELINE
     wgpu::ComputePipeline computePipeline = createComputePipeline(device, shaderModule, bindGroupLayout);
@@ -118,5 +110,6 @@ void scatter_factor(
     bindGroup.release();
     bindGroupLayout.release();
     shaderModule.release();
+    cgammaBuffer.release();
     uniformBuffer.release();
 }
