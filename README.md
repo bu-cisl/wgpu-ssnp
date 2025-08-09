@@ -61,11 +61,11 @@ This volume is 128×128×50 and contains a quarter-radius sphere with voxel valu
 
 **Sample Input (Volume Rendering):**  
 
-<img src="images/128x128x50/input.png?raw=true" alt="Input Volume" width="350"/>
+<img src="images/ssnp_out/128x128x50/input.png?raw=true" alt="Input Volume" width="350"/>
 
 **Expected Output (With Default Settings):**
 
-<img src="images/128x128x50/py_0.0.png?raw=true" alt="Expected Output" width="350"/>
+<img src="images/ssnp_out/128x128x50/py_0.0.png?raw=true" alt="Expected Output" width="350"/>
 
 Feel free to experiment with different parameters or upload custom volumetric inputs!
 
