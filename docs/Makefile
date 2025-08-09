@@ -117,353 +117,366 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named ssnp_cpp
+# Target rules for targets named optics_sim
 
 # Build rule for target.
-ssnp_cpp: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 ssnp_cpp
-.PHONY : ssnp_cpp
+optics_sim: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 optics_sim
+.PHONY : optics_sim
 
 # fast build rule for target.
-ssnp_cpp/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ssnp_cpp.dir/build.make CMakeFiles/ssnp_cpp.dir/build
-.PHONY : ssnp_cpp/fast
+optics_sim/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/optics_sim.dir/build.make CMakeFiles/optics_sim.dir/build
+.PHONY : optics_sim/fast
 
-src/binary_pupil/binary_pupil.o: src/binary_pupil/binary_pupil.cpp.o
-.PHONY : src/binary_pupil/binary_pupil.o
+#=============================================================================
+# Target rules for targets named copy_web
 
-# target to build an object file
-src/binary_pupil/binary_pupil.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ssnp_cpp.dir/build.make CMakeFiles/ssnp_cpp.dir/src/binary_pupil/binary_pupil.cpp.o
-.PHONY : src/binary_pupil/binary_pupil.cpp.o
+# Build rule for target.
+copy_web: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 copy_web
+.PHONY : copy_web
 
-src/binary_pupil/binary_pupil.i: src/binary_pupil/binary_pupil.cpp.i
-.PHONY : src/binary_pupil/binary_pupil.i
+# fast build rule for target.
+copy_web/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/copy_web.dir/build.make CMakeFiles/copy_web.dir/build
+.PHONY : copy_web/fast
 
-# target to preprocess a source file
-src/binary_pupil/binary_pupil.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ssnp_cpp.dir/build.make CMakeFiles/ssnp_cpp.dir/src/binary_pupil/binary_pupil.cpp.i
-.PHONY : src/binary_pupil/binary_pupil.cpp.i
-
-src/binary_pupil/binary_pupil.s: src/binary_pupil/binary_pupil.cpp.s
-.PHONY : src/binary_pupil/binary_pupil.s
-
-# target to generate assembly for a file
-src/binary_pupil/binary_pupil.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ssnp_cpp.dir/build.make CMakeFiles/ssnp_cpp.dir/src/binary_pupil/binary_pupil.cpp.s
-.PHONY : src/binary_pupil/binary_pupil.cpp.s
-
-src/c_gamma/c_gamma.o: src/c_gamma/c_gamma.cpp.o
-.PHONY : src/c_gamma/c_gamma.o
+src/ssnp/binary_pupil/binary_pupil.o: src/ssnp/binary_pupil/binary_pupil.cpp.o
+.PHONY : src/ssnp/binary_pupil/binary_pupil.o
 
 # target to build an object file
-src/c_gamma/c_gamma.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ssnp_cpp.dir/build.make CMakeFiles/ssnp_cpp.dir/src/c_gamma/c_gamma.cpp.o
-.PHONY : src/c_gamma/c_gamma.cpp.o
+src/ssnp/binary_pupil/binary_pupil.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/optics_sim.dir/build.make CMakeFiles/optics_sim.dir/src/ssnp/binary_pupil/binary_pupil.cpp.o
+.PHONY : src/ssnp/binary_pupil/binary_pupil.cpp.o
 
-src/c_gamma/c_gamma.i: src/c_gamma/c_gamma.cpp.i
-.PHONY : src/c_gamma/c_gamma.i
+src/ssnp/binary_pupil/binary_pupil.i: src/ssnp/binary_pupil/binary_pupil.cpp.i
+.PHONY : src/ssnp/binary_pupil/binary_pupil.i
 
 # target to preprocess a source file
-src/c_gamma/c_gamma.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ssnp_cpp.dir/build.make CMakeFiles/ssnp_cpp.dir/src/c_gamma/c_gamma.cpp.i
-.PHONY : src/c_gamma/c_gamma.cpp.i
+src/ssnp/binary_pupil/binary_pupil.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/optics_sim.dir/build.make CMakeFiles/optics_sim.dir/src/ssnp/binary_pupil/binary_pupil.cpp.i
+.PHONY : src/ssnp/binary_pupil/binary_pupil.cpp.i
 
-src/c_gamma/c_gamma.s: src/c_gamma/c_gamma.cpp.s
-.PHONY : src/c_gamma/c_gamma.s
+src/ssnp/binary_pupil/binary_pupil.s: src/ssnp/binary_pupil/binary_pupil.cpp.s
+.PHONY : src/ssnp/binary_pupil/binary_pupil.s
 
 # target to generate assembly for a file
-src/c_gamma/c_gamma.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ssnp_cpp.dir/build.make CMakeFiles/ssnp_cpp.dir/src/c_gamma/c_gamma.cpp.s
-.PHONY : src/c_gamma/c_gamma.cpp.s
+src/ssnp/binary_pupil/binary_pupil.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/optics_sim.dir/build.make CMakeFiles/optics_sim.dir/src/ssnp/binary_pupil/binary_pupil.cpp.s
+.PHONY : src/ssnp/binary_pupil/binary_pupil.cpp.s
 
-src/dft/dft.o: src/dft/dft.cpp.o
-.PHONY : src/dft/dft.o
+src/ssnp/c_gamma/c_gamma.o: src/ssnp/c_gamma/c_gamma.cpp.o
+.PHONY : src/ssnp/c_gamma/c_gamma.o
 
 # target to build an object file
-src/dft/dft.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ssnp_cpp.dir/build.make CMakeFiles/ssnp_cpp.dir/src/dft/dft.cpp.o
-.PHONY : src/dft/dft.cpp.o
+src/ssnp/c_gamma/c_gamma.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/optics_sim.dir/build.make CMakeFiles/optics_sim.dir/src/ssnp/c_gamma/c_gamma.cpp.o
+.PHONY : src/ssnp/c_gamma/c_gamma.cpp.o
 
-src/dft/dft.i: src/dft/dft.cpp.i
-.PHONY : src/dft/dft.i
+src/ssnp/c_gamma/c_gamma.i: src/ssnp/c_gamma/c_gamma.cpp.i
+.PHONY : src/ssnp/c_gamma/c_gamma.i
 
 # target to preprocess a source file
-src/dft/dft.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ssnp_cpp.dir/build.make CMakeFiles/ssnp_cpp.dir/src/dft/dft.cpp.i
-.PHONY : src/dft/dft.cpp.i
+src/ssnp/c_gamma/c_gamma.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/optics_sim.dir/build.make CMakeFiles/optics_sim.dir/src/ssnp/c_gamma/c_gamma.cpp.i
+.PHONY : src/ssnp/c_gamma/c_gamma.cpp.i
 
-src/dft/dft.s: src/dft/dft.cpp.s
-.PHONY : src/dft/dft.s
+src/ssnp/c_gamma/c_gamma.s: src/ssnp/c_gamma/c_gamma.cpp.s
+.PHONY : src/ssnp/c_gamma/c_gamma.s
 
 # target to generate assembly for a file
-src/dft/dft.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ssnp_cpp.dir/build.make CMakeFiles/ssnp_cpp.dir/src/dft/dft.cpp.s
-.PHONY : src/dft/dft.cpp.s
+src/ssnp/c_gamma/c_gamma.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/optics_sim.dir/build.make CMakeFiles/optics_sim.dir/src/ssnp/c_gamma/c_gamma.cpp.s
+.PHONY : src/ssnp/c_gamma/c_gamma.cpp.s
 
-src/diffract/diffract.o: src/diffract/diffract.cpp.o
-.PHONY : src/diffract/diffract.o
+src/ssnp/dft/dft.o: src/ssnp/dft/dft.cpp.o
+.PHONY : src/ssnp/dft/dft.o
 
 # target to build an object file
-src/diffract/diffract.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ssnp_cpp.dir/build.make CMakeFiles/ssnp_cpp.dir/src/diffract/diffract.cpp.o
-.PHONY : src/diffract/diffract.cpp.o
+src/ssnp/dft/dft.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/optics_sim.dir/build.make CMakeFiles/optics_sim.dir/src/ssnp/dft/dft.cpp.o
+.PHONY : src/ssnp/dft/dft.cpp.o
 
-src/diffract/diffract.i: src/diffract/diffract.cpp.i
-.PHONY : src/diffract/diffract.i
+src/ssnp/dft/dft.i: src/ssnp/dft/dft.cpp.i
+.PHONY : src/ssnp/dft/dft.i
 
 # target to preprocess a source file
-src/diffract/diffract.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ssnp_cpp.dir/build.make CMakeFiles/ssnp_cpp.dir/src/diffract/diffract.cpp.i
-.PHONY : src/diffract/diffract.cpp.i
+src/ssnp/dft/dft.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/optics_sim.dir/build.make CMakeFiles/optics_sim.dir/src/ssnp/dft/dft.cpp.i
+.PHONY : src/ssnp/dft/dft.cpp.i
 
-src/diffract/diffract.s: src/diffract/diffract.cpp.s
-.PHONY : src/diffract/diffract.s
+src/ssnp/dft/dft.s: src/ssnp/dft/dft.cpp.s
+.PHONY : src/ssnp/dft/dft.s
 
 # target to generate assembly for a file
-src/diffract/diffract.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ssnp_cpp.dir/build.make CMakeFiles/ssnp_cpp.dir/src/diffract/diffract.cpp.s
-.PHONY : src/diffract/diffract.cpp.s
+src/ssnp/dft/dft.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/optics_sim.dir/build.make CMakeFiles/optics_sim.dir/src/ssnp/dft/dft.cpp.s
+.PHONY : src/ssnp/dft/dft.cpp.s
 
-src/forward.o: src/forward.cpp.o
-.PHONY : src/forward.o
+src/ssnp/diffract/diffract.o: src/ssnp/diffract/diffract.cpp.o
+.PHONY : src/ssnp/diffract/diffract.o
 
 # target to build an object file
-src/forward.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ssnp_cpp.dir/build.make CMakeFiles/ssnp_cpp.dir/src/forward.cpp.o
-.PHONY : src/forward.cpp.o
+src/ssnp/diffract/diffract.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/optics_sim.dir/build.make CMakeFiles/optics_sim.dir/src/ssnp/diffract/diffract.cpp.o
+.PHONY : src/ssnp/diffract/diffract.cpp.o
 
-src/forward.i: src/forward.cpp.i
-.PHONY : src/forward.i
+src/ssnp/diffract/diffract.i: src/ssnp/diffract/diffract.cpp.i
+.PHONY : src/ssnp/diffract/diffract.i
 
 # target to preprocess a source file
-src/forward.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ssnp_cpp.dir/build.make CMakeFiles/ssnp_cpp.dir/src/forward.cpp.i
-.PHONY : src/forward.cpp.i
+src/ssnp/diffract/diffract.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/optics_sim.dir/build.make CMakeFiles/optics_sim.dir/src/ssnp/diffract/diffract.cpp.i
+.PHONY : src/ssnp/diffract/diffract.cpp.i
 
-src/forward.s: src/forward.cpp.s
-.PHONY : src/forward.s
+src/ssnp/diffract/diffract.s: src/ssnp/diffract/diffract.cpp.s
+.PHONY : src/ssnp/diffract/diffract.s
 
 # target to generate assembly for a file
-src/forward.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ssnp_cpp.dir/build.make CMakeFiles/ssnp_cpp.dir/src/forward.cpp.s
-.PHONY : src/forward.cpp.s
+src/ssnp/diffract/diffract.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/optics_sim.dir/build.make CMakeFiles/optics_sim.dir/src/ssnp/diffract/diffract.cpp.s
+.PHONY : src/ssnp/diffract/diffract.cpp.s
 
-src/intensity/intensity.o: src/intensity/intensity.cpp.o
-.PHONY : src/intensity/intensity.o
+src/ssnp/forward.o: src/ssnp/forward.cpp.o
+.PHONY : src/ssnp/forward.o
 
 # target to build an object file
-src/intensity/intensity.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ssnp_cpp.dir/build.make CMakeFiles/ssnp_cpp.dir/src/intensity/intensity.cpp.o
-.PHONY : src/intensity/intensity.cpp.o
+src/ssnp/forward.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/optics_sim.dir/build.make CMakeFiles/optics_sim.dir/src/ssnp/forward.cpp.o
+.PHONY : src/ssnp/forward.cpp.o
 
-src/intensity/intensity.i: src/intensity/intensity.cpp.i
-.PHONY : src/intensity/intensity.i
+src/ssnp/forward.i: src/ssnp/forward.cpp.i
+.PHONY : src/ssnp/forward.i
 
 # target to preprocess a source file
-src/intensity/intensity.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ssnp_cpp.dir/build.make CMakeFiles/ssnp_cpp.dir/src/intensity/intensity.cpp.i
-.PHONY : src/intensity/intensity.cpp.i
+src/ssnp/forward.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/optics_sim.dir/build.make CMakeFiles/optics_sim.dir/src/ssnp/forward.cpp.i
+.PHONY : src/ssnp/forward.cpp.i
 
-src/intensity/intensity.s: src/intensity/intensity.cpp.s
-.PHONY : src/intensity/intensity.s
+src/ssnp/forward.s: src/ssnp/forward.cpp.s
+.PHONY : src/ssnp/forward.s
 
 # target to generate assembly for a file
-src/intensity/intensity.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ssnp_cpp.dir/build.make CMakeFiles/ssnp_cpp.dir/src/intensity/intensity.cpp.s
-.PHONY : src/intensity/intensity.cpp.s
+src/ssnp/forward.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/optics_sim.dir/build.make CMakeFiles/optics_sim.dir/src/ssnp/forward.cpp.s
+.PHONY : src/ssnp/forward.cpp.s
 
-src/main.o: src/main.cpp.o
-.PHONY : src/main.o
+src/ssnp/intensity/intensity.o: src/ssnp/intensity/intensity.cpp.o
+.PHONY : src/ssnp/intensity/intensity.o
 
 # target to build an object file
-src/main.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ssnp_cpp.dir/build.make CMakeFiles/ssnp_cpp.dir/src/main.cpp.o
-.PHONY : src/main.cpp.o
+src/ssnp/intensity/intensity.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/optics_sim.dir/build.make CMakeFiles/optics_sim.dir/src/ssnp/intensity/intensity.cpp.o
+.PHONY : src/ssnp/intensity/intensity.cpp.o
 
-src/main.i: src/main.cpp.i
-.PHONY : src/main.i
+src/ssnp/intensity/intensity.i: src/ssnp/intensity/intensity.cpp.i
+.PHONY : src/ssnp/intensity/intensity.i
 
 # target to preprocess a source file
-src/main.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ssnp_cpp.dir/build.make CMakeFiles/ssnp_cpp.dir/src/main.cpp.i
-.PHONY : src/main.cpp.i
+src/ssnp/intensity/intensity.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/optics_sim.dir/build.make CMakeFiles/optics_sim.dir/src/ssnp/intensity/intensity.cpp.i
+.PHONY : src/ssnp/intensity/intensity.cpp.i
 
-src/main.s: src/main.cpp.s
-.PHONY : src/main.s
+src/ssnp/intensity/intensity.s: src/ssnp/intensity/intensity.cpp.s
+.PHONY : src/ssnp/intensity/intensity.s
 
 # target to generate assembly for a file
-src/main.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ssnp_cpp.dir/build.make CMakeFiles/ssnp_cpp.dir/src/main.cpp.s
-.PHONY : src/main.cpp.s
+src/ssnp/intensity/intensity.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/optics_sim.dir/build.make CMakeFiles/optics_sim.dir/src/ssnp/intensity/intensity.cpp.s
+.PHONY : src/ssnp/intensity/intensity.cpp.s
 
-src/merge_prop/merge_prop.o: src/merge_prop/merge_prop.cpp.o
-.PHONY : src/merge_prop/merge_prop.o
+src/ssnp/main.o: src/ssnp/main.cpp.o
+.PHONY : src/ssnp/main.o
 
 # target to build an object file
-src/merge_prop/merge_prop.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ssnp_cpp.dir/build.make CMakeFiles/ssnp_cpp.dir/src/merge_prop/merge_prop.cpp.o
-.PHONY : src/merge_prop/merge_prop.cpp.o
+src/ssnp/main.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/optics_sim.dir/build.make CMakeFiles/optics_sim.dir/src/ssnp/main.cpp.o
+.PHONY : src/ssnp/main.cpp.o
 
-src/merge_prop/merge_prop.i: src/merge_prop/merge_prop.cpp.i
-.PHONY : src/merge_prop/merge_prop.i
+src/ssnp/main.i: src/ssnp/main.cpp.i
+.PHONY : src/ssnp/main.i
 
 # target to preprocess a source file
-src/merge_prop/merge_prop.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ssnp_cpp.dir/build.make CMakeFiles/ssnp_cpp.dir/src/merge_prop/merge_prop.cpp.i
-.PHONY : src/merge_prop/merge_prop.cpp.i
+src/ssnp/main.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/optics_sim.dir/build.make CMakeFiles/optics_sim.dir/src/ssnp/main.cpp.i
+.PHONY : src/ssnp/main.cpp.i
 
-src/merge_prop/merge_prop.s: src/merge_prop/merge_prop.cpp.s
-.PHONY : src/merge_prop/merge_prop.s
+src/ssnp/main.s: src/ssnp/main.cpp.s
+.PHONY : src/ssnp/main.s
 
 # target to generate assembly for a file
-src/merge_prop/merge_prop.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ssnp_cpp.dir/build.make CMakeFiles/ssnp_cpp.dir/src/merge_prop/merge_prop.cpp.s
-.PHONY : src/merge_prop/merge_prop.cpp.s
+src/ssnp/main.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/optics_sim.dir/build.make CMakeFiles/optics_sim.dir/src/ssnp/main.cpp.s
+.PHONY : src/ssnp/main.cpp.s
 
-src/mult/mult.o: src/mult/mult.cpp.o
-.PHONY : src/mult/mult.o
+src/ssnp/merge_prop/merge_prop.o: src/ssnp/merge_prop/merge_prop.cpp.o
+.PHONY : src/ssnp/merge_prop/merge_prop.o
 
 # target to build an object file
-src/mult/mult.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ssnp_cpp.dir/build.make CMakeFiles/ssnp_cpp.dir/src/mult/mult.cpp.o
-.PHONY : src/mult/mult.cpp.o
+src/ssnp/merge_prop/merge_prop.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/optics_sim.dir/build.make CMakeFiles/optics_sim.dir/src/ssnp/merge_prop/merge_prop.cpp.o
+.PHONY : src/ssnp/merge_prop/merge_prop.cpp.o
 
-src/mult/mult.i: src/mult/mult.cpp.i
-.PHONY : src/mult/mult.i
+src/ssnp/merge_prop/merge_prop.i: src/ssnp/merge_prop/merge_prop.cpp.i
+.PHONY : src/ssnp/merge_prop/merge_prop.i
 
 # target to preprocess a source file
-src/mult/mult.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ssnp_cpp.dir/build.make CMakeFiles/ssnp_cpp.dir/src/mult/mult.cpp.i
-.PHONY : src/mult/mult.cpp.i
+src/ssnp/merge_prop/merge_prop.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/optics_sim.dir/build.make CMakeFiles/optics_sim.dir/src/ssnp/merge_prop/merge_prop.cpp.i
+.PHONY : src/ssnp/merge_prop/merge_prop.cpp.i
 
-src/mult/mult.s: src/mult/mult.cpp.s
-.PHONY : src/mult/mult.s
+src/ssnp/merge_prop/merge_prop.s: src/ssnp/merge_prop/merge_prop.cpp.s
+.PHONY : src/ssnp/merge_prop/merge_prop.s
 
 # target to generate assembly for a file
-src/mult/mult.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ssnp_cpp.dir/build.make CMakeFiles/ssnp_cpp.dir/src/mult/mult.cpp.s
-.PHONY : src/mult/mult.cpp.s
+src/ssnp/merge_prop/merge_prop.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/optics_sim.dir/build.make CMakeFiles/optics_sim.dir/src/ssnp/merge_prop/merge_prop.cpp.s
+.PHONY : src/ssnp/merge_prop/merge_prop.cpp.s
 
-src/scatter_effects/scatter_effects.o: src/scatter_effects/scatter_effects.cpp.o
-.PHONY : src/scatter_effects/scatter_effects.o
+src/ssnp/mult/mult.o: src/ssnp/mult/mult.cpp.o
+.PHONY : src/ssnp/mult/mult.o
 
 # target to build an object file
-src/scatter_effects/scatter_effects.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ssnp_cpp.dir/build.make CMakeFiles/ssnp_cpp.dir/src/scatter_effects/scatter_effects.cpp.o
-.PHONY : src/scatter_effects/scatter_effects.cpp.o
+src/ssnp/mult/mult.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/optics_sim.dir/build.make CMakeFiles/optics_sim.dir/src/ssnp/mult/mult.cpp.o
+.PHONY : src/ssnp/mult/mult.cpp.o
 
-src/scatter_effects/scatter_effects.i: src/scatter_effects/scatter_effects.cpp.i
-.PHONY : src/scatter_effects/scatter_effects.i
+src/ssnp/mult/mult.i: src/ssnp/mult/mult.cpp.i
+.PHONY : src/ssnp/mult/mult.i
 
 # target to preprocess a source file
-src/scatter_effects/scatter_effects.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ssnp_cpp.dir/build.make CMakeFiles/ssnp_cpp.dir/src/scatter_effects/scatter_effects.cpp.i
-.PHONY : src/scatter_effects/scatter_effects.cpp.i
+src/ssnp/mult/mult.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/optics_sim.dir/build.make CMakeFiles/optics_sim.dir/src/ssnp/mult/mult.cpp.i
+.PHONY : src/ssnp/mult/mult.cpp.i
 
-src/scatter_effects/scatter_effects.s: src/scatter_effects/scatter_effects.cpp.s
-.PHONY : src/scatter_effects/scatter_effects.s
+src/ssnp/mult/mult.s: src/ssnp/mult/mult.cpp.s
+.PHONY : src/ssnp/mult/mult.s
 
 # target to generate assembly for a file
-src/scatter_effects/scatter_effects.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ssnp_cpp.dir/build.make CMakeFiles/ssnp_cpp.dir/src/scatter_effects/scatter_effects.cpp.s
-.PHONY : src/scatter_effects/scatter_effects.cpp.s
+src/ssnp/mult/mult.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/optics_sim.dir/build.make CMakeFiles/optics_sim.dir/src/ssnp/mult/mult.cpp.s
+.PHONY : src/ssnp/mult/mult.cpp.s
 
-src/scatter_factor/scatter_factor.o: src/scatter_factor/scatter_factor.cpp.o
-.PHONY : src/scatter_factor/scatter_factor.o
+src/ssnp/scatter_effects/scatter_effects.o: src/ssnp/scatter_effects/scatter_effects.cpp.o
+.PHONY : src/ssnp/scatter_effects/scatter_effects.o
 
 # target to build an object file
-src/scatter_factor/scatter_factor.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ssnp_cpp.dir/build.make CMakeFiles/ssnp_cpp.dir/src/scatter_factor/scatter_factor.cpp.o
-.PHONY : src/scatter_factor/scatter_factor.cpp.o
+src/ssnp/scatter_effects/scatter_effects.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/optics_sim.dir/build.make CMakeFiles/optics_sim.dir/src/ssnp/scatter_effects/scatter_effects.cpp.o
+.PHONY : src/ssnp/scatter_effects/scatter_effects.cpp.o
 
-src/scatter_factor/scatter_factor.i: src/scatter_factor/scatter_factor.cpp.i
-.PHONY : src/scatter_factor/scatter_factor.i
+src/ssnp/scatter_effects/scatter_effects.i: src/ssnp/scatter_effects/scatter_effects.cpp.i
+.PHONY : src/ssnp/scatter_effects/scatter_effects.i
 
 # target to preprocess a source file
-src/scatter_factor/scatter_factor.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ssnp_cpp.dir/build.make CMakeFiles/ssnp_cpp.dir/src/scatter_factor/scatter_factor.cpp.i
-.PHONY : src/scatter_factor/scatter_factor.cpp.i
+src/ssnp/scatter_effects/scatter_effects.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/optics_sim.dir/build.make CMakeFiles/optics_sim.dir/src/ssnp/scatter_effects/scatter_effects.cpp.i
+.PHONY : src/ssnp/scatter_effects/scatter_effects.cpp.i
 
-src/scatter_factor/scatter_factor.s: src/scatter_factor/scatter_factor.cpp.s
-.PHONY : src/scatter_factor/scatter_factor.s
+src/ssnp/scatter_effects/scatter_effects.s: src/ssnp/scatter_effects/scatter_effects.cpp.s
+.PHONY : src/ssnp/scatter_effects/scatter_effects.s
 
 # target to generate assembly for a file
-src/scatter_factor/scatter_factor.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ssnp_cpp.dir/build.make CMakeFiles/ssnp_cpp.dir/src/scatter_factor/scatter_factor.cpp.s
-.PHONY : src/scatter_factor/scatter_factor.cpp.s
+src/ssnp/scatter_effects/scatter_effects.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/optics_sim.dir/build.make CMakeFiles/optics_sim.dir/src/ssnp/scatter_effects/scatter_effects.cpp.s
+.PHONY : src/ssnp/scatter_effects/scatter_effects.cpp.s
 
-src/split_prop/split_prop.o: src/split_prop/split_prop.cpp.o
-.PHONY : src/split_prop/split_prop.o
+src/ssnp/scatter_factor/scatter_factor.o: src/ssnp/scatter_factor/scatter_factor.cpp.o
+.PHONY : src/ssnp/scatter_factor/scatter_factor.o
 
 # target to build an object file
-src/split_prop/split_prop.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ssnp_cpp.dir/build.make CMakeFiles/ssnp_cpp.dir/src/split_prop/split_prop.cpp.o
-.PHONY : src/split_prop/split_prop.cpp.o
+src/ssnp/scatter_factor/scatter_factor.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/optics_sim.dir/build.make CMakeFiles/optics_sim.dir/src/ssnp/scatter_factor/scatter_factor.cpp.o
+.PHONY : src/ssnp/scatter_factor/scatter_factor.cpp.o
 
-src/split_prop/split_prop.i: src/split_prop/split_prop.cpp.i
-.PHONY : src/split_prop/split_prop.i
+src/ssnp/scatter_factor/scatter_factor.i: src/ssnp/scatter_factor/scatter_factor.cpp.i
+.PHONY : src/ssnp/scatter_factor/scatter_factor.i
 
 # target to preprocess a source file
-src/split_prop/split_prop.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ssnp_cpp.dir/build.make CMakeFiles/ssnp_cpp.dir/src/split_prop/split_prop.cpp.i
-.PHONY : src/split_prop/split_prop.cpp.i
+src/ssnp/scatter_factor/scatter_factor.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/optics_sim.dir/build.make CMakeFiles/optics_sim.dir/src/ssnp/scatter_factor/scatter_factor.cpp.i
+.PHONY : src/ssnp/scatter_factor/scatter_factor.cpp.i
 
-src/split_prop/split_prop.s: src/split_prop/split_prop.cpp.s
-.PHONY : src/split_prop/split_prop.s
+src/ssnp/scatter_factor/scatter_factor.s: src/ssnp/scatter_factor/scatter_factor.cpp.s
+.PHONY : src/ssnp/scatter_factor/scatter_factor.s
 
 # target to generate assembly for a file
-src/split_prop/split_prop.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ssnp_cpp.dir/build.make CMakeFiles/ssnp_cpp.dir/src/split_prop/split_prop.cpp.s
-.PHONY : src/split_prop/split_prop.cpp.s
+src/ssnp/scatter_factor/scatter_factor.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/optics_sim.dir/build.make CMakeFiles/optics_sim.dir/src/ssnp/scatter_factor/scatter_factor.cpp.s
+.PHONY : src/ssnp/scatter_factor/scatter_factor.cpp.s
 
-src/tilt/tilt.o: src/tilt/tilt.cpp.o
-.PHONY : src/tilt/tilt.o
+src/ssnp/split_prop/split_prop.o: src/ssnp/split_prop/split_prop.cpp.o
+.PHONY : src/ssnp/split_prop/split_prop.o
 
 # target to build an object file
-src/tilt/tilt.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ssnp_cpp.dir/build.make CMakeFiles/ssnp_cpp.dir/src/tilt/tilt.cpp.o
-.PHONY : src/tilt/tilt.cpp.o
+src/ssnp/split_prop/split_prop.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/optics_sim.dir/build.make CMakeFiles/optics_sim.dir/src/ssnp/split_prop/split_prop.cpp.o
+.PHONY : src/ssnp/split_prop/split_prop.cpp.o
 
-src/tilt/tilt.i: src/tilt/tilt.cpp.i
-.PHONY : src/tilt/tilt.i
+src/ssnp/split_prop/split_prop.i: src/ssnp/split_prop/split_prop.cpp.i
+.PHONY : src/ssnp/split_prop/split_prop.i
 
 # target to preprocess a source file
-src/tilt/tilt.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ssnp_cpp.dir/build.make CMakeFiles/ssnp_cpp.dir/src/tilt/tilt.cpp.i
-.PHONY : src/tilt/tilt.cpp.i
+src/ssnp/split_prop/split_prop.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/optics_sim.dir/build.make CMakeFiles/optics_sim.dir/src/ssnp/split_prop/split_prop.cpp.i
+.PHONY : src/ssnp/split_prop/split_prop.cpp.i
 
-src/tilt/tilt.s: src/tilt/tilt.cpp.s
-.PHONY : src/tilt/tilt.s
+src/ssnp/split_prop/split_prop.s: src/ssnp/split_prop/split_prop.cpp.s
+.PHONY : src/ssnp/split_prop/split_prop.s
 
 # target to generate assembly for a file
-src/tilt/tilt.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ssnp_cpp.dir/build.make CMakeFiles/ssnp_cpp.dir/src/tilt/tilt.cpp.s
-.PHONY : src/tilt/tilt.cpp.s
+src/ssnp/split_prop/split_prop.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/optics_sim.dir/build.make CMakeFiles/optics_sim.dir/src/ssnp/split_prop/split_prop.cpp.s
+.PHONY : src/ssnp/split_prop/split_prop.cpp.s
 
-src/webgpu_utils.o: src/webgpu_utils.cpp.o
-.PHONY : src/webgpu_utils.o
+src/ssnp/tilt/tilt.o: src/ssnp/tilt/tilt.cpp.o
+.PHONY : src/ssnp/tilt/tilt.o
 
 # target to build an object file
-src/webgpu_utils.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ssnp_cpp.dir/build.make CMakeFiles/ssnp_cpp.dir/src/webgpu_utils.cpp.o
-.PHONY : src/webgpu_utils.cpp.o
+src/ssnp/tilt/tilt.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/optics_sim.dir/build.make CMakeFiles/optics_sim.dir/src/ssnp/tilt/tilt.cpp.o
+.PHONY : src/ssnp/tilt/tilt.cpp.o
 
-src/webgpu_utils.i: src/webgpu_utils.cpp.i
-.PHONY : src/webgpu_utils.i
+src/ssnp/tilt/tilt.i: src/ssnp/tilt/tilt.cpp.i
+.PHONY : src/ssnp/tilt/tilt.i
 
 # target to preprocess a source file
-src/webgpu_utils.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ssnp_cpp.dir/build.make CMakeFiles/ssnp_cpp.dir/src/webgpu_utils.cpp.i
-.PHONY : src/webgpu_utils.cpp.i
+src/ssnp/tilt/tilt.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/optics_sim.dir/build.make CMakeFiles/optics_sim.dir/src/ssnp/tilt/tilt.cpp.i
+.PHONY : src/ssnp/tilt/tilt.cpp.i
 
-src/webgpu_utils.s: src/webgpu_utils.cpp.s
-.PHONY : src/webgpu_utils.s
+src/ssnp/tilt/tilt.s: src/ssnp/tilt/tilt.cpp.s
+.PHONY : src/ssnp/tilt/tilt.s
 
 # target to generate assembly for a file
-src/webgpu_utils.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ssnp_cpp.dir/build.make CMakeFiles/ssnp_cpp.dir/src/webgpu_utils.cpp.s
-.PHONY : src/webgpu_utils.cpp.s
+src/ssnp/tilt/tilt.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/optics_sim.dir/build.make CMakeFiles/optics_sim.dir/src/ssnp/tilt/tilt.cpp.s
+.PHONY : src/ssnp/tilt/tilt.cpp.s
+
+src/ssnp/webgpu_utils.o: src/ssnp/webgpu_utils.cpp.o
+.PHONY : src/ssnp/webgpu_utils.o
+
+# target to build an object file
+src/ssnp/webgpu_utils.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/optics_sim.dir/build.make CMakeFiles/optics_sim.dir/src/ssnp/webgpu_utils.cpp.o
+.PHONY : src/ssnp/webgpu_utils.cpp.o
+
+src/ssnp/webgpu_utils.i: src/ssnp/webgpu_utils.cpp.i
+.PHONY : src/ssnp/webgpu_utils.i
+
+# target to preprocess a source file
+src/ssnp/webgpu_utils.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/optics_sim.dir/build.make CMakeFiles/optics_sim.dir/src/ssnp/webgpu_utils.cpp.i
+.PHONY : src/ssnp/webgpu_utils.cpp.i
+
+src/ssnp/webgpu_utils.s: src/ssnp/webgpu_utils.cpp.s
+.PHONY : src/ssnp/webgpu_utils.s
+
+# target to generate assembly for a file
+src/ssnp/webgpu_utils.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/optics_sim.dir/build.make CMakeFiles/optics_sim.dir/src/ssnp/webgpu_utils.cpp.s
+.PHONY : src/ssnp/webgpu_utils.cpp.s
 
 # Help Target
 help:
@@ -473,49 +486,50 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... ssnp_cpp"
-	@echo "... src/binary_pupil/binary_pupil.o"
-	@echo "... src/binary_pupil/binary_pupil.i"
-	@echo "... src/binary_pupil/binary_pupil.s"
-	@echo "... src/c_gamma/c_gamma.o"
-	@echo "... src/c_gamma/c_gamma.i"
-	@echo "... src/c_gamma/c_gamma.s"
-	@echo "... src/dft/dft.o"
-	@echo "... src/dft/dft.i"
-	@echo "... src/dft/dft.s"
-	@echo "... src/diffract/diffract.o"
-	@echo "... src/diffract/diffract.i"
-	@echo "... src/diffract/diffract.s"
-	@echo "... src/forward.o"
-	@echo "... src/forward.i"
-	@echo "... src/forward.s"
-	@echo "... src/intensity/intensity.o"
-	@echo "... src/intensity/intensity.i"
-	@echo "... src/intensity/intensity.s"
-	@echo "... src/main.o"
-	@echo "... src/main.i"
-	@echo "... src/main.s"
-	@echo "... src/merge_prop/merge_prop.o"
-	@echo "... src/merge_prop/merge_prop.i"
-	@echo "... src/merge_prop/merge_prop.s"
-	@echo "... src/mult/mult.o"
-	@echo "... src/mult/mult.i"
-	@echo "... src/mult/mult.s"
-	@echo "... src/scatter_effects/scatter_effects.o"
-	@echo "... src/scatter_effects/scatter_effects.i"
-	@echo "... src/scatter_effects/scatter_effects.s"
-	@echo "... src/scatter_factor/scatter_factor.o"
-	@echo "... src/scatter_factor/scatter_factor.i"
-	@echo "... src/scatter_factor/scatter_factor.s"
-	@echo "... src/split_prop/split_prop.o"
-	@echo "... src/split_prop/split_prop.i"
-	@echo "... src/split_prop/split_prop.s"
-	@echo "... src/tilt/tilt.o"
-	@echo "... src/tilt/tilt.i"
-	@echo "... src/tilt/tilt.s"
-	@echo "... src/webgpu_utils.o"
-	@echo "... src/webgpu_utils.i"
-	@echo "... src/webgpu_utils.s"
+	@echo "... copy_web"
+	@echo "... optics_sim"
+	@echo "... src/ssnp/binary_pupil/binary_pupil.o"
+	@echo "... src/ssnp/binary_pupil/binary_pupil.i"
+	@echo "... src/ssnp/binary_pupil/binary_pupil.s"
+	@echo "... src/ssnp/c_gamma/c_gamma.o"
+	@echo "... src/ssnp/c_gamma/c_gamma.i"
+	@echo "... src/ssnp/c_gamma/c_gamma.s"
+	@echo "... src/ssnp/dft/dft.o"
+	@echo "... src/ssnp/dft/dft.i"
+	@echo "... src/ssnp/dft/dft.s"
+	@echo "... src/ssnp/diffract/diffract.o"
+	@echo "... src/ssnp/diffract/diffract.i"
+	@echo "... src/ssnp/diffract/diffract.s"
+	@echo "... src/ssnp/forward.o"
+	@echo "... src/ssnp/forward.i"
+	@echo "... src/ssnp/forward.s"
+	@echo "... src/ssnp/intensity/intensity.o"
+	@echo "... src/ssnp/intensity/intensity.i"
+	@echo "... src/ssnp/intensity/intensity.s"
+	@echo "... src/ssnp/main.o"
+	@echo "... src/ssnp/main.i"
+	@echo "... src/ssnp/main.s"
+	@echo "... src/ssnp/merge_prop/merge_prop.o"
+	@echo "... src/ssnp/merge_prop/merge_prop.i"
+	@echo "... src/ssnp/merge_prop/merge_prop.s"
+	@echo "... src/ssnp/mult/mult.o"
+	@echo "... src/ssnp/mult/mult.i"
+	@echo "... src/ssnp/mult/mult.s"
+	@echo "... src/ssnp/scatter_effects/scatter_effects.o"
+	@echo "... src/ssnp/scatter_effects/scatter_effects.i"
+	@echo "... src/ssnp/scatter_effects/scatter_effects.s"
+	@echo "... src/ssnp/scatter_factor/scatter_factor.o"
+	@echo "... src/ssnp/scatter_factor/scatter_factor.i"
+	@echo "... src/ssnp/scatter_factor/scatter_factor.s"
+	@echo "... src/ssnp/split_prop/split_prop.o"
+	@echo "... src/ssnp/split_prop/split_prop.i"
+	@echo "... src/ssnp/split_prop/split_prop.s"
+	@echo "... src/ssnp/tilt/tilt.o"
+	@echo "... src/ssnp/tilt/tilt.i"
+	@echo "... src/ssnp/tilt/tilt.s"
+	@echo "... src/ssnp/webgpu_utils.o"
+	@echo "... src/ssnp/webgpu_utils.i"
+	@echo "... src/ssnp/webgpu_utils.s"
 .PHONY : help
 
 

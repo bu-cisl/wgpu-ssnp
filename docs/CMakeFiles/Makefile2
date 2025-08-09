@@ -63,59 +63,87 @@ CMAKE_BINARY_DIR = /projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs
 # Directory level rules for the build root directory
 
 # The main recursive "all" target.
-all: CMakeFiles/ssnp_cpp.dir/all
-all: webgpu/all
+all: CMakeFiles/optics_sim.dir/all
+all: CMakeFiles/copy_web.dir/all
+all: external/webgpu/all
 .PHONY : all
 
 # The main recursive "preinstall" target.
-preinstall: webgpu/preinstall
+preinstall: external/webgpu/preinstall
 .PHONY : preinstall
 
 # The main recursive "clean" target.
-clean: CMakeFiles/ssnp_cpp.dir/clean
-clean: webgpu/clean
+clean: CMakeFiles/optics_sim.dir/clean
+clean: CMakeFiles/copy_web.dir/clean
+clean: external/webgpu/clean
 .PHONY : clean
 
 #=============================================================================
-# Directory level rules for directory webgpu
+# Directory level rules for directory external/webgpu
 
 # Recursive "all" directory target.
-webgpu/all:
-.PHONY : webgpu/all
+external/webgpu/all:
+.PHONY : external/webgpu/all
 
 # Recursive "preinstall" directory target.
-webgpu/preinstall:
-.PHONY : webgpu/preinstall
+external/webgpu/preinstall:
+.PHONY : external/webgpu/preinstall
 
 # Recursive "clean" directory target.
-webgpu/clean:
-.PHONY : webgpu/clean
+external/webgpu/clean:
+.PHONY : external/webgpu/clean
 
 #=============================================================================
-# Target rules for target CMakeFiles/ssnp_cpp.dir
+# Target rules for target CMakeFiles/optics_sim.dir
 
 # All Build rule for target.
-CMakeFiles/ssnp_cpp.dir/all:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ssnp_cpp.dir/build.make CMakeFiles/ssnp_cpp.dir/depend
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ssnp_cpp.dir/build.make CMakeFiles/ssnp_cpp.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs/CMakeFiles --progress-num=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 "Built target ssnp_cpp"
-.PHONY : CMakeFiles/ssnp_cpp.dir/all
+CMakeFiles/optics_sim.dir/all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/optics_sim.dir/build.make CMakeFiles/optics_sim.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/optics_sim.dir/build.make CMakeFiles/optics_sim.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs/CMakeFiles --progress-num=2,3,4,5,6,7,8,9,10,11,12,13,14,15,16 "Built target optics_sim"
+.PHONY : CMakeFiles/optics_sim.dir/all
 
 # Build rule for subdir invocation for target.
-CMakeFiles/ssnp_cpp.dir/rule: cmake_check_build_system
+CMakeFiles/optics_sim.dir/rule: cmake_check_build_system
 	$(CMAKE_COMMAND) -E cmake_progress_start /projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs/CMakeFiles 15
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/ssnp_cpp.dir/all
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/optics_sim.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs/CMakeFiles 0
-.PHONY : CMakeFiles/ssnp_cpp.dir/rule
+.PHONY : CMakeFiles/optics_sim.dir/rule
 
 # Convenience name for target.
-ssnp_cpp: CMakeFiles/ssnp_cpp.dir/rule
-.PHONY : ssnp_cpp
+optics_sim: CMakeFiles/optics_sim.dir/rule
+.PHONY : optics_sim
 
 # clean rule for target.
-CMakeFiles/ssnp_cpp.dir/clean:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ssnp_cpp.dir/build.make CMakeFiles/ssnp_cpp.dir/clean
-.PHONY : CMakeFiles/ssnp_cpp.dir/clean
+CMakeFiles/optics_sim.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/optics_sim.dir/build.make CMakeFiles/optics_sim.dir/clean
+.PHONY : CMakeFiles/optics_sim.dir/clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/copy_web.dir
+
+# All Build rule for target.
+CMakeFiles/copy_web.dir/all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/copy_web.dir/build.make CMakeFiles/copy_web.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/copy_web.dir/build.make CMakeFiles/copy_web.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs/CMakeFiles --progress-num=1 "Built target copy_web"
+.PHONY : CMakeFiles/copy_web.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/copy_web.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs/CMakeFiles 1
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/copy_web.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs/CMakeFiles 0
+.PHONY : CMakeFiles/copy_web.dir/rule
+
+# Convenience name for target.
+copy_web: CMakeFiles/copy_web.dir/rule
+.PHONY : copy_web
+
+# clean rule for target.
+CMakeFiles/copy_web.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/copy_web.dir/build.make CMakeFiles/copy_web.dir/clean
+.PHONY : CMakeFiles/copy_web.dir/clean
 
 #=============================================================================
 # Special targets to cleanup operation of make.

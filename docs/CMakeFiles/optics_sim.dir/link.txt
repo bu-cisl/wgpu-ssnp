@@ -1,0 +1,1 @@
+/projectnb/cislbu/rsyed/wgpu_ssnp-idt/emsdk/upstream/emscripten/em++ -sUSE_WEBGPU -sASYNCIFY --preload-file=/projectnb/cislbu/rsyed/wgpu_ssnp-idt/src@/src -sALLOW_MEMORY_GROWTH=1 -O3 -msimd128 "-sEXPORTED_FUNCTIONS=['_callSSNP']" "-sEXPORTED_RUNTIME_METHODS=['ccall','HEAPF32','HEAPU8']" -sNO_DISABLE_EXCEPTION_CATCHING @CMakeFiles/optics_sim.dir/objects1.rsp -o optics_sim.js 
