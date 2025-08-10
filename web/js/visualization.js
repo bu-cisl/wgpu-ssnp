@@ -92,11 +92,6 @@ function plotSlices(flatArray, H, W, localMin, localMax) {
 	container.appendChild(colorbar);
 	resultContainer.appendChild(container);
 
-	const angleLabel = document.createElement('div');
-	angleLabel.className = 'angle-label';
-	angleLabel.textContent = `Angle: (${currentAngle[0].toFixed(2)}, ${currentAngle[1].toFixed(2)})`;
-	resultContainer.appendChild(angleLabel);
-
 	// Re-enable run button and reset text
 	const runBtn = document.getElementById("runBtn");
 	runBtn.disabled = false;

@@ -100,15 +100,15 @@ EM_JS(void, plot_from_heap, (uintptr_t ptr, int len, int H, int W, float mn, flo
 
 extern "C" {
     EMSCRIPTEN_KEEPALIVE
-    void callSSNP(const char* inputStr) {
+    void callSSNP(uintptr_t dataPtr, int D, int H, int W, const char* paramsStr) {
         try {
-            std::string fullInput(inputStr);
+            // Parse params
+            std::string fullInput(paramsStr);
             size_t firstPipe = fullInput.find('|');
             size_t secondPipe = fullInput.find('|', firstPipe + 1);
             size_t thirdPipe = fullInput.find('|', secondPipe + 1);
             size_t fourthPipe = fullInput.find('|', thirdPipe + 1);
 
-            // Extract all components
             std::string anglesStr = fullInput.substr(0, firstPipe);
             std::string resStr = fullInput.substr(firstPipe + 1, secondPipe - firstPipe - 1);
             std::string naStr = fullInput.substr(secondPipe + 1, thirdPipe - secondPipe - 1);
@@ -138,14 +138,16 @@ extern "C" {
             bool intensity = (intensityStr == "1");
             float n0 = std::stof(n0Str);
 
-            // File read + processing
-            std::vector<std::vector<std::vector<float>>> tensor;
-            int D, H, W;
-            if (!read_input_tensor("input.bin", tensor, D, H, W)) {
-                printf("Failed to read input.bin\n");
-                return;
-            }
+            // Read data from heap & convert to 3D tensor
+            float* heapData = reinterpret_cast<float*>(dataPtr);
+            vector<vector<vector<float>>> tensor(D, vector<vector<float>>(H, vector<float>(W)));
+            size_t idx = 0;
+            for (int d = 0; d < D; ++d)
+                for (int i = 0; i < H; ++i)
+                    for (int j = 0; j < W; ++j)
+                        tensor[d][i][j] = heapData[idx++];
 
+            // Init WebGPU
             WebGPUContext context;
             initWebGPU(context);
 

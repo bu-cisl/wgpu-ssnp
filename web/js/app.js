@@ -20,3 +20,11 @@ Module.onRuntimeInitialized = () => {
 	// Initialize download functionality
 	document.getElementById("downloadBtn").addEventListener("click", downloadNumPy);
 };
+
+// Memory cleanup
+window.addEventListener('beforeunload', () => {
+    if (window.currentVolumeData) {
+        Module._free(window.currentVolumeData.ptr);
+        window.currentVolumeData = null;
+    }
+});

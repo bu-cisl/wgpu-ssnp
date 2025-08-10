@@ -1,45 +1,4 @@
 // File processing utilities
-function buildBinBufferFromFloatVolume(slices, width, height) {
-	const D = slices.length;
-	const H = height;
-	const W = width;
-	
-	const totalElements = slices[0].length;
-	const channels = Math.floor(totalElements / (W * H));
-	
-	const headerBytes = 3 * 4;
-	const floatBytesPerSlice = W * H * 4;
-	const totalBytes = headerBytes + D * floatBytesPerSlice;
-	const buffer = new ArrayBuffer(totalBytes);
-	const dv = new DataView(buffer);
-	
-	dv.setInt32(0, D, true);
-	dv.setInt32(4, H, true);
-	dv.setInt32(8, W, true);
-	
-	let offset = headerBytes;
-	for (let d = 0; d < D; d++) {
-		const sliceArr = slices[d];
-		
-		if (sliceArr.length !== W * H * channels) {
-			throw new Error(`Slice ${d} has ${sliceArr.length} elements but expected ${W * H * channels}`);
-		}
-		
-		const floatView = new Float32Array(buffer, offset, W * H);
-		
-		if (channels > 1) {
-			for (let i = 0; i < W * H; i++) {
-				floatView[i] = sliceArr[i * channels];
-			}
-		} else {
-			floatView.set(sliceArr);
-		}
-		
-		offset += floatBytesPerSlice;
-	}
-	return buffer;
-}
-
 function getSampleFormatName(format) {
 	return ['undefined', 'unsigned integer', 'signed integer', 'IEEE float'][format] || `unknown (${format})`;
 }

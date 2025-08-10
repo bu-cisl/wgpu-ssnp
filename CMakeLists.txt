@@ -45,7 +45,7 @@ if (EMSCRIPTEN)
     -sALLOW_MEMORY_GROWTH=1
     -O3
     -msimd128
-    "-sEXPORTED_FUNCTIONS=['_callSSNP']"
+    "-sEXPORTED_FUNCTIONS=['_callSSNP','_malloc','_free']"
     "-sEXPORTED_RUNTIME_METHODS=['ccall','HEAPF32','HEAPU8']"
     -sNO_DISABLE_EXCEPTION_CATCHING
   )
