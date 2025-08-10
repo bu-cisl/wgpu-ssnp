@@ -820,7 +820,7 @@ vector<vector<vector<float>>> forward(
     float na, 
     vector<vector<float>> angles, 
     float n0,
-    int intensity
+    int outputType
 ) {
     vector<int> shape = {int(n[0].size()), int(n[0][0].size())};
 
@@ -907,7 +907,7 @@ vector<vector<vector<float>>> forward(
         finalForwardBuffer.release();
         
         // Complex output
-        if (intensity == 2) {
+        if (outputType == 2) {
             vector<float> complexData = readBack(context.device, context.queue, buffer_len * 2, complexSlice);
             complexSlice.release();
             
@@ -928,7 +928,7 @@ vector<vector<vector<float>>> forward(
         // Default output
         else { 
             wgpu::Buffer sliceBuffer = createBuffer(context.device, nullptr, sizeof(float) * buffer_len, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
-            intense(context, sliceBuffer, complexSlice, buffer_len, intensity == 1);
+            intense(context, sliceBuffer, complexSlice, buffer_len, outputType == 1);
             vector<float> slice = readBack(context.device, context.queue, buffer_len, sliceBuffer);
             complexSlice.release();
             sliceBuffer.release();
@@ -971,7 +971,7 @@ vector<vector<vector<float>>> forward(
     float na, 
     vector<vector<float>> angles, 
     float n0,
-    int intensity
+    int outputType
 );
 
 #endif#include "intensity.h"
@@ -1204,11 +1204,11 @@ int main(int argc, char* argv[]) {
 
     vector<float> res = {0.1f, 0.1f, 0.1f};
     float na = 0.65f;
-    int intensity = 1;
+    int outputType = 1;
     float n0 = 1.33f;
     vector<vector<float>> angles(1, vector<float>(2, 0.0f)); // default [0, 0]
 
-    auto result = forward(context, input_tensor, res, na, angles, n0, intensity);
+    auto result = forward(context, input_tensor, res, na, angles, n0, outputType);
 
     if (!write_output_tensor(output_filename, result)) return 1;
 
@@ -1243,7 +1243,7 @@ extern "C" {
             std::string anglesStr = fullInput.substr(0, firstPipe);
             std::string resStr = fullInput.substr(firstPipe + 1, secondPipe - firstPipe - 1);
             std::string naStr = fullInput.substr(secondPipe + 1, thirdPipe - secondPipe - 1);
-            std::string intensityStr = fullInput.substr(thirdPipe + 1, fourthPipe - thirdPipe - 1);
+            std::string outputTypeStr = fullInput.substr(thirdPipe + 1, fourthPipe - thirdPipe - 1);
             std::string n0Str = fullInput.substr(fourthPipe + 1);
 
             // Parse angles
@@ -1266,7 +1266,7 @@ extern "C" {
             }
 
             float na = std::stof(naStr);
-            int intensity = std::stoi(intensityStr);
+            int outputType = std::stoi(outputTypeStr);
             float n0 = std::stof(n0Str);
 
             // Read data from heap & convert to 3D tensor
@@ -1283,10 +1283,10 @@ extern "C" {
             initWebGPU(context);
 
             // Pass n0 to forward function
-            auto result = forward(context, tensor, res, na, angles, n0, intensity);
+            auto result = forward(context, tensor, res, na, angles, n0, outputType);
             
             // Complex output
-            if (intensity == 2) {
+            if (outputType == 2) {
                 auto realPart = result[0];
                 auto imagPart = result[1];
                 

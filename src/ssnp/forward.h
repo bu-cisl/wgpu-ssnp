@@ -24,7 +24,7 @@ vector<vector<vector<float>>> forward(
     float na, 
     vector<vector<float>> angles, 
     float n0,
-    int intensity
+    int outputType
 );
 
 #endif

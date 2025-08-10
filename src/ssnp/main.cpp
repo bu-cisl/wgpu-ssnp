@@ -78,11 +78,11 @@ int main(int argc, char* argv[]) {
 
     vector<float> res = {0.1f, 0.1f, 0.1f};
     float na = 0.65f;
-    int intensity = 1;
+    int outputType = 1;
     float n0 = 1.33f;
     vector<vector<float>> angles(1, vector<float>(2, 0.0f)); // default [0, 0]
 
-    auto result = forward(context, input_tensor, res, na, angles, n0, intensity);
+    auto result = forward(context, input_tensor, res, na, angles, n0, outputType);
 
     if (!write_output_tensor(output_filename, result)) return 1;
 
@@ -117,7 +117,7 @@ extern "C" {
             std::string anglesStr = fullInput.substr(0, firstPipe);
             std::string resStr = fullInput.substr(firstPipe + 1, secondPipe - firstPipe - 1);
             std::string naStr = fullInput.substr(secondPipe + 1, thirdPipe - secondPipe - 1);
-            std::string intensityStr = fullInput.substr(thirdPipe + 1, fourthPipe - thirdPipe - 1);
+            std::string outputTypeStr = fullInput.substr(thirdPipe + 1, fourthPipe - thirdPipe - 1);
             std::string n0Str = fullInput.substr(fourthPipe + 1);
 
             // Parse angles
@@ -140,7 +140,7 @@ extern "C" {
             }
 
             float na = std::stof(naStr);
-            int intensity = std::stoi(intensityStr);
+            int outputType = std::stoi(outputTypeStr);
             float n0 = std::stof(n0Str);
 
             // Read data from heap & convert to 3D tensor
@@ -157,10 +157,10 @@ extern "C" {
             initWebGPU(context);
 
             // Pass n0 to forward function
-            auto result = forward(context, tensor, res, na, angles, n0, intensity);
+            auto result = forward(context, tensor, res, na, angles, n0, outputType);
             
             // Complex output
-            if (intensity == 2) {
+            if (outputType == 2) {
                 auto realPart = result[0];
                 auto imagPart = result[1];
                 

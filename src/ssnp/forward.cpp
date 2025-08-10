@@ -8,7 +8,7 @@ vector<vector<vector<float>>> forward(
     float na, 
     vector<vector<float>> angles, 
     float n0,
-    int intensity
+    int outputType
 ) {
     vector<int> shape = {int(n[0].size()), int(n[0][0].size())};
 
@@ -95,7 +95,7 @@ vector<vector<vector<float>>> forward(
         finalForwardBuffer.release();
         
         // Complex output
-        if (intensity == 2) {
+        if (outputType == 2) {
             vector<float> complexData = readBack(context.device, context.queue, buffer_len * 2, complexSlice);
             complexSlice.release();
             
@@ -116,7 +116,7 @@ vector<vector<vector<float>>> forward(
         // Default output
         else { 
             wgpu::Buffer sliceBuffer = createBuffer(context.device, nullptr, sizeof(float) * buffer_len, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
-            intense(context, sliceBuffer, complexSlice, buffer_len, intensity == 1);
+            intense(context, sliceBuffer, complexSlice, buffer_len, outputType == 1);
             vector<float> slice = readBack(context.device, context.queue, buffer_len, sliceBuffer);
             complexSlice.release();
             sliceBuffer.release();
