@@ -20,10 +20,22 @@ function validateInputs(resVal, naVal, n0Val) {
 }
 
 function runForwardFunction() {
+	if (!window.currentVolumeData) {
+        alert("No volume data loaded");
+        return;
+    }
+	
 	const resVal = document.getElementById("resInput").value.trim() || "0.1,0.1,0.1";
 	const naVal = document.getElementById("naInput").value.trim() || "0.65";
 	const outputTypeVal = document.getElementById("outputType").value;
-	const intensityVal = outputTypeVal === "intensity" ? "1" : "0";
+	let intensityVal;
+	if (outputTypeVal === "intensity") {
+		intensityVal = "1";
+	} else if (outputTypeVal === "complex") {
+		intensityVal = "2";
+	} else {
+		intensityVal = "0"; // amplitude
+	}
 	const n0Val = document.getElementById("n0Input").value.trim() || "1.33";
 	
 	if (!validateInputs(resVal, naVal, n0Val)) {
@@ -35,6 +47,7 @@ function runForwardFunction() {
 	runBtn.disabled = true;
 	runBtn.textContent = "Running...";
 	
+	const { ptr, D, H, W } = window.currentVolumeData;
 	const angleString = `${currentAngle[0]},${currentAngle[1]}`;
 	const combinedParams = `${angleString}|${resVal}|${naVal}|${intensityVal}|${n0Val}`;
 	
@@ -44,12 +57,12 @@ function runForwardFunction() {
 	console.log("Sending input to C++");
 	
 	Module.ccall(
-		"callSSNP",
-		null,
-		["string"],
-		[combinedParams],
-		{ async: true }
-	).catch(err => {
+        "callSSNP", 
+        null,
+        ["number", "number", "number", "number", "string"],
+        [ptr, D, H, W, combinedParams],
+        { async: true }
+    ).catch(err => {
 		console.error("Error:", err);
 		// Re-enable button on error
 		runBtn.disabled = false;

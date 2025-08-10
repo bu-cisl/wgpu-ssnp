@@ -78,7 +78,7 @@ int main(int argc, char* argv[]) {
 
     vector<float> res = {0.1f, 0.1f, 0.1f};
     float na = 0.65f;
-    bool intensity = true;
+    int intensity = 1;
     float n0 = 1.33f;
     vector<vector<float>> angles(1, vector<float>(2, 0.0f)); // default [0, 0]
 
@@ -96,6 +96,11 @@ int main(int argc, char* argv[]) {
 EM_JS(void, plot_from_heap, (uintptr_t ptr, int len, int H, int W, float mn, float mx), {
   var view = new Float32Array(HEAPF32.buffer, ptr, len);
   plotSlices(view, H|0, W|0, Number(mn), Number(mx));
+});
+
+EM_JS(void, plot_complex_from_heap, (uintptr_t ptr, int len, int H, int W, float magMin, float magMax, float phaseMin, float phaseMax), {
+  var view = new Float32Array(HEAPF32.buffer, ptr, len * 2);
+  plotComplexSlices(view, H|0, W|0, Number(magMin), Number(magMax), Number(phaseMin), Number(phaseMax));
 });
 
 extern "C" {
@@ -135,7 +140,7 @@ extern "C" {
             }
 
             float na = std::stof(naStr);
-            bool intensity = (intensityStr == "1");
+            int intensity = std::stoi(intensityStr);
             float n0 = std::stof(n0Str);
 
             // Read data from heap & convert to 3D tensor
@@ -153,25 +158,63 @@ extern "C" {
 
             // Pass n0 to forward function
             auto result = forward(context, tensor, res, na, angles, n0, intensity);
-            auto output = result[0]; // only keep the 2d output since one angle at a time
-
-            size_t N = (size_t)H * (size_t)W;
-            float* out = (float*)malloc(sizeof(float) * N);
-            size_t k = 0;
-
-            float localMin = output[0][0];
-            float localMax = output[0][0];
-            for (int i = 0; i < H; ++i) {
-                for (int j = 0; j < W; ++j) {
-                    float v = output[i][j];
-                    out[k++] = v;
-                    if (v < localMin) localMin = v;
-                    if (v > localMax) localMax = v;
+            
+            // Complex output
+            if (intensity == 2) {
+                auto realPart = result[0];
+                auto imagPart = result[1];
+                
+                size_t N = (size_t)H * (size_t)W;
+                float* complexOut = (float*)malloc(sizeof(float) * N * 2);
+                
+                // Calculate magnitude and phase
+                float magMin = INFINITY, magMax = -INFINITY;
+                float phaseMin = INFINITY, phaseMax = -INFINITY;
+                
+                for (int i = 0; i < H; ++i) {
+                    for (int j = 0; j < W; ++j) {
+                        float real = realPart[i][j];
+                        float imag = imagPart[i][j];
+                        float mag = sqrt(real*real + imag*imag);
+                        float phase = atan2(imag, real);
+                        
+                        size_t idx = i * W + j;
+                        complexOut[idx * 2] = real;
+                        complexOut[idx * 2 + 1] = imag;
+                        
+                        if (mag < magMin) magMin = mag;
+                        if (mag > magMax) magMax = mag;
+                        if (phase < phaseMin) phaseMin = phase;
+                        if (phase > phaseMax) phaseMax = phase;
+                    }
                 }
-            }
+                
+                plot_complex_from_heap((uintptr_t)complexOut, N, H, W, magMin, magMax, phaseMin, phaseMax);
+                free(complexOut);
+            } 
+            
+            // Amplitude/Intensity outputs
+            else {
+                auto output = result[0];
+                
+                size_t N = (size_t)H * (size_t)W;
+                float* out = (float*)malloc(sizeof(float) * N);
+                size_t k = 0;
 
-            plot_from_heap((uintptr_t)out, N, H, W, localMin, localMax);
-            free(out);
+                float localMin = output[0][0];
+                float localMax = output[0][0];
+                for (int i = 0; i < H; ++i) {
+                    for (int j = 0; j < W; ++j) {
+                        float v = output[i][j];
+                        out[k++] = v;
+                        if (v < localMin) localMin = v;
+                        if (v > localMax) localMax = v;
+                    }
+                }
+
+                plot_from_heap((uintptr_t)out, N, H, W, localMin, localMax);
+                free(out);
+            }
 
         } catch (const std::exception &e) {
             printf("C++ exception: %s\n", e.what());

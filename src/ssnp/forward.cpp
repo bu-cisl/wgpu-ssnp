@@ -8,7 +8,7 @@ vector<vector<vector<float>>> forward(
     float na, 
     vector<vector<float>> angles, 
     float n0,
-    bool intensity
+    int intensity
 ) {
     vector<int> shape = {int(n[0].size()), int(n[0][0].size())};
 
@@ -93,20 +93,43 @@ vector<vector<vector<float>>> forward(
         wgpu::Buffer complexSlice = createBuffer(context.device, nullptr, sizeof(float) * buffer_len * 2, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
         dft(context, complexSlice, finalForwardBuffer, buffer_len, shape[0], shape[1], 1); // idft
         finalForwardBuffer.release();
-        wgpu::Buffer sliceBuffer = createBuffer(context.device, nullptr, sizeof(float) * buffer_len, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
-        intense(context, sliceBuffer, complexSlice, buffer_len, intensity);
-        vector<float> slice = readBack(context.device, context.queue, buffer_len, sliceBuffer);
-        complexSlice.release();
-        sliceBuffer.release();
-
-        // reshape for final result
-        vector<vector<float>> reshapedSlice(shape[0], vector<float>(shape[1], 0.0f));
-        for (int i = 0; i < shape[0]; i++) {
-            for (int j = 0; j < shape[1]; j++) {
-                reshapedSlice[i][j] = slice[i * shape[1] + j];
+        
+        // Complex output
+        if (intensity == 2) {
+            vector<float> complexData = readBack(context.device, context.queue, buffer_len * 2, complexSlice);
+            complexSlice.release();
+            
+            // reshape for final result - 2 x H x W (real, imag)
+            vector<vector<float>> realSlice(shape[0], vector<float>(shape[1], 0.0f));
+            vector<vector<float>> imagSlice(shape[0], vector<float>(shape[1], 0.0f));
+            for (int i = 0; i < shape[0]; i++) {
+                for (int j = 0; j < shape[1]; j++) {
+                    int idx = i * shape[1] + j;
+                    realSlice[i][j] = complexData[idx * 2];     // real part
+                    imagSlice[i][j] = complexData[idx * 2 + 1]; // imag part
+                }
             }
+            result.push_back(realSlice);
+            result.push_back(imagSlice);
+        } 
+        
+        // Default output
+        else { 
+            wgpu::Buffer sliceBuffer = createBuffer(context.device, nullptr, sizeof(float) * buffer_len, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
+            intense(context, sliceBuffer, complexSlice, buffer_len, intensity == 1);
+            vector<float> slice = readBack(context.device, context.queue, buffer_len, sliceBuffer);
+            complexSlice.release();
+            sliceBuffer.release();
+
+            // reshape for final result
+            vector<vector<float>> reshapedSlice(shape[0], vector<float>(shape[1], 0.0f));
+            for (int i = 0; i < shape[0]; i++) {
+                for (int j = 0; j < shape[1]; j++) {
+                    reshapedSlice[i][j] = slice[i * shape[1] + j];
+                }
+            }
+            result.push_back(reshapedSlice);
         }
-        result.push_back(reshapedSlice);
     }
 
     return result;

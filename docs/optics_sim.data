@@ -820,7 +820,7 @@ vector<vector<vector<float>>> forward(
     float na, 
     vector<vector<float>> angles, 
     float n0,
-    bool intensity
+    int intensity
 ) {
     vector<int> shape = {int(n[0].size()), int(n[0][0].size())};
 
@@ -905,20 +905,43 @@ vector<vector<vector<float>>> forward(
         wgpu::Buffer complexSlice = createBuffer(context.device, nullptr, sizeof(float) * buffer_len * 2, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
         dft(context, complexSlice, finalForwardBuffer, buffer_len, shape[0], shape[1], 1); // idft
         finalForwardBuffer.release();
-        wgpu::Buffer sliceBuffer = createBuffer(context.device, nullptr, sizeof(float) * buffer_len, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
-        intense(context, sliceBuffer, complexSlice, buffer_len, intensity);
-        vector<float> slice = readBack(context.device, context.queue, buffer_len, sliceBuffer);
-        complexSlice.release();
-        sliceBuffer.release();
-
-        // reshape for final result
-        vector<vector<float>> reshapedSlice(shape[0], vector<float>(shape[1], 0.0f));
-        for (int i = 0; i < shape[0]; i++) {
-            for (int j = 0; j < shape[1]; j++) {
-                reshapedSlice[i][j] = slice[i * shape[1] + j];
+        
+        // Complex output
+        if (intensity == 2) {
+            vector<float> complexData = readBack(context.device, context.queue, buffer_len * 2, complexSlice);
+            complexSlice.release();
+            
+            // reshape for final result - 2 x H x W (real, imag)
+            vector<vector<float>> realSlice(shape[0], vector<float>(shape[1], 0.0f));
+            vector<vector<float>> imagSlice(shape[0], vector<float>(shape[1], 0.0f));
+            for (int i = 0; i < shape[0]; i++) {
+                for (int j = 0; j < shape[1]; j++) {
+                    int idx = i * shape[1] + j;
+                    realSlice[i][j] = complexData[idx * 2];     // real part
+                    imagSlice[i][j] = complexData[idx * 2 + 1]; // imag part
+                }
             }
+            result.push_back(realSlice);
+            result.push_back(imagSlice);
+        } 
+        
+        // Default output
+        else { 
+            wgpu::Buffer sliceBuffer = createBuffer(context.device, nullptr, sizeof(float) * buffer_len, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
+            intense(context, sliceBuffer, complexSlice, buffer_len, intensity == 1);
+            vector<float> slice = readBack(context.device, context.queue, buffer_len, sliceBuffer);
+            complexSlice.release();
+            sliceBuffer.release();
+
+            // reshape for final result
+            vector<vector<float>> reshapedSlice(shape[0], vector<float>(shape[1], 0.0f));
+            for (int i = 0; i < shape[0]; i++) {
+                for (int j = 0; j < shape[1]; j++) {
+                    reshapedSlice[i][j] = slice[i * shape[1] + j];
+                }
+            }
+            result.push_back(reshapedSlice);
         }
-        result.push_back(reshapedSlice);
     }
 
     return result;
@@ -948,7 +971,7 @@ vector<vector<vector<float>>> forward(
     float na, 
     vector<vector<float>> angles, 
     float n0,
-    bool intensity
+    int intensity
 );
 
 #endif#include "intensity.h"
@@ -1181,7 +1204,7 @@ int main(int argc, char* argv[]) {
 
     vector<float> res = {0.1f, 0.1f, 0.1f};
     float na = 0.65f;
-    bool intensity = true;
+    int intensity = 1;
     float n0 = 1.33f;
     vector<vector<float>> angles(1, vector<float>(2, 0.0f)); // default [0, 0]
 
@@ -1201,17 +1224,22 @@ EM_JS(void, plot_from_heap, (uintptr_t ptr, int len, int H, int W, float mn, flo
   plotSlices(view, H|0, W|0, Number(mn), Number(mx));
 });
 
+EM_JS(void, plot_complex_from_heap, (uintptr_t ptr, int len, int H, int W, float magMin, float magMax, float phaseMin, float phaseMax), {
+  var view = new Float32Array(HEAPF32.buffer, ptr, len * 2);
+  plotComplexSlices(view, H|0, W|0, Number(magMin), Number(magMax), Number(phaseMin), Number(phaseMax));
+});
+
 extern "C" {
     EMSCRIPTEN_KEEPALIVE
-    void callSSNP(const char* inputStr) {
+    void callSSNP(uintptr_t dataPtr, int D, int H, int W, const char* paramsStr) {
         try {
-            std::string fullInput(inputStr);
+            // Parse params
+            std::string fullInput(paramsStr);
             size_t firstPipe = fullInput.find('|');
             size_t secondPipe = fullInput.find('|', firstPipe + 1);
             size_t thirdPipe = fullInput.find('|', secondPipe + 1);
             size_t fourthPipe = fullInput.find('|', thirdPipe + 1);
 
-            // Extract all components
             std::string anglesStr = fullInput.substr(0, firstPipe);
             std::string resStr = fullInput.substr(firstPipe + 1, secondPipe - firstPipe - 1);
             std::string naStr = fullInput.substr(secondPipe + 1, thirdPipe - secondPipe - 1);
@@ -1238,41 +1266,81 @@ extern "C" {
             }
 
             float na = std::stof(naStr);
-            bool intensity = (intensityStr == "1");
+            int intensity = std::stoi(intensityStr);
             float n0 = std::stof(n0Str);
 
-            // File read + processing
-            std::vector<std::vector<std::vector<float>>> tensor;
-            int D, H, W;
-            if (!read_input_tensor("input.bin", tensor, D, H, W)) {
-                printf("Failed to read input.bin\n");
-                return;
-            }
+            // Read data from heap & convert to 3D tensor
+            float* heapData = reinterpret_cast<float*>(dataPtr);
+            vector<vector<vector<float>>> tensor(D, vector<vector<float>>(H, vector<float>(W)));
+            size_t idx = 0;
+            for (int d = 0; d < D; ++d)
+                for (int i = 0; i < H; ++i)
+                    for (int j = 0; j < W; ++j)
+                        tensor[d][i][j] = heapData[idx++];
 
+            // Init WebGPU
             WebGPUContext context;
             initWebGPU(context);
 
             // Pass n0 to forward function
             auto result = forward(context, tensor, res, na, angles, n0, intensity);
-            auto output = result[0]; // only keep the 2d output since one angle at a time
-
-            size_t N = (size_t)H * (size_t)W;
-            float* out = (float*)malloc(sizeof(float) * N);
-            size_t k = 0;
-
-            float localMin = output[0][0];
-            float localMax = output[0][0];
-            for (int i = 0; i < H; ++i) {
-                for (int j = 0; j < W; ++j) {
-                    float v = output[i][j];
-                    out[k++] = v;
-                    if (v < localMin) localMin = v;
-                    if (v > localMax) localMax = v;
+            
+            // Complex output
+            if (intensity == 2) {
+                auto realPart = result[0];
+                auto imagPart = result[1];
+                
+                size_t N = (size_t)H * (size_t)W;
+                float* complexOut = (float*)malloc(sizeof(float) * N * 2);
+                
+                // Calculate magnitude and phase
+                float magMin = INFINITY, magMax = -INFINITY;
+                float phaseMin = INFINITY, phaseMax = -INFINITY;
+                
+                for (int i = 0; i < H; ++i) {
+                    for (int j = 0; j < W; ++j) {
+                        float real = realPart[i][j];
+                        float imag = imagPart[i][j];
+                        float mag = sqrt(real*real + imag*imag);
+                        float phase = atan2(imag, real);
+                        
+                        size_t idx = i * W + j;
+                        complexOut[idx * 2] = real;
+                        complexOut[idx * 2 + 1] = imag;
+                        
+                        if (mag < magMin) magMin = mag;
+                        if (mag > magMax) magMax = mag;
+                        if (phase < phaseMin) phaseMin = phase;
+                        if (phase > phaseMax) phaseMax = phase;
+                    }
                 }
-            }
+                
+                plot_complex_from_heap((uintptr_t)complexOut, N, H, W, magMin, magMax, phaseMin, phaseMax);
+                free(complexOut);
+            } 
+            
+            // Amplitude/Intensity outputs
+            else {
+                auto output = result[0];
+                
+                size_t N = (size_t)H * (size_t)W;
+                float* out = (float*)malloc(sizeof(float) * N);
+                size_t k = 0;
 
-            plot_from_heap((uintptr_t)out, N, H, W, localMin, localMax);
-            free(out);
+                float localMin = output[0][0];
+                float localMax = output[0][0];
+                for (int i = 0; i < H; ++i) {
+                    for (int j = 0; j < W; ++j) {
+                        float v = output[i][j];
+                        out[k++] = v;
+                        if (v < localMin) localMin = v;
+                        if (v > localMax) localMax = v;
+                    }
+                }
+
+                plot_from_heap((uintptr_t)out, N, H, W, localMin, localMax);
+                free(out);
+            }
 
         } catch (const std::exception &e) {
             printf("C++ exception: %s\n", e.what());

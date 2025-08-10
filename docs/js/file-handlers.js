@@ -4,93 +4,42 @@ function initializeFileHandlers() {
 	const runBtn = document.getElementById("runBtn");
 
 	fileInput.addEventListener("change", async (e) => {
+		// Clean up previous data 
+		if (window.currentVolumeData) {
+			Module._free(window.currentVolumeData.ptr);
+			window.currentVolumeData = null;
+		}
+
 		const file = e.target.files[0];
 		if (!file) return;
 
 		const name = file.name.toLowerCase();
 		const ext = name.substring(name.lastIndexOf(".") + 1);
 
-		if (ext === "bin") {
-			const r = new FileReader();
-			r.onload = () => {
-				const data = new Uint8Array(r.result);
-				FS.writeFile("input.bin", data);
-				runBtn.disabled = false;
-			};
-			r.readAsArrayBuffer(file);
-		} 
-		else if (ext === "tif" || ext === "tiff") {
+		if (ext === "tif" || ext === "tiff") {
 			try {
 				const arrayBuffer = await file.arrayBuffer();
-				const ifds = UTIF.decode(arrayBuffer);
-				
-				if (ifds.length === 0) {
-					throw new Error("No image slices found in TIFF");
-				}
+				const { slices, width, height, depth } = decodeTiffToRaw(arrayBuffer);
 
-				UTIF.decodeImage(arrayBuffer, ifds[0]);
-				const firstIfd = ifds[0];
-				
-				const width = firstIfd.width || firstIfd['t256']?.[0];
-				const height = firstIfd.height || firstIfd['t257']?.[0];
-				const bps = firstIfd.bps || firstIfd['t258']?.[0] || 8;
-				const spp = firstIfd.spp || firstIfd['t277']?.[0] || 1;
-				const sampleFormat = firstIfd.sampleFormat || firstIfd['t339']?.[0] || 1;
-				const photometric = firstIfd.photometric || firstIfd['t262']?.[0];
-				
-				if (!width || !height) {
-					throw new Error("Could not determine image dimensions");
-				}
+				// Allocate memory on heap and copy data
+				const D = depth;
+				const H = height; 
+				const W = width;
+				const totalFloats = D * H * W;
 
-				console.log("TIFF Metadata:", {
-					width,
-					height,
-					bitsPerSample: bps,
-					samplesPerPixel: spp,
-					sampleFormat: getSampleFormatName(sampleFormat),
-					photometricInterpretation: getPhotometricName(photometric),
-					compression: firstIfd.compression,
-					planarConfiguration: firstIfd.planarConfig,
-					ifdEntries: Object.keys(firstIfd).filter(k => k.startsWith('t'))
-				});
+				const heapPtr = Module._malloc(totalFloats * 4);
+				const heapArray = new Float32Array(Module.HEAPF32.buffer, heapPtr, totalFloats);
 
-				const slices = [];
-				for (let i = 0; i < ifds.length; i++) {
-					UTIF.decodeImage(arrayBuffer, ifds[i]);
-					const ifd = ifds[i];
-					const raw = ifd.data;
-					
-					if (!raw) {
-						throw new Error(`Could not decode slice #${i}`);
-					}
-
-					const sliceWidth = ifd.width || ifd['t256']?.[0];
-					const sliceHeight = ifd.height || ifd['t257']?.[0];
-					if (sliceWidth !== width || sliceHeight !== height) {
-						throw new Error(`Slice ${i} dimensions (${sliceWidth}x${sliceHeight}) don't match first slice (${width}x${height})`);
-					}
-
-					const floatSlice = convertTiffDataToFloat32(raw, {
-						bitsPerSample: bps,
-						samplesPerPixel: spp,
-						sampleFormat,
-						width,
-						height
-					});
-
-					if (spp > 1) {
-						const singleChannel = new Float32Array(width * height);
-						for (let p = 0; p < width * height; p++) {
-							singleChannel[p] = floatSlice[p * spp];
-						}
-						slices.push(singleChannel);
-					} else {
-						slices.push(floatSlice);
+				// Copy slice data directly
+				let idx = 0;
+				for (let d = 0; d < D; d++) {
+					for (let i = 0; i < slices[d].length; i++) {
+						heapArray[idx++] = slices[d][i];
 					}
 				}
 
-				const binBuffer = buildBinBufferFromFloatVolume(slices, width, height);
-				FS.writeFile("input.bin", new Uint8Array(binBuffer));
+				// Store for cleanup
+				window.currentVolumeData = { ptr: heapPtr, D, H, W };
 				runBtn.disabled = false;
 
 			} catch (error) {

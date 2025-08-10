@@ -57,8 +57,9 @@ function createAppStructure() {
 			<div class="control-group">
 				<label for="outputType">Output Type</label>
 				<select id="outputType">
-					<option value="intensity">Intensity</option>
 					<option value="amplitude">Amplitude</option>
+					<option value="intensity" selected>Intensity</option>
+					<option value="complex">Complex</option>
 				</select>
 			</div>
 			<button id="runBtn" disabled>Run Simulation</button>
