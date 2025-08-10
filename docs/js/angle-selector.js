@@ -38,6 +38,8 @@ function initializeAngleSelector() {
 	});
 
 	angleSelector.addEventListener("click", (e) => {
+		if (isSimulationRunning) return;
+		
 		const rect = angleSelector.getBoundingClientRect();
 		const centerX = rect.width / 2;
 		const centerY = rect.height / 2;

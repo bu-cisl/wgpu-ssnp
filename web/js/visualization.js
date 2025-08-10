@@ -93,10 +93,8 @@ function plotSlices(flatArray, H, W, localMin, localMax) {
 	container.appendChild(colorbar);
 	resultContainer.appendChild(container);
 
-	// Re-enable run button and reset text
-	const runBtn = document.getElementById("runBtn");
-	runBtn.disabled = false;
-	runBtn.textContent = "Run Simulation";
+	// Re-enable controls
+	resetSimulationState();
 
 	document.getElementById("downloadBtn").disabled = false;
 }
@@ -169,10 +167,8 @@ function plotComplexSlices(complexArray, H, W, magMin, magMax, phaseMin, phaseMa
 	const phaseContainer = createComplexPlot(complexArray, H, W, phaseMin, phaseMax, false);
 	resultContainer.appendChild(phaseContainer);
 
-	// Re-enable run button and reset text
-	const runBtn = document.getElementById("runBtn");
-	runBtn.disabled = false;
-	runBtn.textContent = "Run Simulation";
+	// Re-enable controls
+	resetSimulationState();
 
 	document.getElementById("downloadBtn").disabled = false;
 }

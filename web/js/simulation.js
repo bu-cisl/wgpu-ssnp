@@ -1,4 +1,16 @@
 // Simulation control and validation
+let isSimulationRunning = false;
+
+function resetSimulationState() {
+	isSimulationRunning = false;
+	const runBtn = document.getElementById("runBtn");
+	const angleSelector = document.getElementById("angleSelector");
+	runBtn.disabled = false;
+	runBtn.textContent = "Run Simulation";
+	angleSelector.style.pointerEvents = "auto";
+	angleSelector.style.opacity = "1";
+}
+
 function validateInputs(resVal, naVal, n0Val) {
 	const resParts = resVal.split(',');
 	if (resParts.length !== 3 || resParts.some(part => isNaN(parseFloat(part)))) {
@@ -42,10 +54,14 @@ function runForwardFunction() {
 		return;
 	}
 	
-	// Disable button and show running state
+	// Set running state and disable controls
+	isSimulationRunning = true;
 	const runBtn = document.getElementById("runBtn");
+	const angleSelector = document.getElementById("angleSelector");
 	runBtn.disabled = true;
 	runBtn.textContent = "Running...";
+	angleSelector.style.pointerEvents = "none";
+	angleSelector.style.opacity = "0.5";
 	
 	const { ptr, D, H, W } = window.currentVolumeData;
 	const angleString = `${currentAngle[0]},${currentAngle[1]}`;
@@ -64,9 +80,8 @@ function runForwardFunction() {
         { async: true }
     ).catch(err => {
 		console.error("Error:", err);
-		// Re-enable button on error
-		runBtn.disabled = false;
-		runBtn.textContent = "Run Simulation";
+		// Re-enable controls on error
+		resetSimulationState();
 	});
 }
 
