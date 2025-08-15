@@ -132,7 +132,7 @@ function downloadNumPy() {
 		const blob = new Blob([buffer], { type: 'application/octet-stream' });
 		const a = document.createElement('a');
 		a.href = URL.createObjectURL(blob);
-		a.download = 'ssnp_output.npy';
+		a.download = 'idt_output.npy';
 		a.click();
 		URL.revokeObjectURL(a.href);
 	}
@@ -294,7 +294,7 @@ function downloadComplexNumPy() {
 	const blob = new Blob([buffer], { type: 'application/octet-stream' });
 	const a = document.createElement('a');
 	a.href = URL.createObjectURL(blob);
-	a.download = 'ssnp_complex_output.npy';
+	a.download = 'idt_complex_output.npy';
 	a.click();
 	URL.revokeObjectURL(a.href);
 }

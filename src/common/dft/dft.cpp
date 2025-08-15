@@ -102,7 +102,7 @@ void dft(
     // ROW DFT PASS -> save output in intermediate buffer before column pass
     wgpu::Buffer intermediateBuffer = createBuffer(device, nullptr, sizeof(float) * 2 * buffer_size, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
 
-    std::string shaderCodeRow = readShaderFile("src/ssnp/dft/dft_row.wgsl", limits.maxWorkgroupSizeX, limits.maxWorkgroupSizeY);
+    std::string shaderCodeRow = readShaderFile("src/common/dft/dft_row.wgsl", limits.maxWorkgroupSizeX, limits.maxWorkgroupSizeY);
     wgpu::ShaderModule shaderModuleRow = createShaderModule(device, shaderCodeRow);
 
     wgpu::BindGroupLayout bindGroupLayout = createBindGroupLayout(device);
@@ -123,7 +123,7 @@ void dft(
     shaderModuleRow.release();
 
     // COLUMN DFT PASS
-    std::string shaderCodeCol = readShaderFile("src/ssnp/dft/dft_col.wgsl", limits.maxWorkgroupSizeX, limits.maxWorkgroupSizeY);
+    std::string shaderCodeCol = readShaderFile("src/common/dft/dft_col.wgsl", limits.maxWorkgroupSizeX, limits.maxWorkgroupSizeY);
     wgpu::ShaderModule shaderModuleCol = createShaderModule(device, shaderCodeCol);
 
     wgpu::BindGroup bindGroupCol = createBindGroup(device, bindGroupLayout, intermediateBuffer, finalOutputBuffer, uniformBuffer, inverseFlagBuffer);

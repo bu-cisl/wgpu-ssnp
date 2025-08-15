@@ -9,7 +9,7 @@
 #include <optional>
 #include <webgpu/webgpu.hpp>
 #include "../../webgpu_utils.h"
-#include "../c_gamma/c_gamma.h"
+#include "../../common/c_gamma/c_gamma.h"
 
 void merge_prop(
     WebGPUContext& context,

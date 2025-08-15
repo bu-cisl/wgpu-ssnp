@@ -6,7 +6,7 @@
 #include <vector>
 #include <webgpu/webgpu.hpp>
 #include "../../webgpu_utils.h"
-#include "../dft/dft.h"
+#include "../../common/dft/dft.h"
 
 void scatter_effects(
     WebGPUContext& context, 

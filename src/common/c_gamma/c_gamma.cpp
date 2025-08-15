@@ -83,7 +83,7 @@ void c_gamma(WebGPUContext& context, wgpu::Buffer& outputBuffer, std::vector<flo
     
     // LOADING AND COMPILING SHADER CODE
     WorkgroupLimits limits = getWorkgroupLimits(device);
-    std::string shaderCode = readShaderFile("src/ssnp/c_gamma/c_gamma.wgsl", limits.maxWorkgroupSizeX);
+    std::string shaderCode = readShaderFile("src/common/c_gamma/c_gamma.wgsl", limits.maxWorkgroupSizeX);
     wgpu::ShaderModule shaderModule = createShaderModule(device, shaderCode);
 
     // CREATING BUFFERS

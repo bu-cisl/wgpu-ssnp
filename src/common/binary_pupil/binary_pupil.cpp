@@ -84,7 +84,7 @@ void binary_pupil(
 
     // LOADING AND COMPILING SHADER CODE
     WorkgroupLimits limits = getWorkgroupLimits(device);
-    std::string shaderCode = readShaderFile("src/ssnp/binary_pupil/binary_pupil.wgsl", limits.maxWorkgroupSizeX);
+    std::string shaderCode = readShaderFile("src/common/binary_pupil/binary_pupil.wgsl", limits.maxWorkgroupSizeX);
     wgpu::ShaderModule shaderModule = createShaderModule(device, shaderCode);
 
     // CREATING BUFFERS
