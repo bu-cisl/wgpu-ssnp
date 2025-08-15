@@ -100,7 +100,7 @@ We benchmarked this WebGPU implementation of the SSNP model against the original
 We determined the WebGPU implementation of the model to be accurate within **1e-4** relative tolerance for sufficiently large inputs (ex. 2048x2048x256 volume). With an extremely large input (ex. 1024x2048x2048 volume), the accuracy is no longer within this threshold, but still remains within a **1e-3** relative tolerance threshold by a huge margin. We believe this is sufficiently accurate.
 
 ### Performance
-<img src="benchmark/benchmark_results.png" alt="Benchmark Results" width="600"/>
+<img src="benchmark/ssnp/benchmark_results.png" alt="Benchmark Results" width="600"/>
 
 We evaluated the performance of our WebGPU implementation of the model against the original with respect to the spatial size (HxW) changing and the depth (D) changing. 
 
