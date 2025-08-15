@@ -4,7 +4,7 @@ A WebGPU-based reimplementation of **High-Fidelity Intensity Diffraction Tomogra
 
 This project ports the SSNP-IDT algorithm to the browser using **WebGPU** via C++ and **Emscripten**, making it device-agnostic and fully browser-compatible.
 
-**Live demo**: [https://andrewx-bu.github.io/wgpu-ssnp/](https://andrewx-bu.github.io/wgpu-ssnp/)
+**Live demo**: [https://bu-cisl.github.io/wgpu-ssnp/](https://bu-cisl.github.io/wgpu-ssnp/)
 
 ## Table of Contents
 - [Motivation](#motivation)
@@ -44,7 +44,7 @@ This approach allows for high-fidelity 3D reconstruction of complex, thick sampl
 ## Demo
 
 To test the model in the browser, visit the live demo:  
-[https://andrewx-bu.github.io/wgpu-ssnp/](https://andrewx-bu.github.io/wgpu-ssnp/)
+[https://bu-cisl.github.io/wgpu-ssnp/](https://bu-cisl.github.io/wgpu-ssnp/)
 
 1. Upload a volumetric **.tiff** using the file input panel
 2. Adjust key imaging parameters such as:
@@ -55,7 +55,7 @@ To test the model in the browser, visit the live demo:
 3. Run the model to generate a reconstruction  
 4. Download the output tensor as a numpy file (optional)
 
-A sample input file is provided: [**input.tiff**](https://github.com/andrewx-bu/wgpu-ssnp/blob/main/input.tiff)  
+A sample input file is provided: [**input.tiff**](https://github.com/bu-cisl/wgpu-ssnp/blob/main/input.tiff)  
 This volume is 128×128×50 and contains a quarter-radius sphere with voxel values set to **0.01** inside and **0** outside.
 
 
