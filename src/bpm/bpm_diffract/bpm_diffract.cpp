@@ -13,7 +13,7 @@ static wgpu::BindGroupLayout createBindGroupLayout(wgpu::Device& device) {
     wgpu::BindGroupLayoutEntry outputBufferLayout = {};
     outputBufferLayout.binding = 0;
     outputBufferLayout.visibility = wgpu::ShaderStage::Compute;
-    outputBufferLayout.buffer.type = wgpu::BufferBindingType::ReadOnlyStorage;
+    outputBufferLayout.buffer.type = wgpu::BufferBindingType::Storage;
 
     wgpu::BindGroupLayoutEntry inputBufferLayout = {};
     inputBufferLayout.binding = 1;

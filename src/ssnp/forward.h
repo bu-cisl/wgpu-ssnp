@@ -1,5 +1,5 @@
-#ifndef FORWARD_H
-#define FORWARD_H
+#ifndef SSNP_FORWARD_H
+#define SSNP_FORWARD_H
 
 #include "scatter_factor/scatter_factor.h"
 #include "ssnp_diffract/ssnp_diffract.h"

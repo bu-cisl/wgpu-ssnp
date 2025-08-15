@@ -1,7 +1,8 @@
 #include "model_dispatcher.h"
 
 std::map<std::string, ModelFunction> model_registry = {
-    {"ssnp", ssnp::forward}
+    {"ssnp", ssnp::forward},
+    {"bpm", bpm::forward}
 };
 
 std::vector<std::vector<std::vector<float>>> dispatch_model(

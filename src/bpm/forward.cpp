@@ -30,8 +30,20 @@ namespace bpm {
                 fieldBuffer.release();
 
                 // compute scattering
-                scatter(context, fieldBuffer, fieldBuffer2, buffer_len, shape, res[0], 1.0, n0);
+                fieldBuffer = createBuffer(context.device, nullptr, sizeof(float) * buffer_len * 2, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
+                vector<float> flatSlice;
+                for (const auto& inner : slice) {
+                    flatSlice.insert(flatSlice.end(), inner.begin(), inner.end());
+                }
+                vector<float> complexSlice;
+                for (float value : flatSlice) {
+                    complexSlice.push_back(value); // real part
+                    complexSlice.push_back(0); // 0 for imag part
+                }
+                wgpu::Buffer sliceBuffer = createBuffer(context.device, complexSlice.data(), sizeof(float) * buffer_len * 2, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
+                scatter(context, fieldBuffer, fieldBuffer2, sliceBuffer, buffer_len, shape, res[0], 1.0, n0);
                 fieldBuffer2.release();
+                sliceBuffer.release();
             }
 
             // Propagate the wave back to the focal plane

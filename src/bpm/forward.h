@@ -1,5 +1,5 @@
-#ifndef FORWARD_H
-#define FORWARD_H
+#ifndef BPM_FORWARD_H
+#define BPM_FORWARD_H
 
 #include "../common/webgpu_utils.h"
 #include "../common/dft/dft.h"

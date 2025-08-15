@@ -14,6 +14,7 @@ void scatter(
     WebGPUContext& context, 
     wgpu::Buffer& outputBuffer, 
     wgpu::Buffer& inputBuffer,
+    wgpu::Buffer& sliceBuffer,
     size_t bufferlen,
     std::vector<int> shape,
     std::optional<float> res_z = 0.1, 

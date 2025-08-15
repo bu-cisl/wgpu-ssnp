@@ -14,7 +14,7 @@ static wgpu::BindGroupLayout createBindGroupLayout(wgpu::Device& device) {
     wgpu::BindGroupLayoutEntry inputBufferLayout = {};
     inputBufferLayout.binding = 0;
     inputBufferLayout.visibility = wgpu::ShaderStage::Compute;
-    inputBufferLayout.buffer.type = wgpu::BufferBindingType::Storage;
+    inputBufferLayout.buffer.type = wgpu::BufferBindingType::ReadOnlyStorage;
 
     wgpu::BindGroupLayoutEntry scatterBufferLayout = {};
     scatterBufferLayout.binding = 1;
@@ -49,13 +49,13 @@ static wgpu::BindGroup createBindGroup(
     inputEntry.size = sizeof(float) * buffer_len * 2;
 
     wgpu::BindGroupEntry scatterEntry = {};
-    scatterEntry.binding = 0;
+    scatterEntry.binding = 1;
     scatterEntry.buffer = scatterBuffer;
     scatterEntry.offset = 0;
     scatterEntry.size = sizeof(float) * buffer_len * 2;
 
     wgpu::BindGroupEntry uniformEntry = {};
-    uniformEntry.binding = 1;
+    uniformEntry.binding = 2;
     uniformEntry.buffer = uniformBuffer;
     uniformEntry.offset = 0;
     uniformEntry.size = sizeof(Params);
@@ -74,6 +74,7 @@ void scatter(
     WebGPUContext& context, 
     wgpu::Buffer& outputBuffer, 
     wgpu::Buffer& inputBuffer, 
+    wgpu::Buffer& sliceBuffer,
     size_t bufferlen,
     std::vector<int> shape,
     std::optional<float> res_z, 
@@ -101,7 +102,7 @@ void scatter(
     wgpu::BindGroup bindGroup = createBindGroup(
         device, 
         bindGroupLayout, 
-        inputBuffer,
+        sliceBuffer,
         scatterBuffer, 
         uniformBuffer
     );
@@ -129,6 +130,7 @@ void scatter(
     // result = ifft(field) * scatter
     wgpu::Buffer multBuffer = createBuffer(device, nullptr, sizeof(float) * buffer_len * 2, wgpu::BufferUsage::Storage);
     complex_mult(context, multBuffer, ifftBuffer, scatterBuffer, buffer_len);
+    scatterBuffer.release();
     ifftBuffer.release();
 
     // return fft(result)
