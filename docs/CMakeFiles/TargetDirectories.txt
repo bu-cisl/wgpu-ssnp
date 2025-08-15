@@ -1,6 +1,0 @@
-/projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs/CMakeFiles/optics_sim.dir
-/projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs/CMakeFiles/copy_web.dir
-/projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs/CMakeFiles/edit_cache.dir
-/projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs/CMakeFiles/rebuild_cache.dir
-/projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs/external/webgpu/CMakeFiles/edit_cache.dir
-/projectnb/cislbu/rsyed/wgpu_ssnp-idt/docs/external/webgpu/CMakeFiles/rebuild_cache.dir
