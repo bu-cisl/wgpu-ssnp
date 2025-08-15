@@ -1,5 +1,6 @@
 #ifndef FORWARD_H
 #define FORWARD_H
+
 #include "scatter_factor/scatter_factor.h"
 #include "diffract/diffract.h"
 #include "binary_pupil/binary_pupil.h"
@@ -10,21 +11,24 @@
 #include "mult/mult.h"
 #include "scatter_effects/scatter_effects.h"
 #include "intensity/intensity.h"
-#include "webgpu_utils.h"
+#include "../webgpu_utils.h"
 #include <vector>
 #include <iostream>
 #include <algorithm>
 
 using namespace std;
 
-vector<vector<vector<float>>> forward(
-    WebGPUContext& context, 
-    vector<vector<vector<float>>> n, 
-    vector<float> res, 
-    float na, 
-    vector<vector<float>> angles, 
-    float n0,
-    int outputType
-);
+namespace ssnp {
+
+    vector<vector<vector<float>>> forward(
+        WebGPUContext& context, 
+        vector<vector<vector<float>>> n, 
+        vector<float> res, 
+        float na, 
+        vector<vector<float>> angles, 
+        float n0,
+        int outputType
+    );
+}
 
 #endif

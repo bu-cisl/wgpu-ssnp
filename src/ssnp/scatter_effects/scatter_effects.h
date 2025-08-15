@@ -5,7 +5,7 @@
 #include <cmath>
 #include <vector>
 #include <webgpu/webgpu.hpp>
-#include "../webgpu_utils.h"
+#include "../../webgpu_utils.h"
 #include "../dft/dft.h"
 
 void scatter_effects(

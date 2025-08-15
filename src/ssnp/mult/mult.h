@@ -5,7 +5,7 @@
 #include <cmath>
 #include <vector>
 #include <webgpu/webgpu.hpp>
-#include "../webgpu_utils.h"
+#include "../../webgpu_utils.h"
 
 void mult(
     WebGPUContext& context, 

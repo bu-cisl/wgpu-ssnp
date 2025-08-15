@@ -6,7 +6,7 @@
 #include <vector>
 #include <optional>
 #include <webgpu/webgpu.hpp>
-#include "../webgpu_utils.h"
+#include "../../webgpu_utils.h"
 
 void scatter_factor(
     WebGPUContext& context, 

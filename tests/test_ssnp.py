@@ -50,7 +50,7 @@ def generate_input(shape=(3, 128, 128)) -> np.ndarray:
     return create_sphere(shape)
 
 def run_cpp_model(input_path="input.bin", output_path="output.bin"):
-    result = subprocess.run(["./build/optics_sim", input_path, output_path], capture_output=True, text=True)
+    result = subprocess.run(["./build/optics_sim", "ssnp", input_path, output_path], capture_output=True, text=True)
     if result.returncode != 0:
         print("C++ Error:", result.stderr, result.stdout)
         raise RuntimeError("C++ execution failed.")

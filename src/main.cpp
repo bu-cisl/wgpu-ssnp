@@ -1,9 +1,9 @@
 #define WEBGPU_CPP_IMPLEMENTATION
-#include "forward.h"
 #include <iostream>
 #include <fstream>
 #include <vector>
 #include <string>
+#include "model_dispatcher.h"
 
 using namespace std;
 
@@ -60,13 +60,14 @@ bool write_output_tensor(const string& filename, const vector<vector<vector<floa
 
 // Main for testing script
 int main(int argc, char* argv[]) {
-    if (argc < 3) {
-        cerr << "Usage: " << argv[0] << " <input.bin> <output.bin>" << endl;
+    if (argc < 4) {
+        cerr << "Usage: " << argv[0] << " <model> <input.bin> <output.bin>" << endl;
         return 1;
     }
 
-    string input_filename = argv[1];
-    string output_filename = argv[2];
+    string model_type = argv[1];
+    string input_filename = argv[2];
+    string output_filename = argv[3];
 
     vector<vector<vector<float>>> input_tensor;
     int D, H, W;
@@ -82,7 +83,7 @@ int main(int argc, char* argv[]) {
     float n0 = 1.33f;
     vector<vector<float>> angles(1, vector<float>(2, 0.0f)); // default [0, 0]
 
-    auto result = forward(context, input_tensor, res, na, angles, n0, outputType);
+    auto result = dispatch_model(model_type, context, input_tensor, res, na, angles, n0, outputType);
 
     if (!write_output_tensor(output_filename, result)) return 1;
 
@@ -105,7 +106,7 @@ EM_JS(void, plot_complex_from_heap, (uintptr_t ptr, int len, int H, int W, float
 
 extern "C" {
     EMSCRIPTEN_KEEPALIVE
-    void callSSNP(uintptr_t dataPtr, int D, int H, int W, const char* paramsStr) {
+    void callModel(const char* model, uintptr_t dataPtr, int D, int H, int W, const char* paramsStr) {
         try {
             // Parse params
             std::string fullInput(paramsStr);
@@ -157,7 +158,7 @@ extern "C" {
             initWebGPU(context);
 
             // Pass n0 to forward function
-            auto result = forward(context, tensor, res, na, angles, n0, outputType);
+            auto result = dispatch_model(std::string(model), context, tensor, res, na, angles, n0, outputType);
             
             // Complex output
             if (outputType == 2) {

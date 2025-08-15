@@ -40,6 +40,7 @@ function runForwardFunction() {
 	const resVal = document.getElementById("resInput").value.trim() || "0.1,0.1,0.1";
 	const naVal = document.getElementById("naInput").value.trim() || "0.65";
 	const outputTypeVal = document.getElementById("outputType").value;
+	const modelType = document.getElementById("modelType").value;
 	let outputTypeNumVal;
 	if (outputTypeVal === "intensity") {
 		outputTypeNumVal = "1";
@@ -73,10 +74,10 @@ function runForwardFunction() {
 	console.log("Sending input to C++");
 	
 	Module.ccall(
-        "callSSNP", 
+        "callModel", 
         null,
-        ["number", "number", "number", "number", "string"],
-        [ptr, D, H, W, combinedParams],
+        ["string", "number", "number", "number", "number", "string"],
+        [modelType, ptr, D, H, W, combinedParams],
         { async: true }
     ).catch(err => {
 		console.error("Error:", err);

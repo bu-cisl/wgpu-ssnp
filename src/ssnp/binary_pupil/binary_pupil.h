@@ -6,7 +6,7 @@
 #include <vector>
 #include <optional>
 #include <webgpu/webgpu.hpp>
-#include "../webgpu_utils.h"
+#include "../../webgpu_utils.h"
 #include "../c_gamma/c_gamma.h"
 
 void binary_pupil(

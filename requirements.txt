@@ -12,3 +12,4 @@ typing_extensions==4.12.2
 matplotlib
 pyvista
 tifffile
+pytest

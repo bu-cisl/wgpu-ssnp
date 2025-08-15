@@ -62,6 +62,12 @@ function createAppStructure() {
 					<option value="complex">Complex</option>
 				</select>
 			</div>
+			<div class="control-group">
+				<label for="modelType">Model</label>
+				<select id="modelType">
+					<option value="ssnp" selected>SSNP</option>
+				</select>
+			</div>
 			<button id="runBtn" disabled>Run Simulation</button>
 			<button id="downloadBtn" disabled style="margin-top: 10px;">Download as .npy</button>
 		</div>

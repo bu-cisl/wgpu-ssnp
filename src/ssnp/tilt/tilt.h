@@ -7,7 +7,7 @@
 #include <vector>
 #include <optional>
 #include <webgpu/webgpu.hpp>
-#include "../webgpu_utils.h"
+#include "../../webgpu_utils.h"
 
 void tilt(
     WebGPUContext& context,
