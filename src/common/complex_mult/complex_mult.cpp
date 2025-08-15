@@ -1,25 +1,25 @@
-#include "mult.h"
+#include "complex_mult.h"
 
 static size_t buffer_len;
 
 // CREATING BIND GROUP AND LAYOUT
 static wgpu::BindGroupLayout createBindGroupLayout(wgpu::Device& device) {
-    wgpu::BindGroupLayoutEntry inputBuffer1Layout = {};
-    inputBuffer1Layout.binding = 0;
-    inputBuffer1Layout.visibility = wgpu::ShaderStage::Compute;
-    inputBuffer1Layout.buffer.type = wgpu::BufferBindingType::ReadOnlyStorage;
+    wgpu::BindGroupLayoutEntry inputBufferLayout1 = {};
+    inputBufferLayout1.binding = 0;
+    inputBufferLayout1.visibility = wgpu::ShaderStage::Compute;
+    inputBufferLayout1.buffer.type = wgpu::BufferBindingType::ReadOnlyStorage;
 
-    wgpu::BindGroupLayoutEntry inputBuffer2Layout = {};
-    inputBuffer2Layout.binding = 1;
-    inputBuffer2Layout.visibility = wgpu::ShaderStage::Compute;
-    inputBuffer2Layout.buffer.type = wgpu::BufferBindingType::ReadOnlyStorage;
-
+    wgpu::BindGroupLayoutEntry inputBufferLayout2 = {};
+    inputBufferLayout2.binding = 1;
+    inputBufferLayout2.visibility = wgpu::ShaderStage::Compute;
+    inputBufferLayout2.buffer.type = wgpu::BufferBindingType::ReadOnlyStorage;
+   
     wgpu::BindGroupLayoutEntry outputBufferLayout = {};
     outputBufferLayout.binding = 2;
     outputBufferLayout.visibility = wgpu::ShaderStage::Compute;
     outputBufferLayout.buffer.type = wgpu::BufferBindingType::Storage;
 
-    wgpu::BindGroupLayoutEntry entries[] = {inputBuffer1Layout, inputBuffer2Layout, outputBufferLayout};
+    wgpu::BindGroupLayoutEntry entries[] = {inputBufferLayout1, inputBufferLayout2, outputBufferLayout};
 
     wgpu::BindGroupLayoutDescriptor layoutDesc = {};
     layoutDesc.entryCount = 3;
@@ -45,7 +45,7 @@ static wgpu::BindGroup createBindGroup(
     inputEntry2.binding = 1;
     inputEntry2.buffer = inputBuffer2;
     inputEntry2.offset = 0;
-    inputEntry2.size = sizeof(float) * buffer_len;
+    inputEntry2.size = sizeof(float) * buffer_len * 2;
 
     wgpu::BindGroupEntry outputEntry = {};
     outputEntry.binding = 2;
@@ -63,11 +63,11 @@ static wgpu::BindGroup createBindGroup(
     return device.createBindGroup(bindGroupDesc);
 }
 
-void mult(
+void complex_mult(
     WebGPUContext& context, 
     wgpu::Buffer& outputBuffer, 
-    wgpu::Buffer& inputBuffer1, // forward
-    wgpu::Buffer& inputBuffer2, // pupil
+    wgpu::Buffer& inputBuffer1, 
+    wgpu::Buffer& inputBuffer2, 
     size_t bufferlen
 ) {
     buffer_len = bufferlen;
@@ -76,33 +76,31 @@ void mult(
     wgpu::Device device = context.device;
     wgpu::Queue queue = context.queue;
 
-    // LOADING AND COMPILING SHADER CODE
+    // shader file for complex multiplication
     WorkgroupLimits limits = getWorkgroupLimits(device);
-    std::string shaderCode = readShaderFile("src/ssnp/mult/mult.wgsl", limits.maxWorkgroupSizeX);
+    std::string shaderCode = readShaderFile("src/common/complex_mult/complex_mult.wgsl", limits.maxWorkgroupSizeX);
     wgpu::ShaderModule shaderModule = createShaderModule(device, shaderCode);
 
-    // CREATING BIND GROUP AND LAYOUT
+    // bind group/layout for complex multiplication
     wgpu::BindGroupLayout bindGroupLayout = createBindGroupLayout(device);
     wgpu::BindGroup bindGroup = createBindGroup(
         device, 
         bindGroupLayout, 
         inputBuffer1,
-        inputBuffer2,
+        inputBuffer2, 
         outputBuffer
     );
 
-    // CREATING COMPUTE PIPELINE
+    // perform complex multiplication
     wgpu::ComputePipeline computePipeline = createComputePipeline(device, shaderModule, bindGroupLayout);
-
-    // ENCODING AND DISPATCHING COMPUTE COMMANDS
     uint32_t workgroupsX = std::ceil(double(buffer_len)/limits.maxWorkgroupSizeX);
     wgpu::CommandBuffer commandBuffer = createComputeCommandBuffer(device, computePipeline, bindGroup, workgroupsX);
     queue.submit(1, &commandBuffer);
 
-    // RELEASE RESOURCES
+    // Clean resources
     commandBuffer.release();
     computePipeline.release();
+    shaderModule.release();
     bindGroup.release();
     bindGroupLayout.release();
-    shaderModule.release();
 }

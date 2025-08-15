@@ -92,7 +92,6 @@ int main(int argc, char* argv[]) {
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
-#include <sstream>
 
 EM_JS(void, plot_from_heap, (uintptr_t ptr, int len, int H, int W, float mn, float mx), {
   var view = new Float32Array(HEAPF32.buffer, ptr, len);

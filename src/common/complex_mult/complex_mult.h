@@ -1,13 +1,13 @@
-#ifndef MULT_H
-#define MULT_H
+#ifndef COMPLEX_MULT_H
+#define COMPLEX_MULT_H
 #include <fstream>
 #include <sstream>
 #include <cmath>
 #include <vector>
 #include <webgpu/webgpu.hpp>
-#include "../../webgpu_utils.h"
+#include "../webgpu_utils.h"
 
-void mult(
+void complex_mult(
     WebGPUContext& context, 
     wgpu::Buffer& outputBuffer, 
     wgpu::Buffer& inputBuffer1, 

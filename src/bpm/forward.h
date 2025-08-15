@@ -1,24 +1,21 @@
 #ifndef FORWARD_H
 #define FORWARD_H
 
-#include "scatter_factor/scatter_factor.h"
-#include "ssnp_diffract/ssnp_diffract.h"
-#include "../common/binary_pupil/binary_pupil.h"
-#include "../common/tilt/tilt.h"
-#include "merge_prop/merge_prop.h"
-#include "split_prop/split_prop.h" 
-#include "../common/dft/dft.h"
-#include "../common/mult/mult.h"
-#include "scatter_effects/scatter_effects.h"
-#include "../common/intensity/intensity.h"
 #include "../common/webgpu_utils.h"
+#include "../common/dft/dft.h"
+#include "../common/tilt/tilt.h"
+#include "bpm_diffract/bpm_diffract.h"
+#include "scatter/scatter.h"
+#include "../common/intensity/intensity.h"
+#include "../common/binary_pupil/binary_pupil.h"
+#include "../common/mult/mult.h"
 #include <vector>
 #include <iostream>
 #include <algorithm>
 
 using namespace std;
 
-namespace ssnp {
+namespace bpm {
 
     vector<vector<vector<float>>> forward(
         WebGPUContext& context, 

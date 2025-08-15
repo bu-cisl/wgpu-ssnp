@@ -1,5 +1,4 @@
 #include "model_dispatcher.h"
-#include "ssnp/forward.h"
 
 std::map<std::string, ModelFunction> model_registry = {
     {"ssnp", ssnp::forward}

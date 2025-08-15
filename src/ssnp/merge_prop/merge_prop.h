@@ -8,7 +8,7 @@
 #include <complex>
 #include <optional>
 #include <webgpu/webgpu.hpp>
-#include "../../webgpu_utils.h"
+#include "../../common/webgpu_utils.h"
 #include "../../common/c_gamma/c_gamma.h"
 
 void merge_prop(

@@ -1,7 +1,9 @@
 #ifndef MODEL_DISPATCHER_H
 #define MODEL_DISPATCHER_H
 
-#include "webgpu_utils.h"
+#include "common/webgpu_utils.h"
+#include "ssnp/forward.h"
+#include "bpm/forward.h"
 #include <vector>
 #include <string>
 #include <map>

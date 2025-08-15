@@ -1,4 +1,4 @@
-#include "diffract.h"
+#include "bpm_diffract.h"
 
 // INPUT PARAMS
 struct Params {
@@ -10,15 +10,15 @@ static size_t res_buffer_len;
 
 // CREATING BIND GROUP AND LAYOUT
 static wgpu::BindGroupLayout createBindGroupLayout(wgpu::Device& device) {
-    wgpu::BindGroupLayoutEntry ufBufferLayout = {};
-    ufBufferLayout.binding = 0;
-    ufBufferLayout.visibility = wgpu::ShaderStage::Compute;
-    ufBufferLayout.buffer.type = wgpu::BufferBindingType::ReadOnlyStorage;
+    wgpu::BindGroupLayoutEntry outputBufferLayout = {};
+    outputBufferLayout.binding = 0;
+    outputBufferLayout.visibility = wgpu::ShaderStage::Compute;
+    outputBufferLayout.buffer.type = wgpu::BufferBindingType::ReadOnlyStorage;
 
-    wgpu::BindGroupLayoutEntry ubBufferLayout = {};
-    ubBufferLayout.binding = 1;
-    ubBufferLayout.visibility = wgpu::ShaderStage::Compute;
-    ubBufferLayout.buffer.type = wgpu::BufferBindingType::ReadOnlyStorage;
+    wgpu::BindGroupLayoutEntry inputBufferLayout = {};
+    inputBufferLayout.binding = 1;
+    inputBufferLayout.visibility = wgpu::ShaderStage::Compute;
+    inputBufferLayout.buffer.type = wgpu::BufferBindingType::ReadOnlyStorage;
 
     wgpu::BindGroupLayoutEntry resBufferLayout = {};
     resBufferLayout.binding = 2;
@@ -30,25 +30,15 @@ static wgpu::BindGroupLayout createBindGroupLayout(wgpu::Device& device) {
     cgammaBufferLayout.visibility = wgpu::ShaderStage::Compute;
     cgammaBufferLayout.buffer.type = wgpu::BufferBindingType::ReadOnlyStorage;
 
-    wgpu::BindGroupLayoutEntry newUFBufferLayout = {};
-    newUFBufferLayout.binding = 4;
-    newUFBufferLayout.visibility = wgpu::ShaderStage::Compute;
-    newUFBufferLayout.buffer.type = wgpu::BufferBindingType::Storage;
-
-    wgpu::BindGroupLayoutEntry newUBBufferLayout = {};
-    newUBBufferLayout.binding = 5;
-    newUBBufferLayout.visibility = wgpu::ShaderStage::Compute;
-    newUBBufferLayout.buffer.type = wgpu::BufferBindingType::Storage;
-
     wgpu::BindGroupLayoutEntry uniformBufferLayout = {};
-    uniformBufferLayout.binding = 6;
+    uniformBufferLayout.binding = 4;
     uniformBufferLayout.visibility = wgpu::ShaderStage::Compute;
     uniformBufferLayout.buffer.type = wgpu::BufferBindingType::Uniform;
 
-    wgpu::BindGroupLayoutEntry entries[] = {ufBufferLayout, ubBufferLayout, resBufferLayout, cgammaBufferLayout, newUFBufferLayout, newUBBufferLayout, uniformBufferLayout};
+    wgpu::BindGroupLayoutEntry entries[] = {outputBufferLayout, inputBufferLayout, resBufferLayout, cgammaBufferLayout, uniformBufferLayout};
 
     wgpu::BindGroupLayoutDescriptor layoutDesc = {};
-    layoutDesc.entryCount = 7;
+    layoutDesc.entryCount = 5;
     layoutDesc.entries = entries;
 
     return device.createBindGroupLayout(layoutDesc);
@@ -57,25 +47,23 @@ static wgpu::BindGroupLayout createBindGroupLayout(wgpu::Device& device) {
 static wgpu::BindGroup createBindGroup(
     wgpu::Device& device, 
     wgpu::BindGroupLayout bindGroupLayout, 
-    wgpu::Buffer ufBuffer, 
-    wgpu::Buffer ubBuffer, 
+    wgpu::Buffer outputBuffer, 
+    wgpu::Buffer inputBuffer, 
     wgpu::Buffer resBuffer, 
-    wgpu::Buffer cgammaBuffer, 
-    wgpu::Buffer newUFBuffer, 
-    wgpu::Buffer newUBBuffer, 
+    wgpu::Buffer cgammaBuffer,
     wgpu::Buffer uniformBuffer
 ) {
-    wgpu::BindGroupEntry ufEntry = {};
-    ufEntry.binding = 0;
-    ufEntry.buffer = ufBuffer;
-    ufEntry.offset = 0;
-    ufEntry.size = sizeof(float) * 2 * buffer_len;
+    wgpu::BindGroupEntry outputEntry = {};
+    outputEntry.binding = 0;
+    outputEntry.buffer = outputBuffer;
+    outputEntry.offset = 0;
+    outputEntry.size = sizeof(float) * 2 * buffer_len;
 
-    wgpu::BindGroupEntry ubEntry = {};
-    ubEntry.binding = 1;
-    ubEntry.buffer = ubBuffer;
-    ubEntry.offset = 0;
-    ubEntry.size = sizeof(float) * 2 * buffer_len;
+    wgpu::BindGroupEntry inputEntry = {};
+    inputEntry.binding = 1;
+    inputEntry.buffer = inputBuffer;
+    inputEntry.offset = 0;
+    inputEntry.size = sizeof(float) * 2 * buffer_len;
 
     wgpu::BindGroupEntry resEntry = {};
     resEntry.binding = 2;
@@ -89,29 +77,17 @@ static wgpu::BindGroup createBindGroup(
     cgammaEntry.offset = 0;
     cgammaEntry.size = sizeof(float) * buffer_len;
 
-    wgpu::BindGroupEntry newUFEntry = {};
-    newUFEntry.binding = 4;
-    newUFEntry.buffer = newUFBuffer;
-    newUFEntry.offset = 0;
-    newUFEntry.size = sizeof(float) * 2 * buffer_len;
-
-    wgpu::BindGroupEntry newUBEntry = {};
-    newUBEntry.binding = 5;
-    newUBEntry.buffer = newUBBuffer;
-    newUBEntry.offset = 0;
-    newUBEntry.size = sizeof(float) * 2 * buffer_len;
-
     wgpu::BindGroupEntry uniformEntry = {};
-    uniformEntry.binding = 6;
+    uniformEntry.binding = 4;
     uniformEntry.buffer = uniformBuffer;
     uniformEntry.offset = 0;
     uniformEntry.size = sizeof(Params);
 
-    wgpu::BindGroupEntry entries[] = {ufEntry, ubEntry, resEntry, cgammaEntry, newUFEntry, newUBEntry, uniformEntry};
+    wgpu::BindGroupEntry entries[] = {outputEntry, inputEntry, resEntry, cgammaEntry, uniformEntry};
 
     wgpu::BindGroupDescriptor bindGroupDesc = {};
     bindGroupDesc.layout = bindGroupLayout;
-    bindGroupDesc.entryCount = 7;
+    bindGroupDesc.entryCount = 5;
     bindGroupDesc.entries = entries;
 
     return device.createBindGroup(bindGroupDesc);
@@ -119,10 +95,8 @@ static wgpu::BindGroup createBindGroup(
 
 void diffract(
     WebGPUContext& context, 
-    wgpu::Buffer& newUFBuffer, 
-    wgpu::Buffer& newUBBuffer, 
-    wgpu::Buffer& ufBuffer,
-    wgpu::Buffer& ubBuffer,
+    wgpu::Buffer& outputBuffer, 
+    wgpu::Buffer& inputBuffer,
     size_t bufferlen,
     std::vector<int> shape,
     std::optional<std::vector<float>> res, 
@@ -135,10 +109,10 @@ void diffract(
     // INITIALIZING WEBGPU
     wgpu::Device device = context.device;
     wgpu::Queue queue = context.queue;
-    
+
     // LOADING AND COMPILING SHADER CODE
     WorkgroupLimits limits = getWorkgroupLimits(device);
-    std::string shaderCode = readShaderFile("src/ssnp/diffract/diffract.wgsl", limits.maxWorkgroupSizeX);
+    std::string shaderCode = readShaderFile("src/bpm/bpm_diffract/bpm_diffract.wgsl", limits.maxWorkgroupSizeX);
     wgpu::ShaderModule shaderModule = createShaderModule(device, shaderCode);
 
     // CREATING BUFFERS
@@ -149,7 +123,7 @@ void diffract(
 
     // CREATING BIND GROUP AND LAYOUT
     wgpu::BindGroupLayout bindGroupLayout = createBindGroupLayout(device);
-    wgpu::BindGroup bindGroup = createBindGroup(device, bindGroupLayout, ufBuffer, ubBuffer, resBuffer, cgammaBuffer, newUFBuffer, newUBBuffer, uniformBuffer);
+    wgpu::BindGroup bindGroup = createBindGroup(device, bindGroupLayout, outputBuffer, inputBuffer, resBuffer, cgammaBuffer, uniformBuffer);
 
     // CREATING COMPUTE PIPELINE
     wgpu::ComputePipeline computePipeline = createComputePipeline(device, shaderModule, bindGroupLayout);

@@ -1,5 +1,5 @@
-#ifndef DIFFRACT_H
-#define DIFFRACT_H
+#ifndef SSNP_DIFFRACT_H
+#define SSNP_DIFFRACT_H
 #include <fstream>
 #include <sstream>
 #include <cassert>
@@ -8,7 +8,7 @@
 #include <complex>
 #include <optional>
 #include <webgpu/webgpu.hpp>
-#include "../../webgpu_utils.h"
+#include "../../common/webgpu_utils.h"
 #include "../../common/c_gamma/c_gamma.h"
 
 void diffract(

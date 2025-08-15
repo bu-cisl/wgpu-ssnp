@@ -1,5 +1,5 @@
-#ifndef C_GAMMA_H
-#define C_GAMMA_H
+#ifndef MULT_H
+#define MULT_H
 #include <fstream>
 #include <sstream>
 #include <cmath>
@@ -7,11 +7,12 @@
 #include <webgpu/webgpu.hpp>
 #include "../webgpu_utils.h"
 
-void c_gamma(
+void mult(
     WebGPUContext& context, 
     wgpu::Buffer& outputBuffer, 
-    std::vector<float> res, 
-    std::vector<int> shape
+    wgpu::Buffer& inputBuffer1, 
+    wgpu::Buffer& inputBuffer2,
+    size_t bufferlen
 );
 
 #endif 
