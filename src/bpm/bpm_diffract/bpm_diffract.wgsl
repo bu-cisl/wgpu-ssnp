@@ -13,7 +13,7 @@ fn main(@builtin(global_invocation_id) global_id : vec3<u32>) {
 
     let pi = radians(180.0);
     let gamma = cgamma[idx];
-    let kz = 2.0 * pi * res[2] * gamma;
+    let kz = 2.0 * pi * res[0] * gamma;
 
     // Clamp exponent to prevent underflow/overflow
     let exponent = clamp((gamma - 0.2) * 5.0, -60.0, 0.0);

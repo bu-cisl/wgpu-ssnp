@@ -19,9 +19,12 @@ namespace bpm {
         for(vector<float> c_ba : angles) {
             // Configure input field
             size_t buffer_len = shape[0] * shape[1];
+            wgpu::Buffer fieldBufferF = createBuffer(context.device, nullptr, sizeof(float) * buffer_len * 2, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
+            tilt(context, fieldBufferF, c_ba, shape, res);
             wgpu::Buffer fieldBuffer = createBuffer(context.device, nullptr, sizeof(float) * buffer_len * 2, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
-            tilt(context, fieldBuffer, c_ba, shape, res);
-
+            dft(context, fieldBuffer, fieldBufferF, buffer_len, shape[0], shape[1], 0);
+            fieldBufferF.release();
+            
             // Propagate the wave through RI distribution
             for(vector<vector<float>> slice : n) {
                 // propagate the wave 1.0*Δz
