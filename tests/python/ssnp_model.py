@@ -1,4 +1,4 @@
-"""Simple SSNP forward model."""
+"""SSNP forward model."""
 import math
 import torch
 from torch import Tensor
