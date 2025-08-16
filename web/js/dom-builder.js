@@ -66,6 +66,7 @@ function createAppStructure() {
 				<label for="modelType">Model</label>
 				<select id="modelType">
 					<option value="ssnp" selected>SSNP</option>
+					<option value="bpm"> BPM </option>
 				</select>
 			</div>
 			<button id="runBtn" disabled>Run Simulation</button>
