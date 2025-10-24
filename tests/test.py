@@ -14,7 +14,7 @@ ROWS = 128
 COLS = 128
 TOL = 1e-4 # rtol
 IMAGE_NAME = None # None if no save
-MODEL = "bpm"
+MODEL = "bpm" # for local testing
 
 def save_tensor_bin(filename, tensor: np.ndarray):
     assert tensor.ndim == 3
@@ -48,7 +48,6 @@ def generate_input(shape=(3, 128, 128)) -> np.ndarray:
     return create_sphere(shape)
 
 def run_cpp_model(model, input_path="input.bin", output_path="output.bin"):
-    # model is "ssnp" or "bpm" to match your C++ entry point
     result = subprocess.run(["./build/optics_sim", model, input_path, output_path], capture_output=True, text=True)
     if result.returncode != 0:
         print("C++ Error:", result.stderr, result.stdout)
@@ -149,6 +148,7 @@ def run_model_test(model):
         if os.path.exists(file):
             os.remove(file)
 
+# For pytest
 def test_ssnp():
     run_model_test("ssnp")
 
