@@ -29,6 +29,25 @@ jobs:
         with:
           version: 4.0.13
 
+      - name: Setup Vulkan Backend
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libvulkan1 vulkan-tools mesa-vulkan-drivers
+          echo "VK_ICD_FILENAMES=/usr/share/vulkan/icd.d/lvp_icd.x86_64.json" >> $GITHUB_ENV
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+        
+      - name: Install Python Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      - name: Run Pytest Suite
+        run: pytest tests -v
+
       - name: Build docs
         shell: bash
         run: |

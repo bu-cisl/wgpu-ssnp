@@ -5,6 +5,10 @@ project(
     LANGUAGES CXX C
 )
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 file(GLOB_RECURSE SRC_FILES
     ${CMAKE_SOURCE_DIR}/src/*.cpp
 )
@@ -12,9 +16,6 @@ file(GLOB_RECURSE SRC_FILES
 add_executable(optics_sim ${SRC_FILES})
 
 set_target_properties(optics_sim PROPERTIES
-    CXX_STANDARD 17
-    CXX_STANDARD_REQUIRED ON
-    CXX_EXTENSIONS OFF
     COMPILE_WARNING_AS_ERROR ON
 )
 

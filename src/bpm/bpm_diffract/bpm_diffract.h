@@ -1,6 +1,7 @@
 #ifndef BPM_DIFFRACT_H
 #define BPM_DIFFRACT_H
 #include <webgpu/webgpu.hpp>
+#include <optional>
 #include "../../common/webgpu_utils.h"
 #include "../../common/c_gamma/c_gamma.h"
 
