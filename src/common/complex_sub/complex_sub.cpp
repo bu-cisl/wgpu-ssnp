@@ -76,12 +76,12 @@ void complex_sub(
     wgpu::Device device = context.device;
     wgpu::Queue queue = context.queue;
 
-    // shader file for complex multiplication
+    // shader file for complex subtraction
     WorkgroupLimits limits = getWorkgroupLimits(device);
     std::string shaderCode = readShaderFile("src/common/complex_sub/complex_sub.wgsl", limits.maxWorkgroupSizeX);
     wgpu::ShaderModule shaderModule = createShaderModule(device, shaderCode);
 
-    // bind group/layout for complex multiplication
+    // bind group/layout for complex subtraction
     wgpu::BindGroupLayout bindGroupLayout = createBindGroupLayout(device);
     wgpu::BindGroup bindGroup = createBindGroup(
         device, 
@@ -91,7 +91,7 @@ void complex_sub(
         outputBuffer
     );
 
-    // perform complex multiplication
+    // perform complex subtraction
     wgpu::ComputePipeline computePipeline = createComputePipeline(device, shaderModule, bindGroupLayout);
     uint32_t workgroupsX = std::ceil(double(buffer_len)/limits.maxWorkgroupSizeX);
     wgpu::CommandBuffer commandBuffer = createComputeCommandBuffer(device, computePipeline, bindGroup, workgroupsX);

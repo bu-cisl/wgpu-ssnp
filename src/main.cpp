@@ -1,4 +1,3 @@
-#define WEBGPU_CPP_IMPLEMENTATION
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -65,6 +64,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
+    // PARSING INPUTS
     string model_type = argv[1];
     string input_filename = argv[2];
     string output_filename = argv[3];
@@ -74,9 +74,11 @@ int main(int argc, char* argv[]) {
 
     if (!read_input_tensor(input_filename, input_tensor, D, H, W)) return 1;
 
+    // INITIALIZING WEBGPU
     WebGPUContext context;
     initWebGPU(context);
 
+    // DISPATCHING THE REQUESTED MODEL
     vector<float> res = {0.1f, 0.1f, 0.1f};
     float na = 0.65f;
     int outputType = 1;
