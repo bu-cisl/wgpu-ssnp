@@ -1,4 +1,5 @@
 #include "dft.h"
+#include "../complex_scale/complex_scale.h"
 
 static size_t buffer_size;
 
@@ -141,4 +142,44 @@ void dft(
     uniformBuffer.release();
     intermediateBuffer.release();
     inverseFlagBuffer.release();
+}
+
+void dft_adjoint_forward(
+    WebGPUContext& context,
+    wgpu::Buffer& outputBuffer,
+    wgpu::Buffer& inputBuffer,
+    size_t buffersize,
+    int rows,
+    int cols
+) {
+    // ADJOINT(FFT) = N * IFFT FOR THIS DFT NORMALIZATION
+    wgpu::Buffer tempBuffer = createBuffer(
+        context.device,
+        nullptr,
+        sizeof(float) * 2 * buffersize,
+        WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc)
+    );
+    dft(context, tempBuffer, inputBuffer, buffersize, rows, cols, 1);
+    complex_scale(context, outputBuffer, tempBuffer, buffersize, static_cast<float>(buffersize));
+    tempBuffer.release();
+}
+
+void dft_adjoint_inverse(
+    WebGPUContext& context,
+    wgpu::Buffer& outputBuffer,
+    wgpu::Buffer& inputBuffer,
+    size_t buffersize,
+    int rows,
+    int cols
+) {
+    // ADJOINT(IFFT) = FFT / N FOR THIS DFT NORMALIZATION
+    wgpu::Buffer tempBuffer = createBuffer(
+        context.device,
+        nullptr,
+        sizeof(float) * 2 * buffersize,
+        WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc)
+    );
+    dft(context, tempBuffer, inputBuffer, buffersize, rows, cols, 0);
+    complex_scale(context, outputBuffer, tempBuffer, buffersize, 1.0f / static_cast<float>(buffersize));
+    tempBuffer.release();
 }

@@ -18,4 +18,22 @@ void dft(
     uint32_t doInverse
 );
 
+void dft_adjoint_forward(
+    WebGPUContext& context,
+    wgpu::Buffer& outputBuffer,
+    wgpu::Buffer& inputBuffer,
+    size_t buffersize,
+    int rows,
+    int cols
+);
+
+void dft_adjoint_inverse(
+    WebGPUContext& context,
+    wgpu::Buffer& outputBuffer,
+    wgpu::Buffer& inputBuffer,
+    size_t buffersize,
+    int rows,
+    int cols
+);
+
 #endif 
