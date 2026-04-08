@@ -14,7 +14,7 @@ NA = 0.65
 N0 = 1.33
 
 MAX_ITERATIONS = 100
-LEARNING_RATE = 5e-3
+LEARNING_RATE = 5e-1
 ABS_TOL = 1e-10
 REL_TOL = 1e-6
 PRINT_EVERY = 1
@@ -33,7 +33,7 @@ def load_tensor_bin(filename: str) -> np.ndarray:
         data = np.frombuffer(f.read(), dtype=np.float32)
         return data.reshape((depth, height, width))
 
-
+# 15 illumination angles for light intensity stack from sphere target
 def build_angles() -> np.ndarray:
     angles = [[0.0, 0.0]]
     angle_count = 15
@@ -43,7 +43,7 @@ def build_angles() -> np.ndarray:
         angles.append([radius * np.cos(theta), radius * np.sin(theta)])
     return np.asarray(angles, dtype=np.float32)
 
-
+# sphere target
 def create_target_volume(shape):
     volume = np.zeros(shape, dtype=np.float32)
     depth, height, width = shape
@@ -56,7 +56,7 @@ def create_target_volume(shape):
     volume[mask] = 0.02
     return volume
 
-
+# start with zeros for guess
 def create_initial_volume(shape):
     return np.zeros(shape, dtype=np.float32)
 
@@ -122,31 +122,40 @@ def save_reconstruction_input(filename: str, measured: np.ndarray, initial: np.n
 
 
 if __name__ == "__main__":
-    ANGLES = build_angles()
-    target = create_target_volume(SHAPE)
-    initial = create_initial_volume(SHAPE)
+    input_path = Path("reconstruct_input.bin")
+    output_path = Path("reconstruct_output.bin")
 
-    measured = forward_stack(target, ANGLES)
-    initial_prediction = forward_stack(initial, ANGLES)
+    try:
+        ANGLES = build_angles()
+        target = create_target_volume(SHAPE)
+        initial = create_initial_volume(SHAPE)
 
-    save_reconstruction_input("reconstruct_input.bin", measured, initial, ANGLES)
+        measured = forward_stack(target, ANGLES)
+        initial_prediction = forward_stack(initial, ANGLES)
 
-    result = subprocess.run(
-        ["./build/optics_sim", "ssnp_reconstruct", "reconstruct_input.bin", "reconstruct_output.bin"],
-        check=False,
-        text=True,
-    )
-    if result.returncode != 0:
-        raise RuntimeError("C++ reconstruction failed.")
+        save_reconstruction_input(str(input_path), measured, initial, ANGLES)
 
-    reconstructed = load_tensor_bin("reconstruct_output.bin")
-    reconstructed_prediction = forward_stack(reconstructed, ANGLES)
+        result = subprocess.run(
+            ["./build/optics_sim", "ssnp_reconstruct", str(input_path), str(output_path)],
+            check=False,
+            text=True,
+        )
+        if result.returncode != 0:
+            raise RuntimeError("C++ reconstruction failed.")
 
-    simulation_dir = Path("tests/reconstruction_simulations")
-    save_angle_sweep(simulation_dir / "original", "original", target)
-    save_angle_sweep(simulation_dir / "reconstructed", "reconstructed", reconstructed)
+        reconstructed = load_tensor_bin(str(output_path))
+        reconstructed_prediction = forward_stack(reconstructed, ANGLES)
 
-    print(
-        "Reconstruction measurement MSE:",
-        f"{measurement_mse(initial_prediction, measured):.10e} -> {measurement_mse(reconstructed_prediction, measured):.10e}",
-    )
+        simulation_dir = Path("tests/reconstruction_simulations")
+        save_angle_sweep(simulation_dir / "original", "original", target)
+        save_angle_sweep(simulation_dir / "reconstructed", "reconstructed", reconstructed)
+
+        print(
+            "Reconstruction measurement MSE:",
+            f"{measurement_mse(initial_prediction, measured):.10e} -> {measurement_mse(reconstructed_prediction, measured):.10e}",
+        )
+    finally:
+        if input_path.exists():
+            input_path.unlink()
+        if output_path.exists():
+            output_path.unlink()
