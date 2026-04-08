@@ -22,6 +22,24 @@ struct ReconstructionInput {
     bool verbose;
 };
 
+bool read_tensor(ifstream& in, vector<vector<vector<float>>>& tensor, int D, int H, int W) {
+    size_t total = static_cast<size_t>(D) * H * W;
+    vector<float> buffer(total);
+    in.read(reinterpret_cast<char*>(buffer.data()), total * sizeof(float));
+    if (!in) {
+        return false;
+    }
+
+    tensor.resize(D, vector<vector<float>>(H, vector<float>(W)));
+    size_t idx = 0;
+    for (int d = 0; d < D; ++d)
+        for (int i = 0; i < H; ++i)
+            for (int j = 0; j < W; ++j)
+                tensor[d][i][j] = buffer[idx++];
+
+    return true;
+}
+
 bool read_input_tensor(const string& filename, vector<vector<vector<float>>>& tensor, int& D, int& H, int& W) {
     ifstream in(filename, ios::binary);
     if (!in) {
@@ -33,21 +51,12 @@ bool read_input_tensor(const string& filename, vector<vector<vector<float>>>& te
     in.read(reinterpret_cast<char*>(&D), sizeof(int));
     in.read(reinterpret_cast<char*>(&H), sizeof(int));
     in.read(reinterpret_cast<char*>(&W), sizeof(int));
+    if (!in) {
+        cerr << "Failed to read tensor header from: " << filename << endl;
+        return false;
+    }
 
-    size_t total = static_cast<size_t>(D) * H * W;
-    vector<float> buffer(total);
-    in.read(reinterpret_cast<char*>(buffer.data()), total * sizeof(float));
-    in.close();
-
-    // Convert to 3D tensor
-    tensor.resize(D, vector<vector<float>>(H, vector<float>(W)));
-    size_t idx = 0;
-    for (int d = 0; d < D; ++d)
-        for (int i = 0; i < H; ++i)
-            for (int j = 0; j < W; ++j)
-                tensor[d][i][j] = buffer[idx++];
-
-    return true;
+    return read_tensor(in, tensor, D, H, W);
 }
 
 bool write_output_tensor(const string& filename, const vector<vector<vector<float>>>& tensor) {
@@ -70,24 +79,6 @@ bool write_output_tensor(const string& filename, const vector<vector<vector<floa
             out.write(reinterpret_cast<const char*>(tensor[d][i].data()), W * sizeof(float));
 
     out.close();
-    return true;
-}
-
-bool read_tensor_from_stream(ifstream& in, vector<vector<vector<float>>>& tensor, int D, int H, int W) {
-    size_t total = static_cast<size_t>(D) * H * W;
-    vector<float> buffer(total);
-    in.read(reinterpret_cast<char*>(buffer.data()), total * sizeof(float));
-    if (!in) {
-        return false;
-    }
-
-    tensor.assign(D, vector<vector<float>>(H, vector<float>(W)));
-    size_t idx = 0;
-    for (int d = 0; d < D; ++d)
-        for (int i = 0; i < H; ++i)
-            for (int j = 0; j < W; ++j)
-                tensor[d][i][j] = buffer[idx++];
-
     return true;
 }
 
@@ -130,12 +121,12 @@ bool read_reconstruction_input(const string& filename, ReconstructionInput& inpu
         input.angles[a][1] = angle_buffer[static_cast<size_t>(a) * 2 + 1];
     }
 
-    if (!read_tensor_from_stream(in, input.measured, A, H, W)) {
+    if (!read_tensor(in, input.measured, A, H, W)) {
         cerr << "Failed to read measured stack." << endl;
         return false;
     }
 
-    if (!read_tensor_from_stream(in, input.initial_volume, D, H, W)) {
+    if (!read_tensor(in, input.initial_volume, D, H, W)) {
         cerr << "Failed to read initial volume." << endl;
         return false;
     }
