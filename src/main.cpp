@@ -1,138 +1,13 @@
-#include <iostream>
-#include <fstream>
-#include <vector>
-#include <string>
 #include "model_dispatcher.h"
 #include "ssnp/inverse.h"
+#include "utils/testing_io.h"
+
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <vector>
 
 using namespace std;
-
-struct ReconstructionInput {
-    vector<vector<vector<float>>> measured;
-    vector<vector<float>> angles;
-    vector<vector<vector<float>>> initial_volume;
-    vector<float> res;
-    float na;
-    float n0;
-    int max_iterations;
-    float learning_rate;
-    float abs_tol;
-    float rel_tol;
-    int print_every;
-    bool verbose;
-};
-
-bool read_tensor(ifstream& in, vector<vector<vector<float>>>& tensor, int D, int H, int W) {
-    size_t total = static_cast<size_t>(D) * H * W;
-    vector<float> buffer(total);
-    in.read(reinterpret_cast<char*>(buffer.data()), total * sizeof(float));
-    if (!in) {
-        return false;
-    }
-
-    tensor.resize(D, vector<vector<float>>(H, vector<float>(W)));
-    size_t idx = 0;
-    for (int d = 0; d < D; ++d)
-        for (int i = 0; i < H; ++i)
-            for (int j = 0; j < W; ++j)
-                tensor[d][i][j] = buffer[idx++];
-
-    return true;
-}
-
-bool read_input_tensor(const string& filename, vector<vector<vector<float>>>& tensor, int& D, int& H, int& W) {
-    ifstream in(filename, ios::binary);
-    if (!in) {
-        cerr << "Failed to open input file: " << filename << endl;
-        return false;
-    }
-
-    // Read dimensions (3 x int32)
-    in.read(reinterpret_cast<char*>(&D), sizeof(int));
-    in.read(reinterpret_cast<char*>(&H), sizeof(int));
-    in.read(reinterpret_cast<char*>(&W), sizeof(int));
-    if (!in) {
-        cerr << "Failed to read tensor header from: " << filename << endl;
-        return false;
-    }
-
-    return read_tensor(in, tensor, D, H, W);
-}
-
-bool write_output_tensor(const string& filename, const vector<vector<vector<float>>>& tensor) {
-    ofstream out(filename, ios::binary);
-    if (!out) {
-        cerr << "Failed to open output file: " << filename << endl;
-        return false;
-    }
-
-    int D = tensor.size();
-    int H = tensor[0].size();
-    int W = tensor[0][0].size();
-
-    out.write(reinterpret_cast<char*>(&D), sizeof(int));
-    out.write(reinterpret_cast<char*>(&H), sizeof(int));
-    out.write(reinterpret_cast<char*>(&W), sizeof(int));
-
-    for (int d = 0; d < D; ++d)
-        for (int i = 0; i < H; ++i)
-            out.write(reinterpret_cast<const char*>(tensor[d][i].data()), W * sizeof(float));
-
-    out.close();
-    return true;
-}
-
-bool read_reconstruction_input(const string& filename, ReconstructionInput& input) {
-    ifstream in(filename, ios::binary);
-    if (!in) {
-        cerr << "Failed to open reconstruction input file: " << filename << endl;
-        return false;
-    }
-
-    int D, H, W, A;
-    in.read(reinterpret_cast<char*>(&D), sizeof(int));
-    in.read(reinterpret_cast<char*>(&H), sizeof(int));
-    in.read(reinterpret_cast<char*>(&W), sizeof(int));
-    in.read(reinterpret_cast<char*>(&A), sizeof(int));
-
-    input.res.resize(3);
-    in.read(reinterpret_cast<char*>(input.res.data()), sizeof(float) * 3);
-    in.read(reinterpret_cast<char*>(&input.na), sizeof(float));
-    in.read(reinterpret_cast<char*>(&input.n0), sizeof(float));
-    in.read(reinterpret_cast<char*>(&input.max_iterations), sizeof(int));
-    in.read(reinterpret_cast<char*>(&input.learning_rate), sizeof(float));
-    in.read(reinterpret_cast<char*>(&input.abs_tol), sizeof(float));
-    in.read(reinterpret_cast<char*>(&input.rel_tol), sizeof(float));
-    in.read(reinterpret_cast<char*>(&input.print_every), sizeof(int));
-    uint32_t verbose_flag = 0;
-    in.read(reinterpret_cast<char*>(&verbose_flag), sizeof(uint32_t));
-    input.verbose = verbose_flag != 0;
-
-    vector<float> angle_buffer(static_cast<size_t>(A) * 2);
-    in.read(reinterpret_cast<char*>(angle_buffer.data()), sizeof(float) * angle_buffer.size());
-    if (!in) {
-        cerr << "Failed to read reconstruction metadata." << endl;
-        return false;
-    }
-
-    input.angles.assign(A, vector<float>(2, 0.0f));
-    for (int a = 0; a < A; ++a) {
-        input.angles[a][0] = angle_buffer[static_cast<size_t>(a) * 2];
-        input.angles[a][1] = angle_buffer[static_cast<size_t>(a) * 2 + 1];
-    }
-
-    if (!read_tensor(in, input.measured, A, H, W)) {
-        cerr << "Failed to read measured stack." << endl;
-        return false;
-    }
-
-    if (!read_tensor(in, input.initial_volume, D, H, W)) {
-        cerr << "Failed to read initial volume." << endl;
-        return false;
-    }
-
-    return true;
-}
 
 // Main for testing script
 int main(int argc, char* argv[]) {
@@ -151,8 +26,8 @@ int main(int argc, char* argv[]) {
     initWebGPU(context);
 
     if (model_type == "ssnp_reconstruct") {
-        ReconstructionInput input;
-        if (!read_reconstruction_input(input_filename, input)) return 1;
+        testing_io::ReconstructionInput input;
+        if (!testing_io::read_reconstruction_input(input_filename, input)) return 1;
 
         ssnp::ReconstructionOptions options;
         options.max_iterations = input.max_iterations;
@@ -173,14 +48,14 @@ int main(int argc, char* argv[]) {
             options
         );
 
-        if (!write_output_tensor(output_filename, result.volume)) return 1;
+        if (!testing_io::write_output_tensor(output_filename, result.volume)) return 1;
         return 0;
     }
 
     vector<vector<vector<float>>> input_tensor;
     int D, H, W;
 
-    if (!read_input_tensor(input_filename, input_tensor, D, H, W)) return 1;
+    if (!testing_io::read_input_tensor(input_filename, input_tensor, D, H, W)) return 1;
 
     // DISPATCHING THE REQUESTED MODEL
     vector<float> res = {0.1f, 0.1f, 0.1f};
@@ -191,7 +66,7 @@ int main(int argc, char* argv[]) {
 
     auto result = dispatch_model(model_type, context, input_tensor, res, na, angles, n0, outputType);
 
-    if (!write_output_tensor(output_filename, result)) return 1;
+    if (!testing_io::write_output_tensor(output_filename, result)) return 1;
 
     return 0;
 }
