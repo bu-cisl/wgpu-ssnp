@@ -61,14 +61,16 @@ bool all_finite(const Volume& volume) {
     return true;
 }
 
-void add_blob(
+void add_sphere(
     Volume& volume,
     float z_center,
     float y_center,
     float x_center,
     float radius,
-    float amplitude
+    float value_inside
 ) {
+    float radius_sq = radius * radius;
+
     for (size_t z = 0; z < volume.size(); ++z) {
         for (size_t y = 0; y < volume[z].size(); ++y) {
             for (size_t x = 0; x < volume[z][y].size(); ++x) {
@@ -76,7 +78,10 @@ void add_blob(
                 float dy = static_cast<float>(y) - y_center;
                 float dx = static_cast<float>(x) - x_center;
                 float r2 = dx * dx + dy * dy + dz * dz;
-                volume[z][y][x] += amplitude * std::exp(-0.5f * r2 / (radius * radius));
+
+                if (r2 <= radius_sq) {
+                    volume[z][y][x] = value_inside;
+                }
             }
         }
     }
@@ -85,12 +90,18 @@ void add_blob(
 Volume make_target_volume(int depth, int height, int width) {
     Volume volume(
         depth,
-        std::vector<std::vector<float>>(height, std::vector<float>(width, 0.002f))
+        std::vector<std::vector<float>>(height, std::vector<float>(width, 0.0f))
     );
 
-    add_blob(volume, 0.25f * depth, 0.30f * height, 0.30f * width, 0.28f * depth, 0.025f);
-    add_blob(volume, 0.60f * depth, 0.65f * height, 0.60f * width, 0.32f * depth, 0.020f);
-    add_blob(volume, 0.45f * depth, 0.50f * height, 0.40f * width, 0.45f * depth, 0.008f);
+    float radius = 0.20f * std::min({depth, height, width});
+    add_sphere(
+        volume,
+        0.5f * depth,
+        0.5f * height,
+        0.5f * width,
+        radius,
+        0.02f
+    );
 
     return volume;
 }
@@ -137,7 +148,7 @@ int main() {
 
         ssnp::ReconstructionOptions options;
         options.max_iterations = 100;
-        options.learning_rate = 5e-1f;
+        options.learning_rate = 0.5;
         options.abs_tol = 1e-10f;
         options.rel_tol = 1e-6f;
         options.print_every = 1;
