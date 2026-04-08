@@ -19,6 +19,8 @@ list(REMOVE_ITEM SRC_FILES ${CMAKE_SOURCE_DIR}/src/main.cpp)
 add_library(optics_core ${SRC_FILES})
 add_executable(optics_sim src/main.cpp)
 
+target_include_directories(optics_core PUBLIC ${CMAKE_SOURCE_DIR}/src)
+
 foreach(target optics_core optics_sim)
     set_target_properties(${target} PROPERTIES COMPILE_WARNING_AS_ERROR ON)
 endforeach()
@@ -38,6 +40,23 @@ target_link_libraries(optics_core PUBLIC webgpu)
 target_link_libraries(optics_sim PRIVATE optics_core)
 
 target_copy_webgpu_binaries(optics_sim)
+
+enable_testing()
+
+add_executable(ssnp_reconstruction_test tests/ssnp_reconstruction_test.cpp)
+target_link_libraries(ssnp_reconstruction_test PRIVATE optics_core)
+target_copy_webgpu_binaries(ssnp_reconstruction_test)
+
+if (MSVC)
+    target_compile_options(ssnp_reconstruction_test PRIVATE /W4)
+    set_target_properties(ssnp_reconstruction_test PROPERTIES COMPILE_WARNING_AS_ERROR ON)
+else()
+    target_compile_options(ssnp_reconstruction_test PRIVATE -Wall -Wextra -pedantic)
+    set_target_properties(ssnp_reconstruction_test PROPERTIES COMPILE_WARNING_AS_ERROR ON)
+endif()
+
+add_test(NAME ssnp_reconstruction_test COMMAND ssnp_reconstruction_test)
+set_tests_properties(ssnp_reconstruction_test PROPERTIES WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 
 add_custom_target(copy_web ALL
     COMMAND ${CMAKE_COMMAND} -E copy_directory
