@@ -1,5 +1,6 @@
 import struct
 import subprocess
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -13,11 +14,17 @@ NA = 0.65
 N0 = 1.33
 
 MAX_ITERATIONS = 100
-LEARNING_RATE = 5e-1
+LEARNING_RATE = 5e-3
 ABS_TOL = 1e-10
 REL_TOL = 1e-6
 PRINT_EVERY = 1
 VERBOSE = True
+PLOT_ANGLES = np.array([
+    [0.0, 0.0],
+    [0.12, 0.0],
+    [0.0, 0.12],
+    [-0.12, 0.08],
+], dtype=np.float32)
 
 
 def load_tensor_bin(filename: str) -> np.ndarray:
@@ -75,13 +82,24 @@ def measurement_mse(a: np.ndarray, b: np.ndarray) -> float:
     return float(np.mean(diff * diff))
 
 
-def save_projection_png(filename: str, volume: np.ndarray):
-    projection = forward_stack(volume, np.array([[0.0, 0.0]], dtype=np.float32))[0]
+def angle_label(angle: np.ndarray) -> str:
+    return f"{angle[0]:+.2f}_{angle[1]:+.2f}".replace("+", "p").replace("-", "m")
+
+
+def save_projection_png(filename: Path, volume: np.ndarray, angle: np.ndarray):
+    projection = forward_stack(volume, np.asarray([angle], dtype=np.float32))[0]
     plt.imshow(projection, cmap="magma")
     plt.colorbar()
     plt.tight_layout()
     plt.savefig(filename)
     plt.close()
+
+
+def save_angle_sweep(output_dir: Path, prefix: str, volume: np.ndarray):
+    output_dir.mkdir(parents=True, exist_ok=True)
+    for angle in PLOT_ANGLES:
+        filename = output_dir / f"{prefix}_{angle_label(angle)}.png"
+        save_projection_png(filename, volume, angle)
 
 
 def save_reconstruction_input(filename: str, measured: np.ndarray, initial: np.ndarray, angles: np.ndarray):
@@ -124,8 +142,9 @@ if __name__ == "__main__":
     reconstructed = load_tensor_bin("reconstruct_output.bin")
     reconstructed_prediction = forward_stack(reconstructed, ANGLES)
 
-    save_projection_png("original.png", target)
-    save_projection_png("reconstruction.png", reconstructed)
+    simulation_dir = Path("tests/reconstruction_simulations")
+    save_angle_sweep(simulation_dir / "original", "original", target)
+    save_angle_sweep(simulation_dir / "reconstructed", "reconstructed", reconstructed)
 
     print(
         "Reconstruction measurement MSE:",
