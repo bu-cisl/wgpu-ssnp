@@ -146,7 +146,7 @@ if __name__ == "__main__":
         reconstructed = load_tensor_bin(str(output_path))
         reconstructed_prediction = forward_stack(reconstructed, ANGLES)
 
-        simulation_dir = Path("tests/reconstruction_simulations")
+        simulation_dir = Path("images/ssnp_reconstruction_out")
         save_angle_sweep(simulation_dir / "original", "original", target)
         save_angle_sweep(simulation_dir / "reconstructed", "reconstructed", reconstructed)
 
