@@ -9,11 +9,13 @@
 namespace ssnp {
 namespace {
 
-constexpr int kConvergencePatience = 3;
+constexpr int kConvergencePatience = 5;
 
 struct AngleGradientResult {
     float loss = 0.0f;
 };
+
+wgpu::Buffer make_real_buffer(WebGPUContext& context, size_t buffer_len);
 
 // COMPUTING THE PER-ANGLE MSE LOSS
 float mean_squared_loss(
@@ -29,6 +31,81 @@ float mean_squared_loss(
         loss += residual * residual;
     }
     return 0.5f * loss / static_cast<float>(predicted.size());
+}
+
+// COMPUTING THE FORWARD LOSS FOR ONE ANGLE
+float compute_angle_loss(
+    WebGPUContext& context,
+    const std::vector<std::vector<std::vector<float>>>& volume,
+    const std::vector<std::vector<float>>& measured,
+    const std::vector<float>& angle,
+    const std::vector<int>& shape,
+    const std::vector<float>& res,
+    float na,
+    float n0,
+    size_t buffer_len
+) {
+    SSNPState exit_state = propagate_to_object_exit(
+        context,
+        initialize_angle_state(context, angle, shape, res),
+        volume,
+        shape,
+        res,
+        n0
+    );
+
+    wgpu::Buffer field_buffer = project_state_to_sensor_field(
+        context,
+        exit_state,
+        shape,
+        res,
+        na,
+        -static_cast<float>(volume.size()) / 2.0f
+    );
+
+    wgpu::Buffer predicted_intensity_buffer = make_real_buffer(context, buffer_len);
+    intense(context, predicted_intensity_buffer, field_buffer, buffer_len, true);
+    std::vector<float> predicted_intensity = readBack(
+        context.device,
+        context.queue,
+        buffer_len,
+        predicted_intensity_buffer
+    );
+
+    predicted_intensity_buffer.release();
+    field_buffer.release();
+    release_state(exit_state);
+
+    return mean_squared_loss(predicted_intensity, measured);
+}
+
+// COMPUTING THE AVERAGE MEASUREMENT LOSS FOR THE CURRENT VOLUME
+float compute_measurement_loss(
+    WebGPUContext& context,
+    const std::vector<std::vector<std::vector<float>>>& volume,
+    const std::vector<std::vector<std::vector<float>>>& measured,
+    const std::vector<std::vector<float>>& angles,
+    const std::vector<int>& shape,
+    const std::vector<float>& res,
+    float na,
+    float n0,
+    size_t buffer_len
+) {
+    float total_loss = 0.0f;
+    for (size_t angle_idx = 0; angle_idx < angles.size(); ++angle_idx) {
+        total_loss += compute_angle_loss(
+            context,
+            volume,
+            measured[angle_idx],
+            angles[angle_idx],
+            shape,
+            res,
+            na,
+            n0,
+            buffer_len
+        );
+    }
+    return total_loss / static_cast<float>(angles.size());
 }
 
 // CONVERTING THE STORED LOSS TO MEASUREMENT MSE
@@ -359,6 +436,9 @@ ReconstructionResult reconstruct(
     if (measured.size() != angles.size()) {
         throw std::runtime_error("Measured intensity stack and angle list must have the same length.");
     }
+    if (angles.empty()) {
+        throw std::runtime_error("Angle list must be non-empty.");
+    }
     if (measured.empty() || initial_volume.empty()) {
         throw std::runtime_error("Measured data and initial volume must be non-empty.");
     }
@@ -373,6 +453,27 @@ ReconstructionResult reconstruct(
     }
 
     std::vector<int> shape = {int(initial_volume[0].size()), int(initial_volume[0][0].size())};
+    for (const auto& slice : initial_volume) {
+        if (slice.size() != static_cast<size_t>(shape[0])) {
+            throw std::runtime_error("Initial volume slices must have consistent height.");
+        }
+        for (const auto& row : slice) {
+            if (row.size() != static_cast<size_t>(shape[1])) {
+                throw std::runtime_error("Initial volume slices must have consistent width.");
+            }
+        }
+    }
+    for (const auto& image : measured) {
+        if (image.size() != static_cast<size_t>(shape[0])) {
+            throw std::runtime_error("Measured images must match the volume height.");
+        }
+        for (const auto& row : image) {
+            if (row.size() != static_cast<size_t>(shape[1])) {
+                throw std::runtime_error("Measured images must match the volume width.");
+            }
+        }
+    }
+
     size_t buffer_len = static_cast<size_t>(shape[0]) * static_cast<size_t>(shape[1]);
     float inv_pixels = 1.0f / static_cast<float>(buffer_len);
     float angle_scale = 1.0f / static_cast<float>(angles.size());
@@ -410,25 +511,41 @@ ReconstructionResult reconstruct(
 
         // RECORDING THE CURRENT MEASUREMENT LOSS
         float current_loss = total_loss * angle_scale;
-        result.loss_history.push_back(current_loss);
-        result.final_loss = current_loss;
-        result.best_loss = std::min(result.best_loss, current_loss);
 
         // APPLYING THE VOLUME UPDATE
         float max_voxel_update = apply_gradient_step(result.volume, grad_volume, current_learning_rate, angle_scale);
 
+        float updated_loss = current_loss;
+        if (max_voxel_update != 0.0f) {
+            updated_loss = compute_measurement_loss(
+                context,
+                result.volume,
+                measured,
+                angles,
+                shape,
+                res,
+                na,
+                n0,
+                buffer_len
+            );
+        }
+
+        result.loss_history.push_back(updated_loss);
+        result.final_loss = updated_loss;
+        result.best_loss = std::min(result.best_loss, updated_loss);
+
         // PRINTING CONCISE PER-EPOCH MEASUREMENT PROGRESS
         if (options.verbose && options.print_every > 0 && (iter % options.print_every == 0)) {
             std::cout << "iter " << iter
-                      << " measurement_mse " << measurement_mse_from_loss(current_loss)
+                      << " measurement_mse " << measurement_mse_from_loss(updated_loss)
                       << std::endl;
         }
 
         // TRACKING SIMPLE CONVERGENCE AND LEARNING-RATE BACKOFF
         if (std::isfinite(previous_loss)) {
-            float absolute_improvement = previous_loss - current_loss;
+            float absolute_improvement = previous_loss - updated_loss;
             float relative_improvement = absolute_improvement / std::max(std::abs(previous_loss), 1e-12f);
-            if (current_loss > previous_loss) {
+            if (updated_loss > previous_loss) {
                 current_learning_rate *= 0.5f;
             }
             if (max_voxel_update == 0.0f ||
@@ -437,10 +554,10 @@ ReconstructionResult reconstruct(
                 ++stalled_iterations;
             } else {
                 stalled_iterations = 0;
-            }
+                }
         }
 
-        previous_loss = current_loss;
+        previous_loss = updated_loss;
         result.iterations_run = static_cast<int>(result.loss_history.size());
         result.final_learning_rate = current_learning_rate;
 
