@@ -13,24 +13,32 @@ file(GLOB_RECURSE SRC_FILES
     ${CMAKE_SOURCE_DIR}/src/*.cpp
 )
 
-add_executable(optics_sim ${SRC_FILES})
+# SHARED CORE LIBRARY FOR THE APP AND TESTS
+list(REMOVE_ITEM SRC_FILES ${CMAKE_SOURCE_DIR}/src/main.cpp)
 
-set_target_properties(optics_sim PROPERTIES
-    COMPILE_WARNING_AS_ERROR ON
-)
+add_library(optics_core ${SRC_FILES})
+add_executable(optics_sim src/main.cpp)
+
+foreach(target optics_core optics_sim)
+    set_target_properties(${target} PROPERTIES COMPILE_WARNING_AS_ERROR ON)
+endforeach()
 
 if (MSVC)
+    target_compile_options(optics_core PRIVATE /W4)
     target_compile_options(optics_sim PRIVATE /W4)
 else()
+    target_compile_options(optics_core PRIVATE -Wall -Wextra -pedantic)
     target_compile_options(optics_sim PRIVATE -Wall -Wextra -pedantic)
 endif()
 
-# Link WebGPU
 add_subdirectory(webgpu)
-target_link_libraries(optics_sim PRIVATE webgpu)
+
+# LINKING WEBGPU AND SHARED CORE TARGETS
+target_link_libraries(optics_core PUBLIC webgpu)
+target_link_libraries(optics_sim PRIVATE optics_core)
+
 target_copy_webgpu_binaries(optics_sim)
 
-# Copy web assets
 add_custom_target(copy_web ALL
     COMMAND ${CMAKE_COMMAND} -E copy_directory
             ${CMAKE_SOURCE_DIR}/web
