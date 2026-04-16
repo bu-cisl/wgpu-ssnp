@@ -4,6 +4,7 @@
 #include "common/webgpu_utils.h"
 #include "ssnp/forward.h"
 #include "bpm/forward.h"
+#include "born/forward.h"
 #include <vector>
 #include <string>
 #include <map>
