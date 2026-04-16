@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import pyvista as pv
 from python.ssnp_model import SSNPBeam
 from python.bpm_model import BPMBeam
+from python.born_model import BornBeam
 import pytest
 
 SLICES = 32
@@ -60,6 +61,8 @@ def run_python_model(input_tensor, model_name: str):
         model = SSNPBeam(angles=1)
     elif model_name == "bpm":
         model = BPMBeam(angles=1)
+    elif model_name == "born":
+        model = BornBeam(angles=1)
     else:
         raise ValueError(f"Unknown model_name: {model_name}")
     with torch.no_grad():
@@ -154,6 +157,9 @@ def test_ssnp():
 
 def test_bpm():
     run_model_test("bpm")
+
+def test_born():
+    run_model_test("born")
 
 if __name__ == "__main__":
     run_model_test(MODEL)
