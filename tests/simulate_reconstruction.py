@@ -8,7 +8,7 @@ import torch
 
 from python.ssnp_model import SSNPBeam
 
-SHAPE = (64, 100, 100)
+SHAPE = (50, 50, 50)
 RES = (0.2, 0.2, 0.2)
 NA = 0.65
 N0 = 1.33
@@ -43,11 +43,11 @@ def build_angles() -> np.ndarray:
         angles.append([radius * np.cos(theta), radius * np.sin(theta)])
     return np.asarray(angles, dtype=np.float32)
 
-# sphere target
+# small bead target
 def create_target_volume(shape):
     volume = np.zeros(shape, dtype=np.float32)
     depth, height, width = shape
-    radius = 0.20 * min(depth, height, width)
+    radius = 2.5
     z, y, x = np.indices(shape, dtype=np.float32)
     dz = z - 0.5 * depth
     dy = y - 0.5 * height
