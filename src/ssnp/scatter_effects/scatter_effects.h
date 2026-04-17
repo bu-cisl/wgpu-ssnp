@@ -6,7 +6,7 @@
 #include <vector>
 #include <webgpu/webgpu.hpp>
 #include "../../common/webgpu_utils.h"
-#include "../../common/dft/dft.h"
+#include "../../common/fft/fft.h"
 #include "../../common/complex_mult/complex_mult.h"
 #include "../../common/complex_sub/complex_sub.h"
 

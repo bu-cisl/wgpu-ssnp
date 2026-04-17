@@ -19,7 +19,7 @@ void scatter_effects(
 
     // perform fft(scatter*u)
     wgpu::Buffer fftBuffer = createBuffer(context.device, nullptr, sizeof(float) * buffer_len * 2, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
-    dft(context, fftBuffer, fftInputBuffer, buffer_len, shape[0], shape[1], 0);
+    fft(context, fftBuffer, fftInputBuffer, buffer_len, shape[0], shape[1], 0);
     fftInputBuffer.release();
 
     // perform ud - fft(scatter*u)

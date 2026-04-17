@@ -81,7 +81,7 @@ std::vector<std::vector<std::vector<float>>> forward(
                 sizeof(float) * buffer_len * 2,
                 WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc)
             );
-            dft(
+            fft(
                 context,
                 potentialFourierBuffer,
                 potentialSpatialBuffer,
@@ -138,7 +138,7 @@ std::vector<std::vector<std::vector<float>>> forward(
             sizeof(float) * buffer_len * 2,
             WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc)
         );
-        dft(context, complexSlice, filteredFieldBuffer, buffer_len, shape[0], shape[1], 1);
+        fft(context, complexSlice, filteredFieldBuffer, buffer_len, shape[0], shape[1], 1);
         filteredFieldBuffer.release();
 
         if (outputType == 2) {

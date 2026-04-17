@@ -2,7 +2,7 @@
 #define BPM_FORWARD_H
 
 #include "../common/webgpu_utils.h"
-#include "../common/dft/dft.h"
+#include "../common/fft/fft.h"
 #include "../common/tilt/tilt.h"
 #include "bpm_diffract/bpm_diffract.h"
 #include "scatter/scatter.h"

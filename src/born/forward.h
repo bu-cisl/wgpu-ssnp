@@ -3,7 +3,7 @@
 
 #include "../common/binary_pupil/binary_pupil.h"
 #include "../common/complex_add/complex_add.h"
-#include "../common/dft/dft.h"
+#include "../common/fft/fft.h"
 #include "../common/intensity/intensity.h"
 #include "../common/mult/mult.h"
 #include "../common/webgpu_utils.h"

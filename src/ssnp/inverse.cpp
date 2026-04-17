@@ -196,14 +196,14 @@ void backpropagate_through_volume(
     for (int z = static_cast<int>(volume.size()) - 1; z >= 0; --z) {
         // CONVERTING THE CURRENT OBJECT-EXIT FIELD BACK TO SPATIAL DOMAIN
         wgpu::Buffer u_buffer = make_complex_buffer(context, buffer_len);
-        dft(context, u_buffer, exit_state.U, buffer_len, shape[0], shape[1], 1);
+        fft(context, u_buffer, exit_state.U, buffer_len, shape[0], shape[1], 1);
 
         // FORMING THE SCATTER ADJOINT FROM -UD_GRAD
         wgpu::Buffer neg_UD_grad = make_complex_buffer(context, buffer_len);
         complex_scale(context, neg_UD_grad, UD_grad, buffer_len, -1.0f);
 
         wgpu::Buffer scatter_adjoint_spatial = make_complex_buffer(context, buffer_len);
-        dft_adjoint_forward(
+        fft_adjoint_forward(
             context,
             scatter_adjoint_spatial,
             neg_UD_grad,
@@ -221,7 +221,7 @@ void backpropagate_through_volume(
         wgpu::Buffer U_grad_update_spatial = make_complex_buffer(context, buffer_len);
         complex_mult(context, U_grad_update_spatial, q_buffer, scatter_adjoint_spatial, buffer_len);
         wgpu::Buffer U_grad_update = make_complex_buffer(context, buffer_len);
-        dft(context, U_grad_update, U_grad_update_spatial, buffer_len, shape[0], shape[1], 0);
+        fft(context, U_grad_update, U_grad_update_spatial, buffer_len, shape[0], shape[1], 0);
 
         wgpu::Buffer next_U_grad = make_complex_buffer(context, buffer_len);
         complex_add(context, next_U_grad, U_grad, U_grad_update, buffer_len);
@@ -241,7 +241,7 @@ void backpropagate_through_volume(
         wgpu::Buffer q_times_u = make_complex_buffer(context, buffer_len);
         complex_mult(context, q_times_u, q_buffer, u_buffer, buffer_len);
         wgpu::Buffer undo_scatter_freq = make_complex_buffer(context, buffer_len);
-        dft(context, undo_scatter_freq, q_times_u, buffer_len, shape[0], shape[1], 0);
+        fft(context, undo_scatter_freq, q_times_u, buffer_len, shape[0], shape[1], 0);
 
         wgpu::Buffer restored_UD = make_complex_buffer(context, buffer_len);
         complex_add(context, restored_UD, exit_state.UD, undo_scatter_freq, buffer_len);
@@ -359,7 +359,7 @@ AngleGradientResult compute_angle_gradient(
 
     // MAPPING THE SENSOR GRADIENT BACK TO THE EXIT STATE
     wgpu::Buffer split_forward_grad = make_complex_buffer(context, buffer_len);
-    dft_adjoint_inverse(context, split_forward_grad, field_grad, buffer_len, shape[0], shape[1]);
+    fft_adjoint_inverse(context, split_forward_grad, field_grad, buffer_len, shape[0], shape[1]);
     field_grad.release();
 
     wgpu::Buffer pupil_buffer = createBuffer(

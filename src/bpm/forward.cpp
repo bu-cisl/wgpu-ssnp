@@ -22,7 +22,7 @@ namespace bpm {
             wgpu::Buffer fieldBufferF = createBuffer(context.device, nullptr, sizeof(float) * buffer_len * 2, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
             tilt(context, fieldBufferF, c_ba, shape, res);
             wgpu::Buffer fieldBuffer = createBuffer(context.device, nullptr, sizeof(float) * buffer_len * 2, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
-            dft(context, fieldBuffer, fieldBufferF, buffer_len, shape[0], shape[1], 0);
+            fft(context, fieldBuffer, fieldBufferF, buffer_len, shape[0], shape[1], 0);
             fieldBufferF.release();
             
             // Propagate the wave through RI distribution
@@ -64,7 +64,7 @@ namespace bpm {
             
             // Get real space of field
             wgpu::Buffer complexSlice = createBuffer(context.device, nullptr, sizeof(float) * buffer_len * 2, WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc));
-            dft(context, complexSlice, finalForwardBuffer, buffer_len, shape[0], shape[1], 1); // idft
+            fft(context, complexSlice, finalForwardBuffer, buffer_len, shape[0], shape[1], 1); // idft
             finalForwardBuffer.release();
             
             // Complex output

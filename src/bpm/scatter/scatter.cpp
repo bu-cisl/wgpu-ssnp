@@ -125,15 +125,20 @@ void scatter(
 
     // ifft(field)
     wgpu::Buffer ifftBuffer = createBuffer(device, nullptr, sizeof(float) * buffer_len * 2, wgpu::BufferUsage::Storage);
-    dft(context, ifftBuffer, inputBuffer, buffer_len, shape[0], shape[1], 1); // idft
+    fft(context, ifftBuffer, inputBuffer, buffer_len, shape[0], shape[1], 1); // idft
     
     // result = ifft(field) * scatter
-    wgpu::Buffer multBuffer = createBuffer(device, nullptr, sizeof(float) * buffer_len * 2, wgpu::BufferUsage::Storage);
+    wgpu::Buffer multBuffer = createBuffer(
+        device,
+        nullptr,
+        sizeof(float) * buffer_len * 2,
+        WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc)
+    );
     complex_mult(context, multBuffer, ifftBuffer, scatterBuffer, buffer_len);
     scatterBuffer.release();
     ifftBuffer.release();
 
     // return fft(result)
-    dft(context, outputBuffer, multBuffer, buffer_len, shape[0], shape[1], 0);
+    fft(context, outputBuffer, multBuffer, buffer_len, shape[0], shape[1], 0);
     multBuffer.release();
 }

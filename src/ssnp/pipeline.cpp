@@ -58,7 +58,7 @@ SSNPState initialize_angle_state(
         sizeof(float) * buffer_len * 2,
         WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc)
     );
-    dft(context, forwardBuffer, tiltResultBuffer, buffer_len, shape[0], shape[1], 0);
+    fft(context, forwardBuffer, tiltResultBuffer, buffer_len, shape[0], shape[1], 0);
     tiltResultBuffer.release();
 
     std::vector<float> backward(buffer_len * 2, 0.0f);
@@ -105,7 +105,7 @@ SSNPState propagate_to_object_exit(
             sizeof(float) * buffer_len * 2,
             WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc)
         );
-        dft(context, uBuffer, diffracted.U, buffer_len, shape[0], shape[1], 1);
+        fft(context, uBuffer, diffracted.U, buffer_len, shape[0], shape[1], 1);
 
         wgpu::Buffer sliceBuffer = create_complex_slice_buffer(context, slice);
         wgpu::Buffer scatterBuffer = createBuffer(
@@ -194,7 +194,7 @@ wgpu::Buffer project_state_to_sensor_field(
         sizeof(float) * buffer_len * 2,
         WGPUBufferUsage(wgpu::BufferUsage::Storage | wgpu::BufferUsage::CopySrc)
     );
-    dft(context, fieldBuffer, filteredForward, buffer_len, shape[0], shape[1], 1);
+    fft(context, fieldBuffer, filteredForward, buffer_len, shape[0], shape[1], 1);
     filteredForward.release();
 
     return fieldBuffer;

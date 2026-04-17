@@ -7,7 +7,7 @@
 #include "../common/tilt/tilt.h"
 #include "merge_prop/merge_prop.h"
 #include "split_prop/split_prop.h"
-#include "../common/dft/dft.h"
+#include "../common/fft/fft.h"
 #include "../common/mult/mult.h"
 #include "scatter_effects/scatter_effects.h"
 #include "../common/intensity/intensity.h"
