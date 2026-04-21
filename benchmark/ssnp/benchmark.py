@@ -1,4 +1,6 @@
 import subprocess
+from pathlib import Path
+
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -8,16 +10,48 @@ from pycuda import driver as cuda
 import ssnp
 from ssnp import BeamArray
 
+ROOT = Path(__file__).resolve().parents[2]
+BENCHMARK_DIR = ROOT / "benchmark" / "ssnp"
+BUILD_DIR = BENCHMARK_DIR / "build"
+BENCHMARK_EXE = BUILD_DIR / "benchmark"
+RESULTS_PNG = BENCHMARK_DIR / "benchmark_results.png"
+
+
+def ensure_webgpu_benchmark_built():
+    """Configure and build the standalone WebGPU benchmark if needed."""
+    subprocess.run(
+        ["cmake", "-S", str(BENCHMARK_DIR), "-B", str(BUILD_DIR)],
+        cwd=ROOT,
+        check=True,
+    )
+    subprocess.run(
+        ["cmake", "--build", str(BUILD_DIR), "-j"],
+        cwd=ROOT,
+        check=True,
+    )
+
+
 def run_webgpu(D, H, W):
     """Run the WebGPU benchmark subprocess."""
-    result = subprocess.run(["./benchmark/build/benchmark", str(D), str(H), str(W)],
-                            capture_output=True, text=True)
+    if not BENCHMARK_EXE.exists():
+        ensure_webgpu_benchmark_built()
+
+    result = subprocess.run(
+        [str(BENCHMARK_EXE), str(D), str(H), str(W)],
+        capture_output=True,
+        text=True,
+        cwd=ROOT,
+    )
     
     if result.returncode != 0:
         print("WebGPU Benchmark Error:", result.stderr)
         raise RuntimeError("WebGPU benchmark execution failed.")
     
-    return int(result.stdout.strip())  # milliseconds
+    stdout_lines = [line.strip() for line in result.stdout.splitlines() if line.strip()]
+    if not stdout_lines:
+        raise RuntimeError("WebGPU benchmark produced no timing output.")
+
+    return float(stdout_lines[-1])  # milliseconds
 
 def run_pycuda(D, H, W):
     """Run the PyCUDA forward pass timing."""
@@ -115,7 +149,7 @@ if __name__ == "__main__":
     ax2.legend()
     
     plt.tight_layout()
-    plt.savefig('benchmark/ssnp/benchmark_results.png', dpi=300, bbox_inches='tight')
+    plt.savefig(RESULTS_PNG, dpi=300, bbox_inches='tight')
     plt.show()
     
-    print("\nBenchmark complete. Results saved to benchmark_results.png")
+    print(f"\nBenchmark complete. Results saved to {RESULTS_PNG}")

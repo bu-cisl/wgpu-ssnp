@@ -1,36 +1,51 @@
-#define WEBGPU_CPP_IMPLEMENTATION
 #include "../../src/ssnp/forward.h"
-#include <iostream>
-#include <vector>
 #include <chrono>
 #include <cstdlib>
-
-using namespace std;
+#include <iostream>
+#include <stdexcept>
+#include <vector>
 
 int main(int argc, char* argv[]) {
     if (argc != 4) {
-        cerr << "Usage: " << argv[0] << " <D> <H> <W>" << endl;
+        std::cerr << "Usage: " << argv[0] << " <D> <H> <W>" << std::endl;
         return 1;
     }
-    
-    int D = atoi(argv[1]), H = atoi(argv[2]), W = atoi(argv[3]);
-    vector<vector<vector<float>>> input_tensor(D, vector<vector<float>>(H, vector<float>(W, 0.0f)));
+
+    const int D = std::atoi(argv[1]);
+    const int H = std::atoi(argv[2]);
+    const int W = std::atoi(argv[3]);
+    if (D <= 0 || H <= 0 || W <= 0) {
+        std::cerr << "All dimensions must be positive." << std::endl;
+        return 1;
+    }
+
+    std::vector<std::vector<std::vector<float>>> input_tensor(
+        static_cast<size_t>(D),
+        std::vector<std::vector<float>>(
+            static_cast<size_t>(H),
+            std::vector<float>(static_cast<size_t>(W), 0.0f)
+        )
+    );
 
     WebGPUContext context;
     initWebGPU(context);
 
-    vector<float> res = {0.1f, 0.1f, 0.1f};
-    float na = 0.65f;
-    bool intensity = true;
-    float n0 = 1.33f;
-    vector<vector<float>> angles(1, vector<float>(2, 0.0f));
+    const std::vector<float> res = {0.1f, 0.1f, 0.1f};
+    constexpr float na = 0.65f;
+    constexpr float n0 = 1.33f;
+    constexpr int output_type = 1;
+    const std::vector<std::vector<float>> angles(1, std::vector<float>(2, 0.0f));
 
-    auto start = chrono::high_resolution_clock::now();
-    auto result = forward(context, input_tensor, res, na, angles, n0, intensity);
-    auto end = chrono::high_resolution_clock::now();
-    
-    auto duration = chrono::duration_cast<chrono::milliseconds>(end - start);
-    cout << duration.count() << endl;
+    const auto start = std::chrono::high_resolution_clock::now();
+    const auto result = ssnp::forward(context, input_tensor, res, na, angles, n0, output_type);
+    const auto end = std::chrono::high_resolution_clock::now();
+
+    if (result.empty()) {
+        throw std::runtime_error("SSNP benchmark returned no output.");
+    }
+
+    const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+    std::cout << duration.count() << std::endl;
 
     return 0;
 }

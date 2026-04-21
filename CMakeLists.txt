@@ -10,11 +10,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 file(GLOB_RECURSE SRC_FILES
-    ${CMAKE_SOURCE_DIR}/src/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
 )
 
 # SHARED CORE LIBRARY FOR THE APP AND TESTS
-list(REMOVE_ITEM SRC_FILES ${CMAKE_SOURCE_DIR}/src/main.cpp)
+list(REMOVE_ITEM SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp)
 
 add_library(optics_core ${SRC_FILES})
 add_executable(optics_sim src/main.cpp)
@@ -41,7 +41,7 @@ target_copy_webgpu_binaries(optics_sim)
 
 add_custom_target(copy_web ALL
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-            ${CMAKE_SOURCE_DIR}/web
+            ${CMAKE_CURRENT_SOURCE_DIR}/web
             ${CMAKE_BINARY_DIR}
     COMMENT "Copying web assets to build directory"
 )
