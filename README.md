@@ -4,7 +4,7 @@ A WebGPU-based reimplementation of **High-Fidelity Intensity Diffraction Tomogra
 
 This project ports the SSNP-IDT algorithm to the browser using **WebGPU** via C++ and **Emscripten**, making it device-agnostic and fully browser-compatible.
 
-**Live demo**: [https://bu-cisl.github.io/wgpu-ssnp/](https://bu-cisl.github.io/wgpu-ssnp/)
+**Live demo**: [https://bu-cisl.github.io/wgpu-idt/](https://bu-cisl.github.io/wgpu-idt/)
 
 ## Table of Contents
 - [Motivation](#motivation)
@@ -44,7 +44,7 @@ This approach allows for high-fidelity 3D reconstruction of complex, thick sampl
 ## Demo
 
 To test the model in the browser, visit the live demo:  
-[https://bu-cisl.github.io/wgpu-ssnp/](https://bu-cisl.github.io/wgpu-ssnp/)
+[https://bu-cisl.github.io/wgpu-idt/](https://bu-cisl.github.io/wgpu-idt/)
 
 1. Upload a volumetric **.tiff** using the file input panel
 2. Adjust key imaging parameters such as:
@@ -55,7 +55,7 @@ To test the model in the browser, visit the live demo:
 3. Run the model to generate a reconstruction  
 4. Download the output tensor as a numpy file (optional)
 
-A sample input file is provided: [**input.tiff**](https://github.com/bu-cisl/wgpu-ssnp/blob/main/input.tiff)  
+A sample input file is provided: [**input.tiff**](https://github.com/bu-cisl/wgpu-idt/blob/main/input.tiff)  
 This volume is 128×128×50 and contains a quarter-radius sphere with voxel values set to **0.01** inside and **0** outside.
 
 
@@ -83,7 +83,7 @@ The system consists of a WebAssembly-compiled C++ backend and a lightweight brow
 - Uses GPU buffers to pass data between shader stages, minimizing I/O overhead  
 - Dynamically configures workgroup sizes and dispatch strategy based on input volume and hardware  
 - Compiled to WebAssembly (WASM) using Emscripten for browser integration  
-- Includes a standalone WebGPU-based DFT module ([wgpu-dft](https://github.com/rayan-syed/wgpu-dft)), developed for this project and extracted as a reusable component
+- Includes a standalone WebGPU-based FFT module ([wgpu-fft](https://github.com/rayan-syed/wgpu-fft)), developed for this project and extracted as a reusable component
 
 ### Frontend
 
@@ -104,29 +104,33 @@ We determined the WebGPU implementation of the model to be accurate within **1e-
 
 We evaluated the performance of our WebGPU implementation of the model against the original with respect to the spatial size (HxW) changing and the depth (D) changing. 
 
-In the scenario in which only spatial size changes, WebGPU remains consistently slower than PyCUDA.
+In the scenario where only spatial size increases, the WebGPU implementation remains consistently slower than the PyCUDA baseline. However, both implementations exhibit similar scaling trends, indicating that the underlying computational structure is consistent across platforms.
 
-In the scenario in which depth changes, WebGPU becomes much slower than PyCUDA as depth increases. This makes sense since for every extra slice in the volume, more FFT calls are made. Since WebGPU utilizes a naive DFT at the moment instead of an FFT, the slowdown can confidently be attributed to that.
+In the scenario where depth increases, the performance gap becomes more pronounced, with the WebGPU implementation incurring a significantly higher runtime as the number of slices grows. While this increase is expected due to the additional propagation steps required per slice, further investigation reveals that the dominant cost is not the transform operation itself, but rather the accumulation of per-slice computation, memory movement, and kernel dispatch overhead.
 
-Although not plotted, with extremely small inputs, the WebGPU implementation was much faster than PyCUDA. We strongly believe that with an FFT implementation instead of a DFT, the performance will become as good if not better than that of PyCUDA for large inputs as well. This is a change we hope to make in the future.
+To better understand this behavior, we benchmarked DFT and FFT implementations in isolation. As expected, the DFT exhibits significantly worse scaling than the FFT, as seen in [wgpu-fft](https://github.com/rayan-syed/wgpu-fft). However, within the full forward pipeline, substituting the FFT with a DFT did not substantially change overall runtime. This indicates that the forward model is not transform-bound, but instead limited by system-level factors such as memory bandwidth and execution overhead.
+
+While the current WebGPU implementation does not match the performance of the CUDA-based baseline, it achieves comparable scaling behavior and enables execution in environments where CUDA-based solutions are not feasible, such as browser-based deployment.
 
 ## References
 
-- Jiabei Zhu, Hao Wang, and Lei Tian.  
-  *High-Fidelity Intensity Diffraction Tomography with a Non-Paraxial Multiple-Scattering Model*.  
-  Optics Express, Vol. 30, No. 18, pp. 32808–32821 (2022).  
-  [Paper](https://opg.optica.org/oe/fulltext.cfm?uri=oe-30-18-32808&id=495495) | [arXiv](https://arxiv.org/abs/2207.06532)
+Jiabei Zhu, Hao Wang, and Lei Tian.  
+*High-Fidelity Intensity Diffraction Tomography with a Non-Paraxial Multiple-Scattering Model*.  
+Optics Express, Vol. 30, No. 18, pp. 32808–32821 (2022).  
+[Paper](https://opg.optica.org/oe/fulltext.cfm?uri=oe-30-18-32808&id=495495) | [arXiv](https://arxiv.org/abs/2207.06532)
 
-- Original PyCUDA implementation of SSNP-IDT:  
-  [https://github.com/bu-cisl/SSNP-IDT](https://github.com/bu-cisl/SSNP-IDT)
+Original PyCUDA implementation of SSNP-IDT:  
+[https://github.com/bu-cisl/SSNP-IDT](https://github.com/bu-cisl/SSNP-IDT)
 
-- WebGPU-Cpp: C++ abstraction layer for WebGPU  
-  [https://github.com/eliemichel/WebGPU-Cpp](https://github.com/eliemichel/WebGPU-Cpp)
+WebGPU-Cpp: C++ abstraction layer for WebGPU  
+[https://github.com/eliemichel/WebGPU-Cpp](https://github.com/eliemichel/WebGPU-Cpp)
 
 ## Acknowledgments
 
 This work was conducted as part of the Computational Imaging Systems Lab (CISL) at Boston University.
 
-We thank Jiabei Zhu, Hao Wang, and Lei Tian for developing the original SSNP-IDT model and releasing the PyCUDA implementation.  
+We thank Jiabei Zhu, Hao Wang, and Lei Tian for developing the original SSNP-IDT model and releasing the PyCUDA implementation.
+
 Special thanks to [Mitchell Gilmore](https://github.com/mitch-gilmore) and [Jeffrey Alido](https://github.com/jeffreyalido) for their support and feedback throughout the project.  
+
 We also acknowledge [Elie Michel](https://github.com/eliemichel) for the WebGPU-Cpp library, which served as the foundation for the C++ backend
