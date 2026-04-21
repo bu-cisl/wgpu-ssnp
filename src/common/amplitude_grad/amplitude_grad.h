@@ -1,15 +1,16 @@
-#ifndef INTENSITY_GRAD_H
-#define INTENSITY_GRAD_H
+#ifndef AMPLITUDE_GRAD_H
+#define AMPLITUDE_GRAD_H
 
+#include <webgpu/webgpu.hpp>
 #include "../webgpu_utils.h"
 
-void intensity_grad(
+void amplitude_grad(
     WebGPUContext& context,
     wgpu::Buffer& outputBuffer,
     wgpu::Buffer& fieldBuffer,
     wgpu::Buffer& measuredBuffer,
     size_t bufferlen,
-    float scale
+    float inv_pixels
 );
 
 #endif

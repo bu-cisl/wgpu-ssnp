@@ -27,7 +27,9 @@ float mean_squared_loss(
     for (size_t i = 0; i < predicted.size(); ++i) {
         size_t row = i / width;
         size_t col = i % width;
-        float residual = predicted[i] - measured[row][col];
+        float pred_amp = std::sqrt(predicted[i] + 1e-8f);
+        float meas_amp = std::sqrt(measured[row][col] + 1e-8f);
+        float residual = pred_amp - meas_amp;
         loss += residual * residual;
     }
     return 0.5f * loss / static_cast<float>(predicted.size());
@@ -109,7 +111,7 @@ float compute_measurement_loss(
 }
 
 // CONVERTING THE STORED LOSS TO MEASUREMENT MSE
-float measurement_mse_from_loss(float loss) {
+float amplitude_mse_from_loss(float loss) {
     return 2.0f * loss;
 }
 
@@ -353,7 +355,7 @@ AngleGradientResult compute_angle_gradient(
     );
 
     wgpu::Buffer field_grad = make_complex_buffer(context, buffer_len);
-    intensity_grad(context, field_grad, field_buffer, measured_buffer, buffer_len, inv_pixels);
+    amplitude_grad(context, field_grad, field_buffer, measured_buffer, buffer_len, inv_pixels);
     field_buffer.release();
     measured_buffer.release();
 
@@ -537,7 +539,7 @@ ReconstructionResult reconstruct(
         // PRINTING CONCISE PER-EPOCH MEASUREMENT PROGRESS
         if (options.verbose && options.print_every > 0 && (iter % options.print_every == 0)) {
             std::cout << "iter " << iter
-                      << " measurement_mse " << measurement_mse_from_loss(updated_loss)
+                      << " amplitude_mse " << amplitude_mse_from_loss(updated_loss)
                       << std::endl;
         }
 

@@ -10,7 +10,7 @@
 #include "../common/complex_add/complex_add.h"
 #include "../common/complex_mult/complex_mult.h"
 #include "../common/complex_scale/complex_scale.h"
-#include "../common/intensity_grad/intensity_grad.h"
+#include "../common/amplitude_grad/amplitude_grad.h"
 
 namespace ssnp {
 

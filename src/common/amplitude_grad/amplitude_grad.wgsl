@@ -11,7 +11,14 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
     }
 
     let value = field[i];
-    let predicted = value.x * value.x + value.y * value.y;
-    let residual = (predicted - measured[i]) * params;
-    output_grad[i] = vec2<f32>(2.0 * residual * value.x, 2.0 * residual * value.y);
+    let pred_intensity = value.x * value.x + value.y * value.y;
+    let pred_amp = sqrt(pred_intensity + 1e-8);
+    let meas_amp = sqrt(measured[i] + 1e-8);
+    let residual = (pred_amp - meas_amp) * params;
+    let scale = residual / pred_amp;
+
+    output_grad[i] = vec2<f32>(
+        value.x * scale,
+        value.y * scale
+    );
 }
