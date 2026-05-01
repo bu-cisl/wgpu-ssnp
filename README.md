@@ -1,20 +1,11 @@
-# WebGPU SSNP Model
+# WebGPU IDT Framework
 
-A WebGPU-based reimplementation of **High-Fidelity Intensity Diffraction Tomography with a Non-Paraxial Multiple-Scattering Model (SSNP-IDT)**, originally introduced by Jiabei Zhu, Hao Wang, and Lei Tian [[paper]](https://opg.optica.org/oe/fulltext.cfm?uri=oe-30-18-32808&id=495495) and implemented in PyCUDA [[original code]](https://github.com/bu-cisl/SSNP-IDT).
+A WebGPU-based framework for Intensity Diffraction Tomography (IDT), supporting multiple physics-based forward models and experimental 3D reconstruction (e.g., [SSNP-IDT](https://opg.optica.org/oe/fulltext.cfm?uri=oe-30-18-32808&id=495495)).
 
-This project ports the SSNP-IDT algorithm to the browser using **WebGPU** via C++ and **Emscripten**, making it device-agnostic and fully browser-compatible.
+The project implements Born approximation, Beam Propagation Method (BPM), and Split-Step Non-Paraxial (SSNP) forward propagation in C++/WebGPU, with browser deployment through Emscripten/WebAssembly. The goal is to make computational imaging models portable, hardware-agnostic, and accessible without requiring CUDA or server-side execution.
 
-**Live demo**: [https://bu-cisl.github.io/wgpu-idt/](https://bu-cisl.github.io/wgpu-idt/)
-
-## Table of Contents
-- [Motivation](#motivation)
-- [Features](#features)
-- [Physics Background](#physics-background)
-- [Demo](#demo)
-- [Architecture Overview](#architecture-overview)
-- [Evaluation](#evaluation)
-- [References](#references)
-- [Acknowledgments](#acknowledgments)
+**Report**: [WebGPU-IDT Report](WebGPU-IDT-Report.pdf)  
+**Live demo**: [WebGPU-IDT Arena](https://bu-cisl.github.io/wgpu-idt/)
 
 ## Motivation
 
@@ -22,29 +13,25 @@ Recent advances in computational imaging have produced powerful models, but most
 
 SSNP is one such model: a waved-based physics model for diffraction tomography, which is non-paraxial and models multiple scattering. The original implementation is written in PyCUDA and optimized for NVIDIA GPUs, requiring a Python/CUDA environment and compatible hardware.
 
-This project is a new implemention of SSNP in WebGPU and C++, compiled to WebAssembly via Emscripten. It runs entirely in the browser, with no installation or platform constraints, making the model broadly accessible while retaining competitive performance.
+This project explores WebGPU as a portable backend for IDT. We support Born approximation for weak scattering, BPM for paraxial propagation, and SSNP for higher-fidelity multiple scattering. 
+
+The same backend also supports experimental inverse reconstruction (currently implemented for SSNP only), allowing the system to be used for both simulation and reconstruction research.
 
 ## Features
 
 - **Device-Agnostic**: Compatible with various GPU and compute backends, not tied to a specific platform or vendor  
 - **Browser-Native Execution**: Runs entirely in-browser via WebGPU with no installation required  
-- **Interactive Visualization**: Displays reconstructed output in real time within a browser interface  
-- **Downloadable Results**: Provides option to export reconstructed output tensors as numpy files
+- **Interactive Visualization**: Displays simulated outputs in real time within a browser interface
+- **Downloadable Results**: Provides option to export simulated output tensors as numpy files
 - **User-Configurable Inputs**: Adjustable parameters include numerical aperture, resolution, refractive index, and illumination mode  
 - **Volumetric Input**: Accepts **.tiff** volume datasets directly through the web interface  
-
-## Physics Background
-
-Intensity Diffraction Tomography (IDT) is a computational imaging technique that reconstructs the 3D refractive index of a sample by analyzing how light scatters through it under varying illumination angles. Traditional IDT methods often rely on single-scattering (Born) approximations and paraxial assumptions, which limit accuracy in high-resolution or strongly scattering regimes.
-
-SSNP-IDT addresses these limitations by incorporating a **non-paraxial multiple-scattering model**. The forward model is fully physics-based and differentiable, enabling iterative gradient-based inversion from intensity-only measurements. **This implementation omits the gradient computation for prototyping focusing on the forward pass only.**
-
-This approach allows for high-fidelity 3D reconstruction of complex, thick samples using a compact, single-shot data acquisition setup.
 
 ## Demo
 
 To test the model in the browser, visit the live demo:  
 [https://bu-cisl.github.io/wgpu-idt/](https://bu-cisl.github.io/wgpu-idt/)
+
+<sub> Note: The current demo focuses only on forward simulation. Full reconstruction is supported in the internal pipeline and is not exposed in the web interface due to computational cost and the difficulty of supporting an interactive reconstruction workflow in a browser UI. </sub>
 
 1. Upload a volumetric **.tiff** using the file input panel
 2. Adjust key imaging parameters such as:
@@ -52,7 +39,7 @@ To test the model in the browser, visit the live demo:
    - Resolution  
    - Refractive index  
    - Illumination mode  
-3. Run the model to generate a reconstruction  
+3. Run the model to generate a simulated measurement  
 4. Download the output tensor as a numpy file (optional)
 
 A sample input file is provided: [**input.tiff**](https://github.com/bu-cisl/wgpu-idt/blob/main/input.tiff)  
@@ -79,7 +66,7 @@ The system consists of a WebAssembly-compiled C++ backend and a lightweight brow
 ### Backend 
 
 - Initializes the WebGPU context and handles device selection  
-- Compiles and orchestrates modular WebGPU compute shaders representing each stage of the SSNP algorithm  
+- Compiles and orchestrates modular WebGPU compute shaders
 - Uses GPU buffers to pass data between shader stages, minimizing I/O overhead  
 - Dynamically configures workgroup sizes and dispatch strategy based on input volume and hardware  
 - Compiled to WebAssembly (WASM) using Emscripten for browser integration  
@@ -90,46 +77,24 @@ The system consists of a WebAssembly-compiled C++ backend and a lightweight brow
 - Provides a browser interface for uploading **.tiff** volume data  
 - Carefully decodes the volume data into a **.bin** file for the C++ executable to use as input
 - Coordinates execution of the backend pipeline and retrieves output data  
-- Displays reconstructed results interactively using standard browser rendering techniques  
+- Displays simulated results interactively using standard browser rendering techniques  
 - Exposes controls for key imaging parameters such as numerical aperture, resolution, and refractive index  
 
 ## Evaluation
-We benchmarked this WebGPU implementation of the SSNP model against the original model written in PyCUDA with respect to accuracy and performance.
 
-### Accuracy
-We determined the WebGPU implementation of the model to be accurate within **1e-4** relative tolerance for sufficiently large inputs (ex. 2048x2048x256 volume). With an extremely large input (ex. 1024x2048x2048 volume), the accuracy is no longer within this threshold, but still remains within a **1e-3** relative tolerance threshold by a huge margin. We believe this is sufficiently accurate.
+We evaluate the framework in terms of forward model accuracy, performance, and reconstruction quality.
 
-### Performance
-<img src="benchmark/ssnp/benchmark_results.png" alt="Benchmark Results" width="600"/>
+- **Accuracy**: All forward models (Born, BPM, SSNP) match PyTorch reference implementations within approximately \(1e^{-4}\) relative error for large inputs
+- **Performance**: The WebGPU implementation exhibits similar scaling trends to PyCUDA but with higher runtime, primarily due to memory movement and execution overhead
+- **Reconstruction**: The reconstruction pipeline successfully recovers spatial structure from synthetic measurements, though it tends to underestimate refractive index magnitude
 
-We evaluated the performance of our WebGPU implementation of the model against the original with respect to the spatial size (HxW) changing and the depth (D) changing. 
-
-In the scenario where only spatial size increases, the WebGPU implementation remains consistently slower than the PyCUDA baseline. However, both implementations exhibit similar scaling trends, indicating that the underlying computational structure is consistent across platforms.
-
-In the scenario where depth increases, the performance gap becomes more pronounced, with the WebGPU implementation incurring a significantly higher runtime as the number of slices grows. While this increase is expected due to the additional propagation steps required per slice, further investigation reveals that the dominant cost is not the transform operation itself, but rather the accumulation of per-slice computation, memory movement, and kernel dispatch overhead.
-
-To better understand this behavior, we benchmarked DFT and FFT implementations in isolation. As expected, the DFT exhibits significantly worse scaling than the FFT, as seen in [wgpu-fft](https://github.com/rayan-syed/wgpu-fft). However, within the full forward pipeline, substituting the FFT with a DFT did not substantially change overall runtime. This indicates that the forward model is not transform-bound, but instead limited by system-level factors such as memory bandwidth and execution overhead.
-
-While the current WebGPU implementation does not match the performance of the CUDA-based baseline, it achieves comparable scaling behavior and enables execution in environments where CUDA-based solutions are not feasible, such as browser-based deployment.
-
-## References
-
-Jiabei Zhu, Hao Wang, and Lei Tian.  
-*High-Fidelity Intensity Diffraction Tomography with a Non-Paraxial Multiple-Scattering Model*.  
-Optics Express, Vol. 30, No. 18, pp. 32808–32821 (2022).  
-[Paper](https://opg.optica.org/oe/fulltext.cfm?uri=oe-30-18-32808&id=495495) | [arXiv](https://arxiv.org/abs/2207.06532)
-
-Original PyCUDA implementation of SSNP-IDT:  
-[https://github.com/bu-cisl/SSNP-IDT](https://github.com/bu-cisl/SSNP-IDT)
-
-WebGPU-Cpp: C++ abstraction layer for WebGPU  
-[https://github.com/eliemichel/WebGPU-Cpp](https://github.com/eliemichel/WebGPU-Cpp)
+For full experimental details, benchmarks, and analysis, please refer to our [report](WebGPU-IDT-Report.pdf).
 
 ## Acknowledgments
 
 This work was conducted as part of the Computational Imaging Systems Lab (CISL) at Boston University.
 
-We thank Jiabei Zhu, Hao Wang, and Lei Tian for developing the original SSNP-IDT model and releasing the PyCUDA implementation.
+We thank Jiabei Zhu, Hao Wang, and Lei Tian for developing the original SSNP-IDT model and releasing the PyCUDA implementation, which inspired this project.
 
 Special thanks to [Mitchell Gilmore](https://github.com/mitch-gilmore) and [Jeffrey Alido](https://github.com/jeffreyalido) for their support and feedback throughout the project.  
 
